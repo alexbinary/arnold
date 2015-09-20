@@ -26,6 +26,18 @@ body {
 #canvas_wrapper.playing {
   background: black;
 }
+#subtitles {
+  position: absolute;
+  z-index: 25;
+  height: 100px;
+  bottom: 50px;
+  left: 50px;
+  right: 50px;
+  color: white;
+  font-size: 2em;
+  text-shadow: 0 0 5px black;
+  font-family: "Arial";
+}
 
 #log {
   position:absolute;
@@ -89,6 +101,10 @@ input[type="file"] {
 
 input[type="text"] {
   width: 80%;
+}
+
+#inputFileSubtitles {
+  display: inline;
 }
 
 .mainHint {

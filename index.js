@@ -72,6 +72,12 @@ menuView.append(new gui.MenuItem({
     gui.Window.get().showDevTools();
   }
 }));
+menuView.append(new gui.MenuItem({
+  label: 'Reload',
+  click: function () {
+    reload();
+  }
+}));
 var itemView = new gui.MenuItem({
   label: 'View',
   submenu: menuView
@@ -210,6 +216,9 @@ function createPlayer() {
 
     console.log(player);
   }
+  player.onTimeChanged = function(time) {
+    updateSubtitles(time/1000);
+  }
   player.onStopped = function() {
     document.querySelector('#canvas_wrapper').className = '';
     reload();
@@ -218,30 +227,75 @@ function createPlayer() {
 }
 
 // =============================================================================
+// Subtitles
+
+var updateSubtitles = function(){};
+function loadSubtitles(path) {
+  var srt = require('fs').readFileSync(path, 'utf-8');
+  updateSubtitles = require('subplay')(srt, function(text) {
+      document.querySelector('#subtitles').innerHTML = text;
+  });
+}
+document.querySelector('#inputFileSubtitles').addEventListener('change', function(){
+  loadSubtitles(this.value);
+})
+
+// =============================================================================
 // OpenSubtitles
 
 var OS = require('opensubtitles-api');
 var OpenSubtitles = new OS('OSTestUserAgent');
-
+document.querySelector('#buttonLoadSubtitles').addEventListener('click', function(){
+  searchSubtitles();
+})
 function searchSubtitles() {
+  console.log(mediaInfo.name);
   OpenSubtitles.search({
-      // sublanguageid: 'fr',
+      sublanguageid: 'en',
       hash: mediaInfo.os_hash,
+      // imdbid: mediaInfo.imdb_id,
+      // filename: mediaInfo.title,
+      // query: mediaInfo.name,
   }).then(function (subtitles) {
-    for (var i in subtitles) {
-      console.log(i, subtitles[i]);
+    var select = document.querySelector('#selectOpenSubtitles');
+    while (select.firstChild) {
+      select.removeChild(select.firstChild);
     }
-    console.log(subtitles['en'].url);
-    // player.play(subtitles['en'].url);
+    for (var i in subtitles) {
+      var option = document.createElement('option');
+      option.value=subtitles[i].url;
+      option.text=i;
+      select.add(option);
+    }
+    select.addEventListener('change', function () {
+      var url = select.value;
+      var name = new Date().getTime() + '.srt';
+      var Download = require('download');
+      new Download()
+          .get(url)
+          .dest('/tmp')
+          .rename(name)
+          .run(function() {
+            loadSubtitles('/tmp/'+name);
+          });
+    })
   });
 }
 function getOpenSubtitlesHash() {
-  var path = new RegExp('file://').test(mediaInfo.mrl) ? mediaInfo.mrl.substring(7) : mediaInfo.mrl;
+  var path;
+  if (new RegExp('http://').test(mediaInfo.mrl)) {
+    path = mediaInfo.filepath;
+  }
+  else if (new RegExp('file://').test(mediaInfo.mrl)) {
+    path = mediaInfo.mrl.substring(7)
+  } else {
+    path = mediaInfo.mrl;
+  }
+  console.log(path);
   OpenSubtitles.extractInfo(path)
   .then(function (infos) {
       mediaInfo.os_hash = infos.moviehash;
       updateMediaInfo();
-      searchSubtitles();
   });
 }
 
@@ -254,7 +308,8 @@ function getOpenSubtitlesHash() {
 function playTorrentOrMagnet(magnet_link_or_buffer) {
   log('initializing download ...');
   var peerflix = require('peerflix');
-  var engine = peerflix(magnet_link_or_buffer, { port: 0});
+  mediaInfo.filepath = '/tmp/'+(new Date().getTime());
+  var engine = peerflix(magnet_link_or_buffer, { port: 0, path:mediaInfo.filepath});
   engine.server.on('listening', function () {
     log('stream is ready');
     playURL('http://localhost:'+engine.server.address().port);
@@ -507,6 +562,7 @@ function loadResults(keywords) {
           var ep = episodes[select.value];
           var url = (ep.torrents['720p'] || ep.torrents['480p'] || ep.torrents['0']).url;
           mediaInfo.imdb_id = result.imdb_id;
+          mediaInfo.name = result.title + ' ' + ep.season+'x'+ep.episode + ' ' + ep.title;
           playUri(url);
         })
         select.addEventListener('change', function(){
@@ -541,4 +597,6 @@ createPlayer();
 //
 // require('nw.gui').Window.get().showDevTools();
 // playLocalMediaFile('/Users/alexandrebintz/Movies/family_matters_1x22_rock_video.avi');
-// playLocalMediaFile('/Users/alexandrebintz/Desktop/another_earth_2011_1080p_it_eng_es_fr_sub_it_eng_es_fr_de_da_ne_nor_su.mkv');
+// playUri('/Users/alexandrebintz/Movies/another_earth_2011_1080p_it_eng_es_fr_sub_it_eng_es_fr_de_da_ne_nor_su.mkv');
+// var path = '/Users/alexandrebintz/Movies/Another.Earth.2011.BDRip.x264.AC3-Zoo.eng.srt';
+// loadSubtitles(path);

@@ -11,7 +11,7 @@
 
       <div id="controls_main">
 
-        <p class="mainHint">Drop a <b>file</b> to play it</p>
+        <p class="mainHint">Drop a file to play it</p>
 
         <p class="secondHint">You can use any file <b>VLC</b> would play, including <b>audio</b> files and <b>streams</b></p>
         <p class="secondHint">You can also drop a <b>torrent file</b> to start streaming it</p>
@@ -47,6 +47,7 @@
     <div id="canvas_wrapper">
       <canvas id="canvas" width=200 height=300/>
     </div>
+    <div id="subtitles"></div>
 
     <div id="topspacer">
     </div>
@@ -68,6 +69,19 @@
         </label>
       </p>
       <p><label>OpenSubtitles.org hash:</label> <span id="mediaHash"></span></p>
+    </section>
+    <section id="sectionSubtitles">
+      <h2>Subtitles</h2>
+      <p>
+        <label>
+          Choose file
+          <input id="inputFileSubtitles" type="file">
+        </label>
+      </p>
+      <p>
+        <button id="buttonLoadSubtitles">Load from OpenSubtitles</button>
+        <select id="selectOpenSubtitles"></select>
+      </p>
     </section>
     <section id="search">
       <h2>Content from Popcorn Time</h2>

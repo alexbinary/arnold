@@ -6,5 +6,9 @@
     "frame": false,
     "width": 1200,
     "height": 700
+  },
+  "dependencies": {
+    "download": "^4.2.0",
+    "subplay": "^1.1.0"
   }
 }
