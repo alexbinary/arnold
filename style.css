@@ -1,0 +1,154 @@
+::-webkit-scrollbar {
+    display: none;
+}
+html {
+  text-align: center;
+  background: lightgrey;
+  font-family: 'Helvetica Neue';
+}
+
+body {
+  -webkit-app-region: drag;
+}
+
+#canvas_wrapper {
+  display: -webkit-flex;
+  -webkit-justify-content: center;
+  -webkit-align-items: center;
+  position:absolute;
+  z-index: 20;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: none;
+}
+#canvas_wrapper.playing {
+  background: black;
+}
+
+#log {
+  position:absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: white;
+  text-align: left;
+  padding: 50px;
+}
+#log p {
+  margin: 2px;
+}
+
+canvas {
+}
+
+#controls {
+  position: absolute;
+  z-index: 30;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 50px;
+  background: white;
+}
+
+#dropIndicator {
+  visibility: hidden;
+  position: absolute;
+  top: 30%;
+  width: 90%;
+  font-size: 4em;
+}
+
+#dropIndicator p {
+  margin: 0;
+  margin-top: 10px;
+}
+#dropIndicator .dropHint {
+  font-size: 0.3em;
+}
+#dropIndicator #dropHint1 {
+  font-size: 0.2em;
+}
+
+#controls.hover #dropIndicator {
+  visibility: visible;
+}
+
+#controls.hover #controls_main {
+  opacity: 0.05;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+input[type="text"] {
+  width: 80%;
+}
+
+.mainHint {
+  font-size: 2em;
+  margin-bottom: 0;
+}
+
+.secondHint {
+  font-size: 0.8em;
+}
+
+.thirdHint {
+  font-size: 0.9em;
+  margin-top: 30px;
+}
+
+button {
+  border: none;
+  font-family: 'Helvetica Neue';
+  font-size: 1em;
+  box-shadow: 0 0 1px grey;
+}
+
+#closeButton {
+  position: absolute;
+  z-index: 30;
+  top : 5px;
+  right: 5px;
+  width: 40px;
+  height: 40px;
+  border-radius: 25px;
+  font-size: 2em;
+  visibility: hidden;
+}
+
+#closeButton:hover {
+  cursor: pointer;
+  background: white;
+}
+#closeButton:focus {
+  outline: none;
+}
+
+#topspacer {
+  height: 100%;
+}
+
+section {
+  background: white;
+  padding: 20px;
+  box-shadow: 0 0 25px;
+  border-radius: 2px;
+  margin: 25px 0;
+}
+label {
+  font-weight: bold;
+}
+#sectionMediaInfo {
+  text-align: left;
+}
+#search {
+  padding: 20px;
+}
