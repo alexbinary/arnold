@@ -12,3 +12,12 @@ cd nwjs-v0.12.3-osx-x64
 git clone https://github.com/alexbinary/arnold.git nwjs.app/Contents/Resources/app.nw
 open nwjs.app
 ```
+
+# Licence
+
+Everything public domain.
+
+You are free to Buy it, use it, break it, fix it,
+Trash it, change it, mail, upgrade it,
+Charge it, point it, zoom it, press it,
+Snap it, work it, quick, erase it, etc. (https://en.wikipedia.org/wiki/Technologic)
