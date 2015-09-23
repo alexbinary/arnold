@@ -249,11 +249,15 @@ document.querySelector('#buttonLoadSubtitles').addEventListener('click', functio
   searchSubtitles();
 })
 function searchSubtitles() {
-  console.log(mediaInfo.name);
+  console.log(mediaInfo);
   OpenSubtitles.search({
       sublanguageid: 'en',
+      // search by hash
       hash: mediaInfo.os_hash,
-      // imdbid: mediaInfo.imdb_id,
+      // search by imdb_id + season x episode
+      imdbid: mediaInfo.imdb_id,
+      episode: mediaInfo.episode_nb,
+      season: mediaInfo.season_nb,
       // filename: mediaInfo.title,
       // query: mediaInfo.name,
   }).then(function (subtitles) {
@@ -314,6 +318,10 @@ function playTorrentOrMagnet(magnet_link_or_buffer) {
     log('stream is ready');
     playURL('http://localhost:'+engine.server.address().port);
   });
+  console.log(engine.files)
+  for(var i=0 ; i<engine.files.length ; i++) {
+    console.log(engine.files[i].name, engine.files[i].path)
+  }
 }
 
 // @param path - e.g. /User/john/file.torrent
@@ -562,6 +570,8 @@ function loadResults(keywords) {
           var ep = episodes[select.value];
           var url = (ep.torrents['720p'] || ep.torrents['480p'] || ep.torrents['0']).url;
           mediaInfo.imdb_id = result.imdb_id;
+          mediaInfo.episode_nb = ep.episode;
+          mediaInfo.season_nb = ep.season;
           mediaInfo.name = result.title + ' ' + ep.season+'x'+ep.episode + ' ' + ep.title;
           playUri(url);
         })
