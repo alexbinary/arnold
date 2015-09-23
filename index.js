@@ -198,7 +198,7 @@ function updateMediaInfo() {
 
 var player = null;
 function createPlayer() {
-  var wcjs = require("wcjs-renderer");
+  var wcjs = require("./node_modules_hacked/wcjs-renderer");
   player = wcjs.init(canvas);
   player.onPlaying = function() {
     document.querySelector('#canvas_wrapper').className = 'playing';
