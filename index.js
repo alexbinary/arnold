@@ -1,8 +1,50 @@
 
+
+
+
 // =============================================================================
 // global DOM elements
 
 var canvas = document.getElementById("canvas");
+
+// =============================================================================
+// player
+
+var player = null;
+function createPlayer() {
+  player = new Player(canvas);
+  player.vlc.onPlaying = function() {
+    document.querySelector('#canvas_wrapper').className = 'playing';
+    mediaInfo.mrl = player.vlc.playlist.items[player.vlc.playlist.currentItem].mrl;
+    mediaInfo.title=player.vlc.playlist.items[player.vlc.playlist.currentItem].title;
+    mediaInfo.audio=player.vlc.audio;
+    mediaInfo.subtitles=player.vlc.subtitles;
+    updateMediaInfo();
+    getOpenSubtitlesHash();
+    selectAudio.value = player.vlc.audio.track;
+    selectSubtitles.value = player.vlc.subtitles.track;
+
+    // var i = player.vlc.playlist.add('/Users/alexandrebintz/Downloads/Another.Earth.2011.BDRip.x264.AC3-Zoo.eng.srt');
+    // console.log(player.vlc.playlist.playItem(i));
+
+    console.log(player);
+  }
+  player.vlc.onTimeChanged = function(time) {
+    updateSubtitles(time/1000);
+  }
+  player.vlc.onStopped = function() {
+    document.querySelector('#canvas_wrapper').className = '';
+    reload();
+  }
+  return player;
+}
+
+function playUri(uri) {
+  log('opening media');
+  player.playUri(uri);
+  hideControls();
+  showClose();
+}
 
 // =============================================================================
 // Display
@@ -34,127 +76,9 @@ function log(text) {
   document.querySelector('#log').innerHTML += '<p> • '+text+'</p>';
 }
 
-// =============================================================================
-// App Menu
 
-var gui = require('nw.gui');
-var menubar = new gui.Menu({ type: 'menubar' });
-gui.Window.get().menu = menubar;
 
-// standard menus
-
-menubar.createMacBuiltin('Arnold',{
-  hideEdit: false,
-  hideWindow: false
-});
-
-// View Menu
-
-var menuView = new gui.Menu();
-menuView.append(new gui.MenuItem({
-  label: 'Fullscreen',
-  click: function () {
-    gui.Window.get().toggleFullscreen();
-  }
-}));
-menuView.append(new gui.MenuItem({
-  label: 'Kiosk',
-  click: function () {
-    gui.Window.get().toggleKioskMode();
-  }
-}));
-menuView.append(new gui.MenuItem({
-  type: 'separator'
-}));
-menuView.append(new gui.MenuItem({
-  label: 'Open dev tools',
-  click: function () {
-    gui.Window.get().showDevTools();
-  }
-}));
-menuView.append(new gui.MenuItem({
-  label: 'Reload',
-  click: function () {
-    reload();
-  }
-}));
-var itemView = new gui.MenuItem({
-  label: 'View',
-  submenu: menuView
-});
-menubar.append(itemView);
-
-// Play Menu
-
-var menuPlay = new gui.Menu();
-menuPlay.append(new gui.MenuItem({
-  label: 'Play/Pause',
-  click: function () {
-    player.togglePause();
-  }
-}));
-menuPlay.append(new gui.MenuItem({
-  label: 'Stop',
-  click: function () {
-    player.stop();
-  }
-}));
-menuPlay.append(new gui.MenuItem({
-  type: 'separator'
-}));
-menuPlay.append(new gui.MenuItem({
-  label: 'Jump forward 1s',
-  click: function () {
-    player.time = player.time + 1000*1;
-  },
-  key: String.fromCharCode(29), // arrow right
-  modifiers: 'shift'
-}));
-menuPlay.append(new gui.MenuItem({
-  label: 'Jump forward 10s',
-  click: function () {
-    player.time = player.time + 1000*10;
-  },
-  key: String.fromCharCode(29), // arrow right
-  modifiers: 'alt'
-}));
-menuPlay.append(new gui.MenuItem({
-  label: 'Jump forward 1min',
-  click: function () {
-    player.time = player.time + 1000*60;
-  },
-  key: String.fromCharCode(29), // arrow right
-  modifiers: 'cmd'
-}));
-menuPlay.append(new gui.MenuItem({
-  label: 'Jump backward 1s',
-  click: function () {
-    player.time = player.time - 1000*1;
-  },
-  key: String.fromCharCode(28), // arrow left
-  modifiers: 'shift'
-}));
-menuPlay.append(new gui.MenuItem({
-  label: 'Jump backward 10s',
-  click: function () {
-    player.time = player.time - 1000*10;
-  },
-  key: String.fromCharCode(28), // arrow left
-  modifiers: 'alt'
-}));
-menuPlay.append(new gui.MenuItem({
-  label: 'Jump backward 1min',
-  click: function () {
-    player.time = player.time - 1000*60;
-  },
-  key: String.fromCharCode(28), // arrow left
-  modifiers: 'cmd'
-}));
-var itemPlay = new gui.MenuItem({
-  label: 'Play',
-  submenu: menuPlay
-});
-menubar.append(itemPlay);
+Menu.createAppMenuBar();
 
 
 // =============================================================================
@@ -176,7 +100,7 @@ function updateMediaInfo() {
     selectAudio.add(option);
   }
   selectAudio.addEventListener('change', function () {
-    player.audio.track = +selectAudio.value;
+    player.vlc.audio.track = +selectAudio.value;
   })
   var selectSubtitles = document.querySelector('#selectSubtitles');
   while (selectSubtitles.firstChild) {
@@ -189,41 +113,8 @@ function updateMediaInfo() {
     selectSubtitles.add(option);
   }
   selectSubtitles.addEventListener('change', function () {
-    player.subtitles.track = +selectSubtitles.value;
+    player.vlc.subtitles.track = +selectSubtitles.value;
   })
-}
-
-// =============================================================================
-// VLC Player
-
-var player = null;
-function createPlayer() {
-  var wcjs = require("./node_modules_hacked/wcjs-renderer");
-  player = wcjs.init(canvas);
-  player.onPlaying = function() {
-    document.querySelector('#canvas_wrapper').className = 'playing';
-    mediaInfo.mrl = player.playlist.items[player.playlist.currentItem].mrl;
-    mediaInfo.title=player.playlist.items[player.playlist.currentItem].title;
-    mediaInfo.audio=player.audio;
-    mediaInfo.subtitles=player.subtitles;
-    updateMediaInfo();
-    getOpenSubtitlesHash();
-    selectAudio.value = player.audio.track;
-    selectSubtitles.value = player.subtitles.track;
-
-    // var i = player.playlist.add('/Users/alexandrebintz/Downloads/Another.Earth.2011.BDRip.x264.AC3-Zoo.eng.srt');
-    // console.log(player.playlist.playItem(i));
-
-    console.log(player);
-  }
-  player.onTimeChanged = function(time) {
-    updateSubtitles(time/1000);
-  }
-  player.onStopped = function() {
-    document.querySelector('#canvas_wrapper').className = '';
-    reload();
-  }
-  return player;
 }
 
 // =============================================================================
@@ -303,105 +194,7 @@ function getOpenSubtitlesHash() {
   });
 }
 
-// =============================================================================
-// Lower level torrent utilities
 
-// @param torrent - torrent file content as buffer
-//                  or magnet link
-//
-function playTorrentOrMagnet(magnet_link_or_buffer) {
-  log('initializing download ...');
-  var peerflix = require('peerflix');
-  mediaInfo.filepath = '/tmp/'+(new Date().getTime());
-  var engine = peerflix(magnet_link_or_buffer, { port: 0, path:mediaInfo.filepath});
-  engine.server.on('listening', function () {
-    log('stream is ready');
-    playURL('http://localhost:'+engine.server.address().port);
-  });
-  console.log(engine.files)
-  for(var i=0 ; i<engine.files.length ; i++) {
-    console.log(engine.files[i].name, engine.files[i].path)
-  }
-}
-
-// @param path - e.g. /User/john/file.torrent
-//
-function playTorrentFile(path) {
-  log('reading torrent file ...');
-  var readTorrent = require('read-torrent');
-  readTorrent(path, function (err, torrent, raw) {
-    playTorrentOrMagnet(raw);
-  })
-}
-
-// =============================================================================
-// Low level play functions
-
-// @param path - e.g. /User/john/file.mkv
-//
-function playLocalMediaFile(path) {
-  log('playing local media file');
-  player.play('file://'+path);
-}
-
-// @param url - e.g. http://example.com/file.mkv
-//
-function playRemoteMediaFile(url) {
-  log('playing url');
-  player.play(url);
-}
-
-// @param path - e.g. /User/john/file.torrent
-//
-function playLocalTorrentFile(path) {
-  playTorrentFile(path);
-}
-
-// @param url - e.g. magnet:?xt=urn:btih:72F242DB89E763B6CE390F25D576195C2169B149&dn=big+buck+bunny+4k+uhd+hfr+60fps+flac+webdl+2160p+x264+zmachine&tr=udp%3A%2F%2Fopen.demonii.com%3A1337%2Fannounce
-//
-function playMagnet(url) {
-  log('opening magnet');
-  playTorrentOrMagnet(url);
-}
-
-// =============================================================================
-// Higer level play functions
-
-// @param path - e.g. /User/john/file.ext
-//
-function playFilePath(path) {
-  if(/\.torrent$/.test(path)) {
-    playLocalTorrentFile(path);
-  } else {
-    playLocalMediaFile(path);
-  }
-}
-
-// @param path - e.g. http://example.com/file.ext
-//                 or magnet:?xt=urn:btih:72F242DB89E763B6CE390F25D576195C2169B149&dn=big+buck+bunny+4k+uhd+hfr+60fps+flac+webdl+2160p+x264+zmachine&tr=udp%3A%2F%2Fopen.demonii.com%3A1337%2Fannounce
-//
-function playURL(url) {
-  if(/^magnet/.test(url)) {
-    playMagnet(url);
-  } else {
-    playRemoteMediaFile(url);
-  }
-}
-
-// @param uri - e.g. /User/john/file.ext
-//                or http://example.com/file.ext
-//                or magnet:?xt=urn:btih:72F242DB89E763B6CE390F25D576195C2169B149&dn=big+buck+bunny+4k+uhd+hfr+60fps+flac+webdl+2160p+x264+zmachine&tr=udp%3A%2F%2Fopen.demonii.com%3A1337%2Fannounce
-//
-function playUri(uri) {
-  log('opening media');
-  if(/^magnet/.test(uri) || new RegExp('http://').test(uri)) {
-    playURL(uri);
-  } else {
-    playFilePath(uri);
-  }
-  hideControls();
-  showClose();
-}
 
 // =============================================================================
 // Drag & Drop
@@ -481,11 +274,11 @@ function getClipboardContent() {
 
 window.addEventListener('keypress', function(e) {
   if (e.keyCode == 32) {  // space
-    player.togglePause();
+    player.vlc.togglePause();
   }
 })
 canvas.addEventListener('click', function() {
-  player.togglePause();
+  player.vlc.togglePause();
 })
 
 // =============================================================================
