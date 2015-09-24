@@ -13,6 +13,13 @@ git clone https://github.com/alexbinary/arnold.git nwjs.app/Contents/Resources/a
 open nwjs.app
 ```
 
+Then to update with latest code run :
+
+```
+cd nwjs.app/Contents/Resources/app.nw
+git pull
+```
+
 # Licence
 
 Everything public domain.
