@@ -80,7 +80,7 @@ ArnoldGui.prototype.initDragNDrop = function() {
     e.preventDefault();
     var filepath = e.dataTransfer.files[0] && e.dataTransfer.files[0].path;
     if (filepath) {
-      playUri(filepath);
+      arnold.playUri(filepath);
       return false;
     }
     return false;
