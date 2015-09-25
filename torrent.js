@@ -36,8 +36,8 @@ var Torrent = {
 
     arnold.arnoldGui.log('initializing download ...');
     var peerflix = require('peerflix');
-    mediaInfo.filepath = '/tmp/'+(new Date().getTime());
-    var engine = peerflix(magnet_link_or_buffer, { port: 0, path:mediaInfo.filepath});
+    arnold.mediaInfo.filepath = '/tmp/'+(new Date().getTime());
+    var engine = peerflix(magnet_link_or_buffer, { port: 0, path:arnold.mediaInfo.filepath});
     engine.server.on('listening', function () {
       arnold.arnoldGui.log('stream is ready');
       player.playMRL('http://localhost:'+engine.server.address().port);

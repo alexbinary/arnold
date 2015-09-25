@@ -39,11 +39,11 @@ Subtitles.prototype.searchSubtitles = function () {
   this.OpenSubtitles.search({
       sublanguageid: 'en',
       // search by hash
-      hash: mediaInfo.os_hash,
+      hash: arnold.mediaInfo.os_hash,
       // search by imdb_id + season x episode
-      imdbid: mediaInfo.imdb_id,
-      episode: mediaInfo.episode_nb,
-      season: mediaInfo.season_nb,
+      imdbid: arnold.mediaInfo.imdb_id,
+      episode: arnold.mediaInfo.episode_nb,
+      season: arnold.mediaInfo.season_nb,
       // filename: mediaInfo.title,
       // query: mediaInfo.name,
   }).then((function (subtitles) {
@@ -75,17 +75,17 @@ Subtitles.prototype.searchSubtitles = function () {
 Subtitles.prototype.getOpenSubtitlesHash = function () {
 
   var path;
-  if (new RegExp('http://').test(mediaInfo.mrl)) {
-    path = mediaInfo.filepath;
+  if (new RegExp('http://').test(arnold.mediaInfo.mrl)) {
+    path = arnold.mediaInfo.filepath;
   }
-  else if (new RegExp('file://').test(mediaInfo.mrl)) {
-    path = mediaInfo.mrl.substring(7)
+  else if (new RegExp('file://').test(arnold.mediaInfo.mrl)) {
+    path = arnold.mediaInfo.mrl.substring(7)
   } else {
-    path = mediaInfo.mrl;
+    path = arnold.mediaInfo.mrl;
   }
   this.OpenSubtitles.extractInfo(path)
   .then(function (infos) {
-      mediaInfo.os_hash = infos.moviehash;
+      arnold.mediaInfo.os_hash = infos.moviehash;
       arnold.arnoldGui.updateMediaInfo();
   });
 }

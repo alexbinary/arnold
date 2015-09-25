@@ -22,6 +22,8 @@ function Arnold() {
   this.initPlayer();
   this.initHotKeys();
 
+  this.mediaInfo = {};
+
   var popcorn = new Popcorn();
   popcorn.loadResults();
 
@@ -48,10 +50,10 @@ Arnold.prototype.initPlayer = function() {
   this.player = new Player(this.canvas);
   this.player.vlc.onPlaying = (function() {
     document.querySelector('#canvas_wrapper').className = 'playing';
-    mediaInfo.mrl = this.player.vlc.playlist.items[this.player.vlc.playlist.currentItem].mrl;
-    mediaInfo.title=this.player.vlc.playlist.items[this.player.vlc.playlist.currentItem].title;
-    mediaInfo.audio=this.player.vlc.audio;
-    mediaInfo.subtitles=this.player.vlc.subtitles;
+    this.mediaInfo.mrl = this.player.vlc.playlist.items[this.player.vlc.playlist.currentItem].mrl;
+    this.mediaInfo.title=this.player.vlc.playlist.items[this.player.vlc.playlist.currentItem].title;
+    this.mediaInfo.audio=this.player.vlc.audio;
+    this.mediaInfo.subtitles=this.player.vlc.subtitles;
     this.arnoldGui.updateMediaInfo();
     subtitles.getOpenSubtitlesHash();
     selectAudio.value = this.player.vlc.audio.track;

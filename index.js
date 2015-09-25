@@ -1,6 +1,4 @@
 
-var mediaInfo = {};
-
 var subtitles = new Subtitles();
 
 var arnold = new Arnold();

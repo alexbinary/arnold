@@ -89,17 +89,17 @@ ArnoldGui.prototype.initDragNDrop = function() {
 
 ArnoldGui.prototype.updateMediaInfo = function() {
 
-  document.querySelector('#mediaTitle').innerHTML=mediaInfo.title;
-  document.querySelector('#mediaIMDBID').innerHTML=mediaInfo.imdb_id;
-  document.querySelector('#mediaHash').innerHTML=mediaInfo.os_hash;
+  document.querySelector('#mediaTitle').innerHTML=arnold.mediaInfo.title;
+  document.querySelector('#mediaIMDBID').innerHTML=arnold.mediaInfo.imdb_id;
+  document.querySelector('#mediaHash').innerHTML=arnold.mediaInfo.os_hash;
   var selectAudio = document.querySelector('#selectAudio');
   while (selectAudio.firstChild) {
     selectAudio.removeChild(selectAudio.firstChild);
   }
-  for (var i = 0; i < mediaInfo.audio.count; i++) {
+  for (var i = 0; i < arnold.mediaInfo.audio.count; i++) {
     var option = document.createElement('option');
     option.value=i;
-    option.text=mediaInfo.audio[i];
+    option.text=arnold.mediaInfo.audio[i];
     selectAudio.add(option);
   }
   selectAudio.addEventListener('change', function () {
@@ -109,10 +109,10 @@ ArnoldGui.prototype.updateMediaInfo = function() {
   while (selectSubtitles.firstChild) {
     selectSubtitles.removeChild(selectSubtitles.firstChild);
   }
-  for (var i = 0; i < mediaInfo.subtitles.count; i++) {
+  for (var i = 0; i < arnold.mediaInfo.subtitles.count; i++) {
     var option = document.createElement('option');
     option.value=i;
-    option.text=mediaInfo.subtitles[i];
+    option.text=arnold.mediaInfo.subtitles[i];
     selectSubtitles.add(option);
   }
   selectSubtitles.addEventListener('change', function () {
