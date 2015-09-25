@@ -17,17 +17,6 @@ var mediaInfo = {};
 var subtitles = new Subtitles();
 
 // =============================================================================
-// System clipboard
-//
-
-function getClipboardContent() {
-  var gui = require('nw.gui');
-  var clipboard = gui.Clipboard.get();
-  var text = clipboard.get('text');
-  return text;
-}
-
-// =============================================================================
 // Main
 //
 

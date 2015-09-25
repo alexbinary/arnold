@@ -41,7 +41,7 @@ ArnoldGui.prototype.initInputs = function() {
       arnold.playUri(inputUri.value);
     }, false);
     inputUriPaste.addEventListener("click", function(evt) {
-      arnold.playUri(getClipboardContent());
+      arnold.playUri(arnoldGui.getClipboardContent());
     }, false);
   }
   function chooseFile() {
@@ -269,4 +269,9 @@ ArnoldGui.prototype.createAppMenuBar = function() {
 ArnoldGui.prototype.log = function(text) {
 
   document.querySelector('#log').innerHTML += '<p> • '+text+'</p>';
+}
+
+ArnoldGui.prototype.getClipboardContent = function() {
+
+  return require('nw.gui').Clipboard.get().get('text');
 }
