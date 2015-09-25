@@ -24,6 +24,8 @@ function Arnold() {
 
   this.mediaInfo = {};
 
+  this.subtitles = new Subtitles();
+
   var popcorn = new Popcorn();
   popcorn.loadResults();
 
@@ -55,7 +57,7 @@ Arnold.prototype.initPlayer = function() {
     this.mediaInfo.audio=this.player.vlc.audio;
     this.mediaInfo.subtitles=this.player.vlc.subtitles;
     this.arnoldGui.updateMediaInfo();
-    subtitles.getOpenSubtitlesHash();
+    this.subtitles.getOpenSubtitlesHash();
     selectAudio.value = this.player.vlc.audio.track;
     selectSubtitles.value = this.player.vlc.subtitles.track;
 
@@ -63,7 +65,7 @@ Arnold.prototype.initPlayer = function() {
     // console.log(player.vlc.playlist.playItem(i));
   }).bind(this);
   this.player.vlc.onTimeChanged = function(time) {
-    subtitles.updateSubtitles(time/1000);
+    this.subtitles.updateSubtitles(time/1000);
   }
   this.player.vlc.onStopped = (function() {
     document.querySelector('#canvas_wrapper').className = '';
