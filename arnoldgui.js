@@ -206,7 +206,7 @@ ArnoldGui.prototype.createAppMenuBar = function() {
     }),
 
     item('Reload', function () {
-      reload();
+      arnold.reload();
     }),
   ]);
 

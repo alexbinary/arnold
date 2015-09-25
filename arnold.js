@@ -60,10 +60,10 @@ Arnold.prototype.initPlayer = function() {
   this.player.vlc.onTimeChanged = function(time) {
     subtitles.updateSubtitles(time/1000);
   }
-  this.player.vlc.onStopped = function() {
+  this.player.vlc.onStopped = (function() {
     document.querySelector('#canvas_wrapper').className = '';
-    reload();
-  }
+    this.reload();
+  }).bind(this);
 }
 
 Arnold.prototype.playUri = function(uri) {
@@ -72,4 +72,9 @@ Arnold.prototype.playUri = function(uri) {
   this.player.playUri(uri);
   arnoldGui.hideControls();
   arnoldGui.showClose();
+}
+
+Arnold.prototype.reload = function () {
+
+  require('nw.gui').Window.get().reloadDev();
 }

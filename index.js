@@ -8,9 +8,6 @@ var canvas = document.getElementById("canvas");
 
 var arnoldGui = new ArnoldGui();
 
-function reload() {
-  require('nw.gui').Window.get().reloadDev();
-}
 
 var mediaInfo = {};
 
