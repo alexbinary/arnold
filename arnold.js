@@ -37,14 +37,14 @@ function Arnold() {
 
 Arnold.prototype.initHotKeys = function() {
 
-  window.addEventListener('keypress', function(e) {
+  window.addEventListener('keypress', (function(e) {
     if (e.keyCode == 32) {  // space
-      player.vlc.togglePause();
+      this.player.vlc.togglePause();
     }
-  })
-  this.canvas.addEventListener('click', function() {
-    player.vlc.togglePause();
-  })
+  }).bind(this));
+  this.canvas.addEventListener('click', (function() {
+    this.player.vlc.togglePause();
+  }).bind(this));
 }
 
 Arnold.prototype.initPlayer = function() {

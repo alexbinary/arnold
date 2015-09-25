@@ -40,7 +40,7 @@ var Torrent = {
     var engine = peerflix(magnet_link_or_buffer, { port: 0, path:arnold.mediaInfo.filepath});
     engine.server.on('listening', function () {
       arnold.arnoldGui.log('stream is ready');
-      player.playMRL('http://localhost:'+engine.server.address().port);
+      arnold.player.playMRL('http://localhost:'+engine.server.address().port);
     });
     // console.log(engine.files)
     // for(var i=0 ; i<engine.files.length ; i++) {

@@ -103,7 +103,7 @@ ArnoldGui.prototype.updateMediaInfo = function() {
     selectAudio.add(option);
   }
   selectAudio.addEventListener('change', function () {
-    player.vlc.audio.track = +selectAudio.value;
+    arnold.player.vlc.audio.track = +selectAudio.value;
   })
   var selectSubtitles = document.querySelector('#selectSubtitles');
   while (selectSubtitles.firstChild) {
@@ -116,7 +116,7 @@ ArnoldGui.prototype.updateMediaInfo = function() {
     selectSubtitles.add(option);
   }
   selectSubtitles.addEventListener('change', function () {
-    player.vlc.subtitles.track = +selectSubtitles.value;
+    arnold.player.vlc.subtitles.track = +selectSubtitles.value;
   })
 }
 
@@ -213,52 +213,52 @@ ArnoldGui.prototype.createAppMenuBar = function() {
   menu('Play', [
 
     item('Play/Pause', function () {
-      player.vlc.togglePause();
+      arnold.player.vlc.togglePause();
     }),
 
     item('Stop', function () {
-      player.vlc.stop();
+      arnold.player.vlc.stop();
     }),
 
     separator(),
 
     item('Jump forward 1s', function () {
-      player.vlc.time = player.vlc.time + 1000*1;
+      arnold.player.vlc.time = arnold.player.vlc.time + 1000*1;
     },
       String.fromCharCode(29), // arrow right
       'shift'
     ),
 
     item('Jump forward 10s', function () {
-      player.vlc.time = player.vlc.time + 1000*10;
+      arnold.player.vlc.time = arnold.player.vlc.time + 1000*10;
     },
       String.fromCharCode(29), // arrow right
       'alt'
     ),
 
     item('Jump forward 1min', function () {
-      player.vlc.time = player.vlc.time + 1000*60;
+      arnold.player.vlc.time = arnold.player.vlc.time + 1000*60;
     },
       String.fromCharCode(29), // arrow right
       'cmd'
     ),
 
     item('Jump backward 1s', function () {
-      player.vlc.time = player.vlc.time - 1000*1;
+      arnold.player.vlc.time = arnold.player.vlc.time - 1000*1;
     },
       String.fromCharCode(28), // arrow left
       'shift'
     ),
 
     item('Jump backward 10s', function () {
-      player.vlc.time = player.vlc.time - 1000*10;
+      arnold.player.vlc.time = arnold.player.vlc.time - 1000*10;
     },
       String.fromCharCode(28), // arrow left
       'alt'
     ),
 
     item('Jump backward 1min', function () {
-      player.vlc.time = player.vlc.time - 1000*60;
+      arnold.player.vlc.time = arnold.player.vlc.time - 1000*60;
     },
       String.fromCharCode(28), // arrow left
       'cmd'
