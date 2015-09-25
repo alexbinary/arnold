@@ -7,44 +7,7 @@
 
 var canvas = document.getElementById("canvas");
 
-// =============================================================================
-// player
 
-var player = null;
-function createPlayer() {
-  player = new Player(canvas);
-  player.vlc.onPlaying = function() {
-    document.querySelector('#canvas_wrapper').className = 'playing';
-    mediaInfo.mrl = player.vlc.playlist.items[player.vlc.playlist.currentItem].mrl;
-    mediaInfo.title=player.vlc.playlist.items[player.vlc.playlist.currentItem].title;
-    mediaInfo.audio=player.vlc.audio;
-    mediaInfo.subtitles=player.vlc.subtitles;
-    updateMediaInfo();
-    subtitles.getOpenSubtitlesHash();
-    selectAudio.value = player.vlc.audio.track;
-    selectSubtitles.value = player.vlc.subtitles.track;
-
-    // var i = player.vlc.playlist.add('/Users/alexandrebintz/Downloads/Another.Earth.2011.BDRip.x264.AC3-Zoo.eng.srt');
-    // console.log(player.vlc.playlist.playItem(i));
-
-    console.log(player);
-  }
-  player.vlc.onTimeChanged = function(time) {
-    subtitles.updateSubtitles(time/1000);
-  }
-  player.vlc.onStopped = function() {
-    document.querySelector('#canvas_wrapper').className = '';
-    reload();
-  }
-  return player;
-}
-
-function playUri(uri) {
-  log('opening media');
-  player.playUri(uri);
-  hideControls();
-  showClose();
-}
 
 // =============================================================================
 // Display
@@ -167,13 +130,13 @@ var inputUriPaste = document.querySelector('#inputUriPaste');
 
 function initInputs() {
   inputFile.addEventListener("change", function(evt) {
-    playUri(this.value);
+    arnold.playUri(this.value);
   }, false);
   inputUriOpen.addEventListener("click", function(evt) {
-    playUri(inputUri.value);
+    arnold.playUri(inputUri.value);
   }, false);
   inputUriPaste.addEventListener("click", function(evt) {
-    playUri(getClipboardContent());
+    arnold.playUri(getClipboardContent());
   }, false);
 }
 function chooseFile() {
@@ -197,40 +160,11 @@ function getClipboardContent() {
 }
 
 // =============================================================================
-// Keyboard hotkeys and general ui commands
-//
-
-window.addEventListener('keypress', function(e) {
-  if (e.keyCode == 32) {  // space
-    player.vlc.togglePause();
-  }
-})
-canvas.addEventListener('click', function() {
-  player.vlc.togglePause();
-})
-
-// =============================================================================
-// Open file from argv
-//
-
-var argv = require('nw.gui').App.argv;
-if(argv && argv.length > 0) {
-  playUri(argv[0]);
-}
-
-// =============================================================================
-// Popcorn API
-//
-
-var popcorn = new Popcorn();
-popcorn.loadResults();
-
-// =============================================================================
 // Main
 //
 
-onResize();
-createPlayer();
+var arnold = new Arnold();
+var player = arnold.player;
 
 
 
