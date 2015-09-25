@@ -10,7 +10,7 @@
 'use strict';
 
 /**
- * App
+ * Arnold
  */
 function Arnold() {
 
