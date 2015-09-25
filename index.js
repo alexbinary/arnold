@@ -1,6 +1,4 @@
 
-var arnoldGui = new ArnoldGui();
-
 var mediaInfo = {};
 
 var subtitles = new Subtitles();

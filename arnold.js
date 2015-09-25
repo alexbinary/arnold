@@ -16,7 +16,8 @@ function Arnold() {
 
   this.canvas = document.getElementById("canvas");
 
-  arnoldGui.onResize();
+  this.arnoldGui = new ArnoldGui();
+  this.arnoldGui.onResize();
 
   this.initPlayer();
   this.initHotKeys();
@@ -51,7 +52,7 @@ Arnold.prototype.initPlayer = function() {
     mediaInfo.title=this.player.vlc.playlist.items[this.player.vlc.playlist.currentItem].title;
     mediaInfo.audio=this.player.vlc.audio;
     mediaInfo.subtitles=this.player.vlc.subtitles;
-    arnoldGui.updateMediaInfo();
+    this.arnoldGui.updateMediaInfo();
     subtitles.getOpenSubtitlesHash();
     selectAudio.value = this.player.vlc.audio.track;
     selectSubtitles.value = this.player.vlc.subtitles.track;
@@ -70,10 +71,10 @@ Arnold.prototype.initPlayer = function() {
 
 Arnold.prototype.playUri = function(uri) {
 
-  arnoldGui.log('opening media');
+  this.arnoldGui.log('opening media');
   this.player.playUri(uri);
-  arnoldGui.hideControls();
-  arnoldGui.showClose();
+  this.arnoldGui.hideControls();
+  this.arnoldGui.showClose();
 }
 
 Arnold.prototype.reload = function () {

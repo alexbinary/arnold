@@ -40,9 +40,9 @@ ArnoldGui.prototype.initInputs = function() {
     inputUriOpen.addEventListener("click", function(evt) {
       arnold.playUri(inputUri.value);
     }, false);
-    inputUriPaste.addEventListener("click", function(evt) {
-      arnold.playUri(arnoldGui.getClipboardContent());
-    }, false);
+    inputUriPaste.addEventListener("click", (function(evt) {
+      arnold.playUri(this.getClipboardContent());
+    }).bind(this), false);
   }
   function chooseFile() {
     inputFile.click();
