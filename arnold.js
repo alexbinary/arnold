@@ -14,6 +14,8 @@
  */
 function Arnold() {
 
+  this.canvas = document.getElementById("canvas");
+
   arnoldGui.onResize();
 
   this.initPlayer();
@@ -35,14 +37,14 @@ Arnold.prototype.initHotKeys = function() {
       player.vlc.togglePause();
     }
   })
-  canvas.addEventListener('click', function() {
+  this.canvas.addEventListener('click', function() {
     player.vlc.togglePause();
   })
 }
 
 Arnold.prototype.initPlayer = function() {
 
-  this.player = new Player(canvas);
+  this.player = new Player(this.canvas);
   this.player.vlc.onPlaying = (function() {
     document.querySelector('#canvas_wrapper').className = 'playing';
     mediaInfo.mrl = this.player.vlc.playlist.items[this.player.vlc.playlist.currentItem].mrl;

@@ -1,6 +1,4 @@
 
-var canvas = document.getElementById("canvas");
-
 var arnoldGui = new ArnoldGui();
 
 var mediaInfo = {};
