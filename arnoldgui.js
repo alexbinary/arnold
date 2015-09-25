@@ -265,3 +265,8 @@ ArnoldGui.prototype.createAppMenuBar = function() {
     ),
   ]);
 }
+
+ArnoldGui.prototype.log = function(text) {
+
+  document.querySelector('#log').innerHTML += '<p> • '+text+'</p>';
+}

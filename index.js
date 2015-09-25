@@ -11,9 +11,6 @@ var arnoldGui = new ArnoldGui();
 function reload() {
   require('nw.gui').Window.get().reloadDev();
 }
-function log(text) {
-  document.querySelector('#log').innerHTML += '<p> • '+text+'</p>';
-}
 
 var mediaInfo = {};
 

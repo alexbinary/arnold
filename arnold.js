@@ -68,7 +68,7 @@ Arnold.prototype.initPlayer = function() {
 
 Arnold.prototype.playUri = function(uri) {
 
-  log('opening media');
+  arnoldGui.log('opening media');
   this.player.playUri(uri);
   arnoldGui.hideControls();
   arnoldGui.showClose();
