@@ -14,7 +14,7 @@
  */
 function Arnold() {
 
-  onResize();
+  arnoldGui.onResize();
 
   this.initPlayer();
   this.initHotKeys();
@@ -49,7 +49,7 @@ Arnold.prototype.initPlayer = function() {
     mediaInfo.title=this.player.vlc.playlist.items[this.player.vlc.playlist.currentItem].title;
     mediaInfo.audio=this.player.vlc.audio;
     mediaInfo.subtitles=this.player.vlc.subtitles;
-    updateMediaInfo();
+    arnoldGui.updateMediaInfo();
     subtitles.getOpenSubtitlesHash();
     selectAudio.value = this.player.vlc.audio.track;
     selectSubtitles.value = this.player.vlc.subtitles.track;
@@ -70,6 +70,6 @@ Arnold.prototype.playUri = function(uri) {
 
   log('opening media');
   this.player.playUri(uri);
-  hideControls();
-  showClose();
+  arnoldGui.hideControls();
+  arnoldGui.showClose();
 }
