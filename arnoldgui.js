@@ -14,7 +14,7 @@
  */
 function ArnoldGui() {
 
-  Menu.createAppMenuBar();
+  this.createAppMenuBar();
 
   this.initInputs();
   this.initDragNDrop();
@@ -138,4 +138,130 @@ ArnoldGui.prototype.hideControls = function() {
 ArnoldGui.prototype.showClose = function () {
 
   // document.querySelector('#closeButton').style.visibility='visible';
+}
+
+ArnoldGui.prototype.createAppMenuBar = function() {
+
+  var gui = require('nw.gui');
+  var menubar = undefined;
+
+  function initMenuBar() {
+
+    menubar = new gui.Menu({ type: 'menubar' });
+    gui.Window.get().menu = menubar;
+
+    menubar.createMacBuiltin('Arnold',{
+      hideEdit: false,
+      hideWindow: false
+    });
+  }
+
+  function item(label, action, key, modifiers) {
+
+    return new gui.MenuItem({
+      label     : label,
+      click     : action,
+      key       : key,
+      modifiers : modifiers,
+    });
+  }
+
+  function separator() {
+
+    return new gui.MenuItem({ type: 'separator' });
+  }
+
+  function menu(label, items) {
+
+    var menu = new gui.Menu();
+
+    for (var i=0 ; i<items.length ; i++) {
+      menu.append(items[i]);
+    }
+
+    var item = new gui.MenuItem({
+      label   : label,
+      submenu : menu,
+    });
+
+    menubar.append(item);
+  }
+
+  initMenuBar();
+
+  menu('View', [
+
+    item('Fullscreen', function () {
+      gui.Window.get().toggleFullscreen();
+    }),
+
+    item('Kiosk', function () {
+      gui.Window.get().toggleKioskMode();
+    }),
+
+    separator(),
+
+    item('Open dev tools', function () {
+      gui.Window.get().showDevTools();
+    }),
+
+    item('Reload', function () {
+      reload();
+    }),
+  ]);
+
+  menu('Play', [
+
+    item('Play/Pause', function () {
+      player.vlc.togglePause();
+    }),
+
+    item('Stop', function () {
+      player.vlc.stop();
+    }),
+
+    separator(),
+
+    item('Jump forward 1s', function () {
+      player.vlc.time = player.vlc.time + 1000*1;
+    },
+      String.fromCharCode(29), // arrow right
+      'shift'
+    ),
+
+    item('Jump forward 10s', function () {
+      player.vlc.time = player.vlc.time + 1000*10;
+    },
+      String.fromCharCode(29), // arrow right
+      'alt'
+    ),
+
+    item('Jump forward 1min', function () {
+      player.vlc.time = player.vlc.time + 1000*60;
+    },
+      String.fromCharCode(29), // arrow right
+      'cmd'
+    ),
+
+    item('Jump backward 1s', function () {
+      player.vlc.time = player.vlc.time - 1000*1;
+    },
+      String.fromCharCode(28), // arrow left
+      'shift'
+    ),
+
+    item('Jump backward 10s', function () {
+      player.vlc.time = player.vlc.time - 1000*10;
+    },
+      String.fromCharCode(28), // arrow left
+      'alt'
+    ),
+
+    item('Jump backward 1min', function () {
+      player.vlc.time = player.vlc.time - 1000*60;
+    },
+      String.fromCharCode(28), // arrow left
+      'cmd'
+    ),
+  ]);
 }
