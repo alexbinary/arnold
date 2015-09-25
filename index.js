@@ -20,7 +20,7 @@ function createPlayer() {
     mediaInfo.audio=player.vlc.audio;
     mediaInfo.subtitles=player.vlc.subtitles;
     updateMediaInfo();
-    getOpenSubtitlesHash();
+    subtitles.getOpenSubtitlesHash();
     selectAudio.value = player.vlc.audio.track;
     selectSubtitles.value = player.vlc.subtitles.track;
 
@@ -30,7 +30,7 @@ function createPlayer() {
     console.log(player);
   }
   player.vlc.onTimeChanged = function(time) {
-    updateSubtitles(time/1000);
+    subtitles.updateSubtitles(time/1000);
   }
   player.vlc.onStopped = function() {
     document.querySelector('#canvas_wrapper').className = '';
@@ -120,79 +120,7 @@ function updateMediaInfo() {
 // =============================================================================
 // Subtitles
 
-var updateSubtitles = function(){};
-function loadSubtitles(path) {
-  var srt = require('fs').readFileSync(path, 'utf-8');
-  updateSubtitles = require('subplay')(srt, function(text) {
-      document.querySelector('#subtitles').innerHTML = text;
-  });
-}
-document.querySelector('#inputFileSubtitles').addEventListener('change', function(){
-  loadSubtitles(this.value);
-})
-
-// =============================================================================
-// OpenSubtitles
-
-var OS = require('opensubtitles-api');
-var OpenSubtitles = new OS('OSTestUserAgent');
-document.querySelector('#buttonLoadSubtitles').addEventListener('click', function(){
-  searchSubtitles();
-})
-function searchSubtitles() {
-  console.log(mediaInfo);
-  OpenSubtitles.search({
-      sublanguageid: 'en',
-      // search by hash
-      hash: mediaInfo.os_hash,
-      // search by imdb_id + season x episode
-      imdbid: mediaInfo.imdb_id,
-      episode: mediaInfo.episode_nb,
-      season: mediaInfo.season_nb,
-      // filename: mediaInfo.title,
-      // query: mediaInfo.name,
-  }).then(function (subtitles) {
-    var select = document.querySelector('#selectOpenSubtitles');
-    while (select.firstChild) {
-      select.removeChild(select.firstChild);
-    }
-    for (var i in subtitles) {
-      var option = document.createElement('option');
-      option.value=subtitles[i].url;
-      option.text=i;
-      select.add(option);
-    }
-    select.addEventListener('change', function () {
-      var url = select.value;
-      var name = new Date().getTime() + '.srt';
-      var Download = require('download');
-      new Download()
-          .get(url)
-          .dest('/tmp')
-          .rename(name)
-          .run(function() {
-            loadSubtitles('/tmp/'+name);
-          });
-    })
-  });
-}
-function getOpenSubtitlesHash() {
-  var path;
-  if (new RegExp('http://').test(mediaInfo.mrl)) {
-    path = mediaInfo.filepath;
-  }
-  else if (new RegExp('file://').test(mediaInfo.mrl)) {
-    path = mediaInfo.mrl.substring(7)
-  } else {
-    path = mediaInfo.mrl;
-  }
-  console.log(path);
-  OpenSubtitles.extractInfo(path)
-  .then(function (infos) {
-      mediaInfo.os_hash = infos.moviehash;
-      updateMediaInfo();
-  });
-}
+var subtitles = new Subtitles();
 
 
 
