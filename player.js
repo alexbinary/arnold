@@ -59,7 +59,7 @@ Player.prototype.playUri = function(uri) {
  */
 Player.prototype.playMagnet = function(magnet) {
 
-  app.arnoldGui.log('opening magnet');
+  app.gui.log('opening magnet');
   Torrent.playFromTorrentOrMagnet(magnet);
 }
 
@@ -85,12 +85,12 @@ Player.prototype.playFile = function(uri) {
 
   if (this.isHTTP(uri)) {
 
-    app.arnoldGui.log('playing url');
+    app.gui.log('playing url');
     this.playMRL(uri);
 
   } else {
 
-    app.arnoldGui.log('playing local media file');
+    app.gui.log('playing local media file');
     this.playMRL(uri.startsWith('file://') ? uri : 'file://'+uri);
   }
 }

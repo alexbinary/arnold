@@ -19,7 +19,7 @@ var Torrent = {
    */
   playFromFile : function(path) {
 
-    app.arnoldGui.log('reading torrent file ...');
+    app.gui.log('reading torrent file ...');
     var readTorrent = require('read-torrent');
     readTorrent(path, function (err, torrent, raw) {
       Torrent.playFromTorrentOrMagnet(raw);
@@ -34,12 +34,12 @@ var Torrent = {
    */
   playFromTorrentOrMagnet : function(magnet_link_or_buffer) {
 
-    app.arnoldGui.log('initializing download ...');
+    app.gui.log('initializing download ...');
     var peerflix = require('peerflix');
     app.mediaInfo.filepath = '/tmp/'+(new Date().getTime());
     var engine = peerflix(magnet_link_or_buffer, { port: 0, path:app.mediaInfo.filepath});
     engine.server.on('listening', function () {
-      app.arnoldGui.log('stream is ready');
+      app.gui.log('stream is ready');
       app.player.playMRL('http://localhost:'+engine.server.address().port);
     });
     // console.log(engine.files)

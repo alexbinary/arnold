@@ -86,6 +86,6 @@ Subtitles.prototype.getOpenSubtitlesHash = function () {
   this.OpenSubtitles.extractInfo(path)
   .then(function (infos) {
       app.mediaInfo.os_hash = infos.moviehash;
-      app.arnoldGui.updateMediaInfo();
+      app.gui.updateMediaInfo();
   });
 }

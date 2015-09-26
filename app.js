@@ -19,8 +19,8 @@ App.prototype.start = function () {
 
   this.canvas = document.getElementById("canvas");
 
-  this.arnoldGui = new Gui();
-  this.arnoldGui.onResize();
+  this.gui = new Gui();
+  this.gui.onResize();
 
   this.initPlayer();
   this.initHotKeys();
@@ -59,7 +59,7 @@ App.prototype.initPlayer = function() {
     this.mediaInfo.title=this.player.vlc.playlist.items[this.player.vlc.playlist.currentItem].title;
     this.mediaInfo.audio=this.player.vlc.audio;
     this.mediaInfo.subtitles=this.player.vlc.subtitles;
-    this.arnoldGui.updateMediaInfo();
+    this.gui.updateMediaInfo();
     this.subtitles.getOpenSubtitlesHash();
     selectAudio.value = this.player.vlc.audio.track;
     selectSubtitles.value = this.player.vlc.subtitles.track;
@@ -78,10 +78,10 @@ App.prototype.initPlayer = function() {
 
 App.prototype.playUri = function(uri) {
 
-  this.arnoldGui.log('opening media');
+  this.gui.log('opening media');
   this.player.playUri(uri);
-  this.arnoldGui.hideControls();
-  this.arnoldGui.showClose();
+  this.gui.hideControls();
+  this.gui.showClose();
 }
 
 App.prototype.reload = function () {
