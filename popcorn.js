@@ -90,7 +90,7 @@ Popcorn.prototype.loadResults = function (keywords) {
           app.mediaInfo.episode_nb = ep.episode;
           app.mediaInfo.season_nb = ep.season;
           app.mediaInfo.name = result.title + ' ' + ep.season+'x'+ep.episode + ' ' + ep.title;
-          playUri(url);
+          app.playUri(url);
         })
         select.addEventListener('change', function(){
           tdSyn.innerHTML = episodes[select.value].overview;
