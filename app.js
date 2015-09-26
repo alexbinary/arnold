@@ -19,7 +19,7 @@ App.prototype.start = function () {
 
   this.canvas = document.getElementById("canvas");
 
-  this.arnoldGui = new ArnoldGui();
+  this.arnoldGui = new Gui();
   this.arnoldGui.onResize();
 
   this.initPlayer();
