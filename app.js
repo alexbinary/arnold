@@ -27,56 +27,9 @@ function App() {
   this.initHotKeys();
 }
 
-/**
- * App - start application
- */
-App.prototype.start = function () {
-
-  this.openFromArgv();
-
-  popcorn.loadResults();
-}
-
-App.prototype.openFromArgv = function () {
-
-  var argv = require('nw.gui').App.argv;
-  if(argv && argv.length > 0) {
-    this.playUri(argv[0]);
-  }
-}
-
-App.prototype.initPopcorn = function () {
-
-  this.popcorn = new Popcorn();
-}
-
 App.prototype.initMediaInfo = function () {
 
   this.mediaInfo = new MediaInfo();
-}
-
-App.prototype.initGui = function () {
-
-  this.gui = new Gui();
-  this.gui.onResize();
-}
-
-App.prototype.initSubtitles = function () {
-
-  this.subtitles = new Subtitles();
-}
-
-App.prototype.initHotKeys = function() {
-
-  window.addEventListener('keypress', (function(e) {
-    if (e.keyCode == 32) {  // space
-      this.player.vlc.togglePause();
-    }
-  }).bind(this));
-
-  document.querySelector('#canvas').addEventListener('click', (function() {
-    this.player.vlc.togglePause();
-  }).bind(this));
 }
 
 App.prototype.initPlayer = function() {
@@ -103,6 +56,53 @@ App.prototype.initPlayer = function() {
     document.querySelector('#canvas_wrapper').className = '';
     this.reload();
   }).bind(this);
+}
+
+App.prototype.initSubtitles = function () {
+
+  this.subtitles = new Subtitles();
+}
+
+App.prototype.initPopcorn = function () {
+
+  this.popcorn = new Popcorn();
+}
+
+App.prototype.initGui = function () {
+
+  this.gui = new Gui();
+  this.gui.onResize();
+}
+
+App.prototype.initHotKeys = function() {
+
+  window.addEventListener('keypress', (function(e) {
+    if (e.keyCode == 32) {  // space
+      this.player.vlc.togglePause();
+    }
+  }).bind(this));
+
+  document.querySelector('#canvas').addEventListener('click', (function() {
+    this.player.vlc.togglePause();
+  }).bind(this));
+}
+
+/**
+ * App - start application
+ */
+App.prototype.start = function () {
+
+  this.openFromArgv();
+
+  popcorn.loadResults();
+}
+
+App.prototype.openFromArgv = function () {
+
+  var argv = require('nw.gui').App.argv;
+  if(argv && argv.length > 0) {
+    this.playUri(argv[0]);
+  }
 }
 
 App.prototype.playUri = function(uri) {
