@@ -14,7 +14,6 @@
  */
 function App() {
 
-  this.canvas = document.querySelector('#canvas');
   this.mediaInfo = {};
 
   this.initPlayer();
@@ -58,14 +57,15 @@ App.prototype.initHotKeys = function() {
       this.player.vlc.togglePause();
     }
   }).bind(this));
-  this.canvas.addEventListener('click', (function() {
+
+  document.querySelector('#canvas').addEventListener('click', (function() {
     this.player.vlc.togglePause();
   }).bind(this));
 }
 
 App.prototype.initPlayer = function() {
 
-  this.player = new Player(this.canvas);
+  this.player = new Player(document.querySelector('#canvas'));
   this.player.vlc.onPlaying = (function() {
     document.querySelector('#canvas_wrapper').className = 'playing';
     this.mediaInfo.mrl = this.player.vlc.playlist.items[this.player.vlc.playlist.currentItem].mrl;
