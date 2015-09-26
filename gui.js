@@ -275,3 +275,8 @@ Gui.prototype.getClipboardContent = function() {
 
   return require('nw.gui').Clipboard.get().get('text');
 }
+
+Gui.prototype.setPlaying = function (playing) {
+
+  document.querySelector('#canvas_wrapper').className = playing ? 'playing' : '';
+}

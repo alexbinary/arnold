@@ -44,7 +44,7 @@ App.prototype.initPlayer = function() {
 
   this.player.on('playing', (function() {
 
-    document.querySelector('#canvas_wrapper').className = 'playing';
+    this.gui.setPlaying(true);
 
     this.mediaInfo.mrl = this.player.vlc.playlist.items[this.player.vlc.playlist.currentItem].mrl;
     this.mediaInfo.title=this.player.vlc.playlist.items[this.player.vlc.playlist.currentItem].title;
@@ -69,7 +69,7 @@ App.prototype.initPlayer = function() {
 
   this.player.on('stopped', (function() {
 
-    document.querySelector('#canvas_wrapper').className = '';
+    this.gui.setPlaying(false);
     this.reload();
 
   }).bind(this));
