@@ -32,9 +32,14 @@ App.prototype.start = function () {
   var popcorn = new Popcorn();
   popcorn.loadResults();
 
+  this.openFromArgv();
+}
+
+App.prototype.openFromArgv = function () {
+
   var argv = require('nw.gui').App.argv;
   if(argv && argv.length > 0) {
-    playUri(argv[0]);
+    this.playUri(argv[0]);
   }
 }
 
