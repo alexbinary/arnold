@@ -87,19 +87,24 @@ Gui.prototype.initDragNDrop = function() {
   };
 }
 
-Gui.prototype.updateMediaInfo = function() {
+/**
+ * Gui - update display with new media info
+ *
+ * @param mediaInfo { MediaInfo }
+ */
+Gui.prototype.updateMediaInfo = function(mediaInfo) {
 
-  document.querySelector('#mediaTitle').innerHTML=app.mediaInfo.title;
-  document.querySelector('#mediaIMDBID').innerHTML=app.mediaInfo.imdb_id;
-  document.querySelector('#mediaHash').innerHTML=app.mediaInfo.os_hash;
+  document.querySelector('#mediaTitle').innerHTML=mediaInfo.title;
+  document.querySelector('#mediaIMDBID').innerHTML=mediaInfo.imdb_id;
+  document.querySelector('#mediaHash').innerHTML=mediaInfo.os_hash;
   var selectAudio = document.querySelector('#selectAudio');
   while (selectAudio.firstChild) {
     selectAudio.removeChild(selectAudio.firstChild);
   }
-  for (var i = 0; i < app.mediaInfo.audio.count; i++) {
+  for (var i = 0; i < mediaInfo.audio.count; i++) {
     var option = document.createElement('option');
     option.value=i;
-    option.text=app.mediaInfo.audio[i];
+    option.text=mediaInfo.audio[i];
     selectAudio.add(option);
   }
   selectAudio.addEventListener('change', function () {
@@ -109,10 +114,10 @@ Gui.prototype.updateMediaInfo = function() {
   while (selectSubtitles.firstChild) {
     selectSubtitles.removeChild(selectSubtitles.firstChild);
   }
-  for (var i = 0; i < app.mediaInfo.subtitles.count; i++) {
+  for (var i = 0; i < mediaInfo.subtitles.count; i++) {
     var option = document.createElement('option');
     option.value=i;
-    option.text=app.mediaInfo.subtitles[i];
+    option.text=mediaInfo.subtitles[i];
     selectSubtitles.add(option);
   }
   selectSubtitles.addEventListener('change', function () {
@@ -279,4 +284,24 @@ Gui.prototype.getClipboardContent = function() {
 Gui.prototype.setPlaying = function (playing) {
 
   document.querySelector('#canvas_wrapper').className = playing ? 'playing' : '';
+}
+
+/**
+ * Gui - update display for current audio track
+ *
+ * @param track { number }
+ */
+Gui.prototype.setCurrentAudioTrack = function (track) {
+
+  selectAudio.value = track;
+}
+
+/**
+ * Gui - update display for current subtitles track
+ *
+ * @param track { number }
+ */
+Gui.prototype.setCurrentSubtitlesTrack = function (track) {
+
+  selectSubtitles.value = track;
 }

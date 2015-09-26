@@ -43,6 +43,65 @@ function Player(canvas) {
 util.inherits(Player, EventEmitter);
 
 /**
+ * Player - toggle Play/Pause
+ */
+Player.prototype.togglePause = function () {
+
+  this.vlc.togglePause();
+}
+
+/**
+ * Player - return current item in the playlist
+ *
+ * @return { WebChimera.VlcMedia }
+ */
+Player.prototype.getCurrentPlaylistItem = function () {
+
+  var index = this.vlc.playlist.currentItem;
+  return this.vlc.playlist.items[index];
+}
+
+/**
+ * Player - return current audio properties
+ *
+ * @return { WebChimera.VlcAudio }
+ */
+Player.prototype.getAudio = function () {
+
+  return this.vlc.audio;
+}
+
+/**
+ * Player - return current audio track number
+ *
+ * @return { number }
+ */
+Player.prototype.getCurrentAudioTrack = function () {
+
+  return this.getAudio().track;
+}
+
+/**
+ * Player - return current subtitles properties
+ *
+ * @return { WebChimera.VlcSubtitles }
+ */
+Player.prototype.getSubtitles = function () {
+
+  return this.vlc.subtitles;
+}
+
+/**
+ * Player - return current subtitles track number
+ *
+ * @return { number }
+ */
+Player.prototype.getCurrentSubtitlesTrack = function () {
+
+  return this.getSubtitles().track;
+}
+
+/**
  * Player - play given URI
  *
  * @param uri { string } - URI to play, can be :

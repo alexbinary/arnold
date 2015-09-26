@@ -72,6 +72,13 @@ Subtitles.prototype.searchSubtitles = function () {
   }).bind(this));
 }
 
+/**
+ * Subtitles - compute OpenSubtitles hash
+ *
+ * @param mediaInfo { MediaInfo }
+ *
+ * @return { MediaInfo }
+ */
 Subtitles.prototype.getOpenSubtitlesHash = function () {
 
   var path;
@@ -86,6 +93,6 @@ Subtitles.prototype.getOpenSubtitlesHash = function () {
   this.OpenSubtitles.extractInfo(path)
   .then(function (infos) {
       app.mediaInfo.os_hash = infos.moviehash;
-      app.gui.updateMediaInfo();
+      app.gui.updateMediaInfo(app.mediaInfo);
   });
 }
