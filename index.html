@@ -7,91 +7,122 @@
   </head>
   <body>
 
-    <div id="controls" class="_hover">
+    <!-- player = canvas for video + subtitles section -->
 
-      <div id="controls_main">
+    <div id="player">
+      <canvas id="canvas"></canvas>
+      <div id="subtitles"></div>
+    </div>
 
-        <p class="mainHint">Drop a file to play it</p>
+    <!-- log widget -->
 
-        <p class="secondHint">You can use any file <b>VLC</b> would play, including <b>audio</b> files and <b>streams</b></p>
-        <p class="secondHint">You can also drop a <b>torrent file</b> to start streaming it</p>
+    <div id="log">
+    </div>
 
-        <div class="thirdHint">
-          <p>
-            Or <button id="chooseFile">select a file</button>,
-            enter a <b>path</b> or a <b>url</b> to a file or a <b>magnet</b> link below,<br>
-            or <button id="inputUriPaste">use the one in your clipboard</button>
-          </p>
-          <p>
-            <input id="inputUri" type="text"/>
-            <button id="inputUriOpen">Play</button>
-          </p>
+    <!-- main interface -->
+
+    <div id="ui">
+
+      <!-- menu -->
+
+      <div id="uiMenu">
+        <ul>
+          <li id="uiMenuHome">Home</li>
+          <li id="uiMenuPlaying">Playing</li>
+          <li id="uiMenuPopcorn">Popcorn</li>
+        </ul>
+      </div>
+
+      <!-- home screen = controls for opening a file -->
+
+      <div id="home" class="_hover">
+
+        <div id="home_content">
+
+          <p class="mainHint">Drop a file to play it</p>
+
+          <p class="secondHint">You can use any file <b>VLC</b> would play, including <b>audio</b> files and <b>streams</b></p>
+          <p class="secondHint">You can also drop a <b>torrent file</b> to start streaming it</p>
+
+          <div class="thirdHint">
+            <p>
+              Or <button id="btnChooseFile">select a file</button>,
+              enter a <b>path</b> or a <b>url</b> to a file or a <b>magnet</b> link below,<br>
+              or <button id="btnUriPaste">use the one in your clipboard</button>
+            </p>
+            <p>
+              <input id="inputUri" type="text"/>
+              <button id="btnUriOpen">Play</button>
+            </p>
+            <input id="inputFile" type="file" />
+          </div>
+        </div>
+
+        <div id="dropIndicator">
+          <p>Drop to play</p>
+          <p class="dropHint" id="dropHint1">this is a test</p>
+          <p class="dropHint" id="dropHint2">this is another test</p>
         </div>
       </div>
 
-      <div id="dropIndicator">
-        <p>Drop to play</p>
-        <p class="dropHint" id="dropHint1">this is a test</p>
-        <p class="dropHint" id="dropHint2">this is another test</p>
+      <!-- info & controls about playing content -->
+
+      <div id="playing">
+
+        <section>
+
+          <h2>Media info</h2>
+
+          <p><label>Title</label> <span id="mediaTitle"></span></p>
+          <p><label>IMDB ID</label> <span id="mediaIMDBID"></span></p>
+          <p>
+            <label>Audio</label>
+            <select id="selectAudio"></select>
+          </p>
+          <p>
+            <label>Subtitles</label>
+            <select id="selectSubtitles"></select>
+          </p>
+          <p><label>OpenSubtitles.org hash:</label> <span id="mediaHash"></span></p>
+
+        </section>
+
+        <section>
+
+          <h2>Subtitles</h2>
+
+          <p>
+            <label>Choose file</label>
+            <input id="inputFileSubtitles" type="file">
+          </p>
+          <p>
+            <button id="buttonLoadSubtitles">Load from OpenSubtitles</button>
+            <select id="selectOpenSubtitles"></select>
+          </p>
+
+        </section>
+
       </div>
 
-      <input id="inputFile" type="file" />
+      <!-- Popcorn Time API -->
+
+      <div id="popcorn">
+
+        <h2>Content from Popcorn Time</h2>
+
+        <p>
+          <input id="inputSearch" type="text">
+          <button id="buttonSearch">Search</button>
+        </p>
+
+        <p id="loading">Loading</p>
+
+        <div id="results"></div>
+
+      </div>
+
     </div>
 
-    <div id="log">
-
-    </div>
-
-    <button id="closeButton">X</button>
-
-    <div id="canvas_wrapper">
-      <canvas id="canvas" width=200 height=300/>
-    </div>
-    <div id="subtitles"></div>
-
-    <div id="topspacer">
-    </div>
-
-    <section id="sectionMediaInfo">
-      <h2>Media info</h2>
-      <p><label>Title:</label> <span id="mediaTitle"></span></p>
-      <p><label>IMDB ID:</label> <span id="mediaIMDBID"></span></p>
-      <p>
-        <label>
-          Audio
-          <select id="selectAudio"></select>
-        </label>
-      </p>
-      <p>
-        <label>
-          Subtitles
-          <select id="selectSubtitles"></select>
-        </label>
-      </p>
-      <p><label>OpenSubtitles.org hash:</label> <span id="mediaHash"></span></p>
-    </section>
-    <section id="sectionSubtitles">
-      <h2>Subtitles</h2>
-      <p>
-        <label>
-          Choose file
-          <input id="inputFileSubtitles" type="file">
-        </label>
-      </p>
-      <p>
-        <button id="buttonLoadSubtitles">Load from OpenSubtitles</button>
-        <select id="selectOpenSubtitles"></select>
-      </p>
-    </section>
-    <section id="search">
-      <h2>Content from Popcorn Time</h2>
-      <p>
-        <input id="inputSearch" type="text">
-        <button id="buttonSearch">Search</button>
-      </p>
-      <p id="loading">Loading</p>
-      <div id="results"></div>
-    </section>
     <script src="mediainfo.js"></script>
     <script src="torrent.js"></script>
     <script src="popcorn.js"></script>

@@ -23,40 +23,57 @@ function Gui() {
     this.onResize();
   }).bind(this));
 
-  document.querySelector('#closeButton').addEventListener('click', this.reload);
+  uiMenuHome.addEventListener('click', (function() {
+    this.showScreen('home');
+  }).bind(this));
+  uiMenuPlaying.addEventListener('click', (function() {
+    this.showScreen('playing');
+  }).bind(this));
+  uiMenuPopcorn.addEventListener('click', (function() {
+    this.showScreen('popcorn');
+  }).bind(this));
+
+  this.showScreen('home');
+}
+
+Gui.prototype.showScreen = function (screen) {
+
+  uiMenuHome.className    = screen == 'home'    ? 'active' : 'inactive';
+  uiMenuPlaying.className = screen == 'playing' ? 'active' : 'inactive';
+  uiMenuPopcorn.className = screen == 'popcorn' ? 'active' : 'inactive';
+
+  home.style.display    = screen == 'home'    ? 'block' : 'none';
+  playing.style.display = screen == 'playing' ? 'block' : 'none';
+  popcorn.style.display = screen == 'popcorn' ? 'block' : 'none';
 }
 
 Gui.prototype.initInputs = function() {
 
-  var inputFile = document.querySelector('#inputFile');
-  var inputUri = document.querySelector('#inputUri');
-  var inputUriOpen = document.querySelector('#inputUriOpen');
-  var inputUriPaste = document.querySelector('#inputUriPaste');
+  inputFile.addEventListener('change', (function() {
+    app.playUri(inputFile.value);
+  }).bind(this));
 
-  function initInputs() {
-    inputFile.addEventListener("change", function(evt) {
-      app.playUri(this.value);
-    }, false);
-    inputUriOpen.addEventListener("click", function(evt) {
-      app.playUri(inputUri.value);
-    }, false);
-    inputUriPaste.addEventListener("click", (function(evt) {
-      app.playUri(this.getClipboardContent());
-    }).bind(this), false);
-  }
-  function chooseFile() {
-    inputFile.click();
-  }
-  initInputs();
+  btnChooseFile.addEventListener('click', (function() {
+    this.showOpenFileDialog();
+  }).bind(this));
 
-  document.querySelector('#chooseFile').addEventListener('click', function() {
-    chooseFile();
-  })
+  btnUriOpen.addEventListener('click', (function() {
+    app.playUri(inputUri.value);
+  }).bind(this));
+
+  btnUriPaste.addEventListener('click', (function() {
+    app.playUri(this.getClipboardContent());
+  }).bind(this));
+}
+
+Gui.prototype.showOpenFileDialog = function () {
+
+  inputFile.click();
 }
 
 Gui.prototype.initDragNDrop = function() {
 
-  var holder = document.querySelector('#controls');
+  var holder = document.querySelector('#home');
   holder.ondragover = function (e) {
     this.className = 'hover';
     var filepath = e.dataTransfer.files[0] && e.dataTransfer.files[0].path;
@@ -126,23 +143,15 @@ Gui.prototype.updateMediaInfo = function(mediaInfo) {
 }
 
 Gui.prototype.onResize = function() {
-
-  var topspacer = document.querySelector('#topspacer');
-  topspacer.style.height=window.innerHeight+'px';
-  // var margin = 0;
-  // canvas.width = window.innerWidth-2*margin;
-  // canvas.height = window.innerHeight-2*margin;
 }
 
 Gui.prototype.hideControls = function() {
 
-  document.querySelector('#controls').style.visibility='hidden';
-  document.querySelector('#controls').style.display='none';
+  document.querySelector('#home').style.visibility='hidden';
+  document.querySelector('#home').style.display='none';
 }
 
 Gui.prototype.showClose = function () {
-
-  // document.querySelector('#closeButton').style.visibility='visible';
 }
 
 Gui.prototype.createAppMenuBar = function() {
@@ -283,7 +292,7 @@ Gui.prototype.getClipboardContent = function() {
 
 Gui.prototype.setPlaying = function (playing) {
 
-  document.querySelector('#canvas_wrapper').className = playing ? 'playing' : '';
+  document.querySelector('#player').className = playing ? 'playing' : '';
 }
 
 /**

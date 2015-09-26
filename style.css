@@ -1,52 +1,80 @@
+/**
+ * Arnold - advanced media center based on VLC and NW.js
+ *
+ * style.css - main CSS
+ *
+ * @author Alexandre Bintz <alexandre@bintz.io>
+ * 09/2015
+ */
+
 ::-webkit-scrollbar {
-    display: none;
+  display: none;  /*  hide scroll bars  */
 }
+
+/*  <html> holds the general background */
 html {
-  text-align: center;
-  background: lightgrey;
   font-family: 'Helvetica Neue';
+  background: url(background.jpg);
 }
 
 body {
-  -webkit-app-region: drag;
-}
-
-#canvas_wrapper {
-  display: -webkit-flex;
-  -webkit-justify-content: center;
-  -webkit-align-items: center;
-  position:absolute;
-  z-index: 20;
+  -webkit-app-region: drag; /*  make all window draggable
+                                (needed in frameless mode)  */
+  padding: 0;
+  margin: 0;
+  /*  body covers the whole screen
+      and is at the bottom of the display stack */
+  position: absolute;
+  z-index: 0;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: none;
+  /* body holds a semi transparent background
+     to attenuate the background image */
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
 }
-#canvas_wrapper.playing {
+
+/*  player covers the whole screen and is at the bottom of the view stack
+    canvas is centered in both direction inside player  */
+#player {
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: -webkit-flex;
+  -webkit-justify-content: center;
+  -webkit-align-items: center;
+}
+/*  player is fully transparent when not playing
+    solid black background when playing */
+#player.playing {
   background: black;
 }
 #subtitles {
   position: absolute;
-  z-index: 25;
-  height: 100px;
-  bottom: 50px;
   left: 50px;
   right: 50px;
+  bottom: 50px;
   color: white;
   font-size: 2em;
   text-shadow: 0 0 5px black;
   font-family: "Arial";
+  text-align: center;
 }
 
+/*  log appears behind the canvas
+    so it is covered by it when playing */
 #log {
   position:absolute;
-  z-index: 10;
+  z-index: 50;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: white;
   text-align: left;
   padding: 50px;
 }
@@ -54,20 +82,99 @@ body {
   margin: 2px;
 }
 
-canvas {
-}
-
-#controls {
+/*  user interface covers the entire screen
+    and appears on top of the player
+    transparent by default */
+#ui {
   position: absolute;
-  z-index: 30;
+  z-index: 200;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   padding: 50px;
-  background: white;
+}
+/*  menu appears on top of the screen
+    and on top of ui content  */
+#uiMenu {
+  position: absolute;
+  z-index: 205;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+#uiMenu li {
+  display: inline-block;
+  padding: 15px;
+  list-style-type: none;
+  font-weight: bold;
+  font-size: 1.1em;
+  color: lightgrey;
+  cursor: pointer;
+}
+#uiMenu li:hover,
+#uiMenu li.active {
+  color: white;
 }
 
+/*  generic style */
+button {
+  border: none;
+  background: none;
+  border-bottom: 2px solid lightgrey;
+  color: lightgrey;
+  font-family: 'Helvetica Neue';
+  font-size: 1em;
+  cursor: pointer;
+}
+button:hover {
+  border-bottom: 2px solid white;
+  color: white;
+}
+button:focus {
+  outline: none;
+}
+input[type="text"] {
+  background: none;
+  border: none;
+  border-bottom: 2px solid lightgrey;
+  color: white;
+  font-size: 1.1em;
+}
+input[type="text"]:focus,
+input[type="text"]:hover {
+  outline: none;
+  border-bottom: 2px solid white;
+}
+
+/*  home section covers the entire screen  */
+#home {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 50px;
+  padding-top: 10%;
+  text-align: center;
+  font-size: 1.3em;
+}
+#home .mainHint {
+  font-size: 2em;
+  margin-bottom: 0;
+}
+#home .secondHint {
+  font-size: 0.8em;
+}
+#home .thirdHint {
+  font-size: 0.9em;
+  margin-top: 30px;
+}
+#home input[type="text"] {
+  width: 80%;
+}
+/*  drop indicator is hidden by default,
+    it appears when dragging over the #home  */
 #dropIndicator {
   visibility: hidden;
   position: absolute;
@@ -75,7 +182,6 @@ canvas {
   width: 90%;
   font-size: 4em;
 }
-
 #dropIndicator p {
   margin: 0;
   margin-top: 10px;
@@ -86,85 +192,62 @@ canvas {
 #dropIndicator #dropHint1 {
   font-size: 0.2em;
 }
-
-#controls.hover #dropIndicator {
+/*  when dragging over the #home,
+    content fades and drop indicator appears  */
+#home.hover #dropIndicator {
   visibility: visible;
 }
-
-#controls.hover #controls_main {
+#home.hover #home_content {
   opacity: 0.05;
 }
-
-input[type="file"] {
+/*  input file used to show open file dialog
+    is not visible to the user  */
+#inputFile {
   display: none;
 }
 
-input[type="text"] {
-  width: 80%;
-}
-
-#inputFileSubtitles {
-  display: inline;
-}
-
-.mainHint {
-  font-size: 2em;
-  margin-bottom: 0;
-}
-
-.secondHint {
-  font-size: 0.8em;
-}
-
-.thirdHint {
-  font-size: 0.9em;
-  margin-top: 30px;
-}
-
-button {
-  border: none;
-  font-family: 'Helvetica Neue';
-  font-size: 1em;
-  box-shadow: 0 0 1px grey;
-}
-
-#closeButton {
+/*  "playing" section covers the entire screen  */
+#playing {
   position: absolute;
-  z-index: 30;
-  top : 5px;
-  right: 5px;
-  width: 40px;
-  height: 40px;
-  border-radius: 25px;
-  font-size: 2em;
-  visibility: hidden;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 50px;
+}
+#playing section {
+  display: block;
+  margin: auto;
+  width: 50%;
+}
+#playing h2 {
+  text-align: center;
+  margin: 50px;
+}
+#playing label {
+  display: inline-block;
+  width: 200px;
 }
 
-#closeButton:hover {
-  cursor: pointer;
-  background: white;
+/*  "popcorn" section covers the entire screen  */
+#popcorn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 50px;
+  text-align: center;
+  overflow: scroll;
 }
-#closeButton:focus {
-  outline: none;
+#popcorn input[type="text"] {
+  text-align: center;
+  font-size: 1.2em;
 }
-
-#topspacer {
-  height: 100%;
+#popcorn table {
+  margin: auto;
 }
-
-section {
-  background: white;
-  padding: 20px;
-  box-shadow: 0 0 25px;
-  border-radius: 2px;
-  margin: 25px 0;
-}
-label {
-  font-weight: bold;
-}
-#sectionMediaInfo {
+#popcorn td {
+  padding: 15px;
   text-align: left;
-}
-#search {
-  padding: 20px;
 }
