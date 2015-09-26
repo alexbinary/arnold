@@ -14,7 +14,7 @@
  */
 function App() {
 
-  this.mediaInfo = {};
+  this.initMediaInfo();
 
   this.initPlayer();
   this.initSubtitles();
@@ -37,6 +37,11 @@ App.prototype.openFromArgv = function () {
   if(argv && argv.length > 0) {
     this.playUri(argv[0]);
   }
+}
+
+App.prototype.initMediaInfo = function () {
+
+  this.mediaInfo = new MediaInfo();
 }
 
 App.prototype.initGui = function () {
