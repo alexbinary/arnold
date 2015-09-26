@@ -72,9 +72,9 @@ App.prototype.initPlayer = function() {
     // var i = player.vlc.playlist.add('/Users/alexandrebintz/Downloads/Another.Earth.2011.BDRip.x264.AC3-Zoo.eng.srt');
     // console.log(player.vlc.playlist.playItem(i));
   }).bind(this);
-  this.player.vlc.onTimeChanged = function(time) {
+  this.player.vlc.onTimeChanged = (function(time) {
     this.subtitles.updateSubtitles(time/1000);
-  }
+  }).bind(this);
   this.player.vlc.onStopped = (function() {
     document.querySelector('#canvas_wrapper').className = '';
     this.reload();
