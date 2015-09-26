@@ -13,6 +13,9 @@
  * App
  */
 function App() {
+}
+
+App.prototype.start = function () {
 
   this.canvas = document.getElementById("canvas");
 
