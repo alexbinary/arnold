@@ -142,13 +142,13 @@ ArnoldGui.prototype.showClose = function () {
 
 ArnoldGui.prototype.createAppMenuBar = function() {
 
-  var gui = require('nw.gui');
+  var nwgui = require('nw.gui');
   var menubar = undefined;
 
   function initMenuBar() {
 
-    menubar = new gui.Menu({ type: 'menubar' });
-    gui.Window.get().menu = menubar;
+    menubar = new nwgui.Menu({ type: 'menubar' });
+    nwgui.Window.get().menu = menubar;
 
     menubar.createMacBuiltin('Arnold',{
       hideEdit: false,
@@ -158,7 +158,7 @@ ArnoldGui.prototype.createAppMenuBar = function() {
 
   function item(label, action, key, modifiers) {
 
-    return new gui.MenuItem({
+    return new nwgui.MenuItem({
       label     : label,
       click     : action,
       key       : key,
@@ -168,18 +168,18 @@ ArnoldGui.prototype.createAppMenuBar = function() {
 
   function separator() {
 
-    return new gui.MenuItem({ type: 'separator' });
+    return new nwgui.MenuItem({ type: 'separator' });
   }
 
   function menu(label, items) {
 
-    var menu = new gui.Menu();
+    var menu = new nwgui.Menu();
 
     for (var i=0 ; i<items.length ; i++) {
       menu.append(items[i]);
     }
 
-    var item = new gui.MenuItem({
+    var item = new nwgui.MenuItem({
       label   : label,
       submenu : menu,
     });
@@ -192,17 +192,17 @@ ArnoldGui.prototype.createAppMenuBar = function() {
   menu('View', [
 
     item('Fullscreen', function () {
-      gui.Window.get().toggleFullscreen();
+      nwgui.Window.get().toggleFullscreen();
     }),
 
     item('Kiosk', function () {
-      gui.Window.get().toggleKioskMode();
+      nwgui.Window.get().toggleKioskMode();
     }),
 
     separator(),
 
     item('Open dev tools', function () {
-      gui.Window.get().showDevTools();
+      nwgui.Window.get().showDevTools();
     }),
 
     item('Reload', function () {
