@@ -26,14 +26,49 @@ function Subtitles() {
   }).bind(this));
 }
 
-Subtitles.prototype.loadSubtitles = function (path) {
+/**
+ * Setup subtitles from local or distant .srt file
+ *
+ * @param uri { string } - uri for the subtitles file
+ *                         can be a http URL or a local file path to a .srt file
+ */
+Subtitles.prototype.loadSubtitles = function (uri) {
+
+  if(new RegExp('^http://').test(uri)) {
+
+    var dir = '/tmp';
+    var name = new Date().getTime() + '.srt';
+    var path = dir+'/'+name;
+
+    new (require('download'))()
+        .get(uri)
+        .dest(dir)
+        .rename(name)
+        .run((function() {
+          this.loadSubtitlesFromPath(path);
+        }).bind(this));
+
+  } else {
+    this.loadSubtitlesFromPath(uri);
+  }
+}
+
+/**
+ * Setup subtitles from local .srt file
+ *
+ * @param path { string } - local file path for the .srt file
+ */
+Subtitles.prototype.loadSubtitlesFromPath = function (path) {
 
   var srt = require('fs').readFileSync(path, 'utf-8');
   this.updateSubtitles = require('subplay')(srt, function(text) {
-      document.querySelector('#subtitles').innerHTML = text;
+    document.querySelector('#subtitles').innerHTML = text;
   });
 }
 
+/**
+ * Get available subtitles from OpenSubtitles for the media currently playing
+ */
 Subtitles.prototype.searchSubtitles = function () {
 
   this.OpenSubtitles.search({
@@ -58,16 +93,7 @@ Subtitles.prototype.searchSubtitles = function () {
       select.add(option);
     }
     select.addEventListener('change', (function () {
-      var url = select.value;
-      var name = new Date().getTime() + '.srt';
-      var Download = require('download');
-      new Download()
-          .get(url)
-          .dest('/tmp')
-          .rename(name)
-          .run((function() {
-            this.loadSubtitles('/tmp/'+name);
-          }).bind(this));
+      this.loadSubtitles(select.value);
     }).bind(this))
   }).bind(this));
 }
