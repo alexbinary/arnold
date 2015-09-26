@@ -27,35 +27,52 @@ function App() {
   this.initHotKeys();
 }
 
+/**
+ * App - init application wide MediaInfo container
+ */
 App.prototype.initMediaInfo = function () {
 
   this.mediaInfo = new MediaInfo();
 }
 
+/**
+ * App - init media player
+ */
 App.prototype.initPlayer = function() {
 
   this.player = new Player(document.querySelector('#canvas'));
-  this.player.vlc.onPlaying = (function() {
+
+  this.player.on('playing', (function() {
+
     document.querySelector('#canvas_wrapper').className = 'playing';
+
     this.mediaInfo.mrl = this.player.vlc.playlist.items[this.player.vlc.playlist.currentItem].mrl;
     this.mediaInfo.title=this.player.vlc.playlist.items[this.player.vlc.playlist.currentItem].title;
+
     this.mediaInfo.audio=this.player.vlc.audio;
     this.mediaInfo.subtitles=this.player.vlc.subtitles;
+
     this.gui.updateMediaInfo();
+
     this.subtitles.getOpenSubtitlesHash();
+
     selectAudio.value = this.player.vlc.audio.track;
     selectSubtitles.value = this.player.vlc.subtitles.track;
 
-    // var i = player.vlc.playlist.add('/Users/alexandrebintz/Downloads/Another.Earth.2011.BDRip.x264.AC3-Zoo.eng.srt');
-    // console.log(player.vlc.playlist.playItem(i));
-  }).bind(this);
-  this.player.vlc.onTimeChanged = (function(time) {
+  }).bind(this));
+
+  this.player.on('timeChanged', (function(time) {
+
     this.subtitles.updateSubtitles(time/1000);
-  }).bind(this);
-  this.player.vlc.onStopped = (function() {
+
+  }).bind(this));
+
+  this.player.on('stopped', (function() {
+
     document.querySelector('#canvas_wrapper').className = '';
     this.reload();
-  }).bind(this);
+
+  }).bind(this));
 }
 
 App.prototype.initSubtitles = function () {
@@ -94,7 +111,7 @@ App.prototype.start = function () {
 
   this.openFromArgv();
 
-  popcorn.loadResults();
+  this.popcorn.loadResults();
 }
 
 App.prototype.openFromArgv = function () {

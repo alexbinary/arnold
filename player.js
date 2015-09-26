@@ -21,8 +21,24 @@ const EventEmitter = require('events');
 function Player(canvas) {
   EventEmitter.call(this);
 
+  // init WebChimera renderer
+
   var wcjs = require("./node_modules_hacked/wcjs-renderer");
   this.vlc = wcjs.init(canvas);
+
+  // map WebChimera callbacks to EventEmitter events for convenience
+
+  this.vlc.onPlaying = (function() {
+    this.emit('playing');
+  }).bind(this);
+
+  this.vlc.onStopped = (function() {
+    this.emit('stopped');
+  }).bind(this);
+
+  this.vlc.onTimeChanged = (function(time) {
+    this.emit('timeChanged', time);
+  }).bind(this);
 }
 util.inherits(Player, EventEmitter);
 
