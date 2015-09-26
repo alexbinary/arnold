@@ -11,6 +11,8 @@
 
 /**
  * App
+ *
+ * Init app components
  */
 function App() {
 
@@ -19,16 +21,20 @@ function App() {
   this.initPlayer();
   this.initSubtitles();
 
+  this.initPopcorn();
+
   this.initGui();
   this.initHotKeys();
 }
 
+/**
+ * App - start application
+ */
 App.prototype.start = function () {
 
-  var popcorn = new Popcorn();
-  popcorn.loadResults();
-
   this.openFromArgv();
+
+  popcorn.loadResults();
 }
 
 App.prototype.openFromArgv = function () {
@@ -37,6 +43,11 @@ App.prototype.openFromArgv = function () {
   if(argv && argv.length > 0) {
     this.playUri(argv[0]);
   }
+}
+
+App.prototype.initPopcorn = function () {
+
+  this.popcorn = new Popcorn();
 }
 
 App.prototype.initMediaInfo = function () {
