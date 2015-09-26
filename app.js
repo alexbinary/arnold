@@ -13,21 +13,18 @@
  * App
  */
 function App() {
+
+  this.canvas = document.querySelector('#canvas');
+  this.mediaInfo = {};
+
+  this.initPlayer();
+  this.initSubtitles();
+
+  this.initGui();
+  this.initHotKeys();
 }
 
 App.prototype.start = function () {
-
-  this.canvas = document.getElementById("canvas");
-
-  this.gui = new Gui();
-  this.gui.onResize();
-
-  this.initPlayer();
-  this.initHotKeys();
-
-  this.mediaInfo = {};
-
-  this.subtitles = new Subtitles();
 
   var popcorn = new Popcorn();
   popcorn.loadResults();
@@ -41,6 +38,17 @@ App.prototype.openFromArgv = function () {
   if(argv && argv.length > 0) {
     this.playUri(argv[0]);
   }
+}
+
+App.prototype.initGui = function () {
+
+  this.gui = new Gui();
+  this.gui.onResize();
+}
+
+App.prototype.initSubtitles = function () {
+
+  this.subtitles = new Subtitles();
 }
 
 App.prototype.initHotKeys = function() {
