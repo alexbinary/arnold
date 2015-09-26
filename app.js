@@ -1,7 +1,7 @@
 /**
  * Arnold - advanced media center based on VLC and NW.js
  *
- * arnold.js - Main Application
+ * app.js - Main Application
  *
  * @author Alexandre Bintz <alexandre@bintz.io>
  * 09/2015
@@ -10,9 +10,9 @@
 'use strict';
 
 /**
- * Arnold
+ * App
  */
-function Arnold() {
+function App() {
 
   this.canvas = document.getElementById("canvas");
 
@@ -35,7 +35,7 @@ function Arnold() {
   }
 }
 
-Arnold.prototype.initHotKeys = function() {
+App.prototype.initHotKeys = function() {
 
   window.addEventListener('keypress', (function(e) {
     if (e.keyCode == 32) {  // space
@@ -47,7 +47,7 @@ Arnold.prototype.initHotKeys = function() {
   }).bind(this));
 }
 
-Arnold.prototype.initPlayer = function() {
+App.prototype.initPlayer = function() {
 
   this.player = new Player(this.canvas);
   this.player.vlc.onPlaying = (function() {
@@ -73,7 +73,7 @@ Arnold.prototype.initPlayer = function() {
   }).bind(this);
 }
 
-Arnold.prototype.playUri = function(uri) {
+App.prototype.playUri = function(uri) {
 
   this.arnoldGui.log('opening media');
   this.player.playUri(uri);
@@ -81,7 +81,7 @@ Arnold.prototype.playUri = function(uri) {
   this.arnoldGui.showClose();
 }
 
-Arnold.prototype.reload = function () {
+App.prototype.reload = function () {
 
   require('nw.gui').Window.get().reloadDev();
 }

@@ -35,13 +35,13 @@ ArnoldGui.prototype.initInputs = function() {
 
   function initInputs() {
     inputFile.addEventListener("change", function(evt) {
-      arnold.playUri(this.value);
+      app.playUri(this.value);
     }, false);
     inputUriOpen.addEventListener("click", function(evt) {
-      arnold.playUri(inputUri.value);
+      app.playUri(inputUri.value);
     }, false);
     inputUriPaste.addEventListener("click", (function(evt) {
-      arnold.playUri(this.getClipboardContent());
+      app.playUri(this.getClipboardContent());
     }).bind(this), false);
   }
   function chooseFile() {
@@ -80,7 +80,7 @@ ArnoldGui.prototype.initDragNDrop = function() {
     e.preventDefault();
     var filepath = e.dataTransfer.files[0] && e.dataTransfer.files[0].path;
     if (filepath) {
-      arnold.playUri(filepath);
+      app.playUri(filepath);
       return false;
     }
     return false;
@@ -89,34 +89,34 @@ ArnoldGui.prototype.initDragNDrop = function() {
 
 ArnoldGui.prototype.updateMediaInfo = function() {
 
-  document.querySelector('#mediaTitle').innerHTML=arnold.mediaInfo.title;
-  document.querySelector('#mediaIMDBID').innerHTML=arnold.mediaInfo.imdb_id;
-  document.querySelector('#mediaHash').innerHTML=arnold.mediaInfo.os_hash;
+  document.querySelector('#mediaTitle').innerHTML=app.mediaInfo.title;
+  document.querySelector('#mediaIMDBID').innerHTML=app.mediaInfo.imdb_id;
+  document.querySelector('#mediaHash').innerHTML=app.mediaInfo.os_hash;
   var selectAudio = document.querySelector('#selectAudio');
   while (selectAudio.firstChild) {
     selectAudio.removeChild(selectAudio.firstChild);
   }
-  for (var i = 0; i < arnold.mediaInfo.audio.count; i++) {
+  for (var i = 0; i < app.mediaInfo.audio.count; i++) {
     var option = document.createElement('option');
     option.value=i;
-    option.text=arnold.mediaInfo.audio[i];
+    option.text=app.mediaInfo.audio[i];
     selectAudio.add(option);
   }
   selectAudio.addEventListener('change', function () {
-    arnold.player.vlc.audio.track = +selectAudio.value;
+    app.player.vlc.audio.track = +selectAudio.value;
   })
   var selectSubtitles = document.querySelector('#selectSubtitles');
   while (selectSubtitles.firstChild) {
     selectSubtitles.removeChild(selectSubtitles.firstChild);
   }
-  for (var i = 0; i < arnold.mediaInfo.subtitles.count; i++) {
+  for (var i = 0; i < app.mediaInfo.subtitles.count; i++) {
     var option = document.createElement('option');
     option.value=i;
-    option.text=arnold.mediaInfo.subtitles[i];
+    option.text=app.mediaInfo.subtitles[i];
     selectSubtitles.add(option);
   }
   selectSubtitles.addEventListener('change', function () {
-    arnold.player.vlc.subtitles.track = +selectSubtitles.value;
+    app.player.vlc.subtitles.track = +selectSubtitles.value;
   })
 }
 
@@ -206,59 +206,59 @@ ArnoldGui.prototype.createAppMenuBar = function() {
     }),
 
     item('Reload', function () {
-      arnold.reload();
+      app.reload();
     }),
   ]);
 
   menu('Play', [
 
     item('Play/Pause', function () {
-      arnold.player.vlc.togglePause();
+      app.player.vlc.togglePause();
     }),
 
     item('Stop', function () {
-      arnold.player.vlc.stop();
+      app.player.vlc.stop();
     }),
 
     separator(),
 
     item('Jump forward 1s', function () {
-      arnold.player.vlc.time = arnold.player.vlc.time + 1000*1;
+      app.player.vlc.time = app.player.vlc.time + 1000*1;
     },
       String.fromCharCode(29), // arrow right
       'shift'
     ),
 
     item('Jump forward 10s', function () {
-      arnold.player.vlc.time = arnold.player.vlc.time + 1000*10;
+      app.player.vlc.time = app.player.vlc.time + 1000*10;
     },
       String.fromCharCode(29), // arrow right
       'alt'
     ),
 
     item('Jump forward 1min', function () {
-      arnold.player.vlc.time = arnold.player.vlc.time + 1000*60;
+      app.player.vlc.time = app.player.vlc.time + 1000*60;
     },
       String.fromCharCode(29), // arrow right
       'cmd'
     ),
 
     item('Jump backward 1s', function () {
-      arnold.player.vlc.time = arnold.player.vlc.time - 1000*1;
+      app.player.vlc.time = app.player.vlc.time - 1000*1;
     },
       String.fromCharCode(28), // arrow left
       'shift'
     ),
 
     item('Jump backward 10s', function () {
-      arnold.player.vlc.time = arnold.player.vlc.time - 1000*10;
+      app.player.vlc.time = app.player.vlc.time - 1000*10;
     },
       String.fromCharCode(28), // arrow left
       'alt'
     ),
 
     item('Jump backward 1min', function () {
-      arnold.player.vlc.time = arnold.player.vlc.time - 1000*60;
+      app.player.vlc.time = app.player.vlc.time - 1000*60;
     },
       String.fromCharCode(28), // arrow left
       'cmd'

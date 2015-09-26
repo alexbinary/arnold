@@ -1,2 +1,2 @@
 
-var arnold = new Arnold();
+var app = new App();

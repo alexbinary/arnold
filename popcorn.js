@@ -86,10 +86,10 @@ Popcorn.prototype.loadResults = function (keywords) {
         btnPlay.addEventListener('click', function(){
           var ep = episodes[select.value];
           var url = (ep.torrents['720p'] || ep.torrents['480p'] || ep.torrents['0']).url;
-          arnold.mediaInfo.imdb_id = result.imdb_id;
-          arnold.mediaInfo.episode_nb = ep.episode;
-          arnold.mediaInfo.season_nb = ep.season;
-          arnold.mediaInfo.name = result.title + ' ' + ep.season+'x'+ep.episode + ' ' + ep.title;
+          app.mediaInfo.imdb_id = result.imdb_id;
+          app.mediaInfo.episode_nb = ep.episode;
+          app.mediaInfo.season_nb = ep.season;
+          app.mediaInfo.name = result.title + ' ' + ep.season+'x'+ep.episode + ' ' + ep.title;
           playUri(url);
         })
         select.addEventListener('change', function(){
