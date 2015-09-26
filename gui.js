@@ -1,7 +1,7 @@
 /**
  * Arnold - advanced media center based on VLC and NW.js
  *
- * arnoldgui.js - Main Application's GUI manager
+ * gui.js - Main Application's GUI manager
  *
  * @author Alexandre Bintz <alexandre@bintz.io>
  * 09/2015
@@ -12,7 +12,7 @@
 /**
  * ArnoldGui
  */
-function ArnoldGui() {
+function Gui() {
 
   this.createAppMenuBar();
 
@@ -26,7 +26,7 @@ function ArnoldGui() {
   document.querySelector('#closeButton').addEventListener('click', this.reload);
 }
 
-ArnoldGui.prototype.initInputs = function() {
+Gui.prototype.initInputs = function() {
 
   var inputFile = document.querySelector('#inputFile');
   var inputUri = document.querySelector('#inputUri');
@@ -54,7 +54,7 @@ ArnoldGui.prototype.initInputs = function() {
   })
 }
 
-ArnoldGui.prototype.initDragNDrop = function() {
+Gui.prototype.initDragNDrop = function() {
 
   var holder = document.querySelector('#controls');
   holder.ondragover = function (e) {
@@ -87,7 +87,7 @@ ArnoldGui.prototype.initDragNDrop = function() {
   };
 }
 
-ArnoldGui.prototype.updateMediaInfo = function() {
+Gui.prototype.updateMediaInfo = function() {
 
   document.querySelector('#mediaTitle').innerHTML=app.mediaInfo.title;
   document.querySelector('#mediaIMDBID').innerHTML=app.mediaInfo.imdb_id;
@@ -120,7 +120,7 @@ ArnoldGui.prototype.updateMediaInfo = function() {
   })
 }
 
-ArnoldGui.prototype.onResize = function() {
+Gui.prototype.onResize = function() {
 
   var topspacer = document.querySelector('#topspacer');
   topspacer.style.height=window.innerHeight+'px';
@@ -129,18 +129,18 @@ ArnoldGui.prototype.onResize = function() {
   // canvas.height = window.innerHeight-2*margin;
 }
 
-ArnoldGui.prototype.hideControls = function() {
+Gui.prototype.hideControls = function() {
 
   document.querySelector('#controls').style.visibility='hidden';
   document.querySelector('#controls').style.display='none';
 }
 
-ArnoldGui.prototype.showClose = function () {
+Gui.prototype.showClose = function () {
 
   // document.querySelector('#closeButton').style.visibility='visible';
 }
 
-ArnoldGui.prototype.createAppMenuBar = function() {
+Gui.prototype.createAppMenuBar = function() {
 
   var nwgui = require('nw.gui');
   var menubar = undefined;
@@ -266,12 +266,12 @@ ArnoldGui.prototype.createAppMenuBar = function() {
   ]);
 }
 
-ArnoldGui.prototype.log = function(text) {
+Gui.prototype.log = function(text) {
 
   document.querySelector('#log').innerHTML += '<p> • '+text+'</p>';
 }
 
-ArnoldGui.prototype.getClipboardContent = function() {
+Gui.prototype.getClipboardContent = function() {
 
   return require('nw.gui').Clipboard.get().get('text');
 }
