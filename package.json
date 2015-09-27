@@ -8,7 +8,11 @@
     "height": 800
   },
   "dependencies": {
-    "download": "^4.2.0",
-    "subplay": "^1.1.0"
+    "download": "^4.2.1",
+    "opensubtitles-api": "^1.1.1",
+    "peerflix": "^0.31.0",
+    "request": "^2.64.0",
+    "subplay": "^1.1.0",
+    "webchimera.js": "^0.1.31"
   }
 }
