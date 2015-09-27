@@ -18,6 +18,8 @@ function Subtitles() {
   this.OpenSubtitles = new (require('opensubtitles-api'))('OSTestUserAgent');
 }
 
+module.exports = new Subtitles();
+
 /**
  * Setup subtitles from local or distant .srt file
  *
@@ -90,3 +92,5 @@ Subtitles.prototype.searchSubtitles = function (mediaInfo, callback) {
 
   }).bind(this));
 }
+
+module.exports = new Subtitles

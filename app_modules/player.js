@@ -39,10 +39,6 @@ function Player(canvas) {
   this.vlc.onTimeChanged = (function(time) {
     this.emit('timeChanged', time);
   }).bind(this);
-
-  // init torrent engine
-
-  this.torrentUtils = new TorrentUtils();
 }
 util.inherits(Player, EventEmitter);
 
@@ -175,7 +171,7 @@ Player.prototype.playUri = function(uri) {
  */
 Player.prototype.playTorrent = function(source) {
 
-  this.torrentUtils.createStreamFromTorrent(source, (function(err, stream) {
+  require('./app_modules/torrent').createStreamFromTorrent(source, (function(err, stream) {
     if(err) return;
     this.playUri(stream.url);
     app.mediaInfo.filepath = stream.filepath;

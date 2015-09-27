@@ -15,6 +15,8 @@
 function TorrentUtils() {
 }
 
+module.exports = new TorrentUtils();
+
 /**
  * TorrentUtils - create HTTP stream from .torrent file or magnet link
  *

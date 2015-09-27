@@ -19,7 +19,6 @@ function App() {
   this.initMediaInfo();
 
   this.initPlayer();
-  this.initSubtitles();
 
   this.initPopcorn();
 
@@ -63,7 +62,7 @@ App.prototype.initPlayer = function() {
 
   this.player.on('timeChanged', (function(time) {
 
-    this.subtitles.updateSubtitles(time/1000);
+    require('./app_modules/subtitles').updateSubtitles(time/1000);
 
   }).bind(this));
 
@@ -73,14 +72,6 @@ App.prototype.initPlayer = function() {
     this.reload();
 
   }).bind(this));
-}
-
-/**
- * App - init subtitles engine
- */
-App.prototype.initSubtitles = function () {
-
-  this.subtitles = new Subtitles();
 }
 
 /**
@@ -231,10 +222,11 @@ App.prototype.command = function (cmd) {
     this.player.setSubtitlesTrack(args[0]);
 
   } else if(cmd == 'loadSubtitles') {
-    this.subtitles.loadSubtitles(args[0]);
+    require('./app_modules/subtitles').loadSubtitles(args[0]);
 
   } else if(cmd == 'searchSubtitles') {
-    this.subtitles.searchSubtitles(this.mediaInfo, (function onOpenSubtitlesResult(subtitles) {
+    require('./app_modules/subtitles')
+    .searchSubtitles(this.mediaInfo, (function onOpenSubtitlesResult(subtitles) {
       this.gui.onOpenSubtitlesResult(subtitles);
     }).bind(this));
   }
