@@ -24,7 +24,5 @@ git pull
 
 Everything public domain.
 
-You are free to Buy it, use it, break it, fix it,
-Trash it, change it, mail, upgrade it,
-Charge it, point it, zoom it, press it,
-Snap it, work it, quick, erase it, etc. (https://en.wikipedia.org/wiki/Technologic)
+Background image ([rc/background.jpg](rc/background.jpg)) provided by NASA  
+http://www.nasa.gov/centers/goddard/news/topstory/2008/spitzer_infrared.html
