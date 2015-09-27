@@ -54,7 +54,7 @@ body {
 .playing #player {
   background: black;
 }
-#subtitles {
+#subtitles_container {
   position: absolute;
   left: 50px;
   right: 50px;

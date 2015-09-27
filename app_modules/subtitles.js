@@ -66,7 +66,7 @@ Subtitles.prototype.loadSubtitlesFromPath = function (path) {
 
   require('fs').readFile(path, 'utf-8', (function(err, data) {
 
-    this.updateSubtitles = require('subplay')(srt, function(text) {
+    this.updateSubtitles = require('subplay')(data, function(text) {
       subtitles_container.innerHTML = text;
     });
 
