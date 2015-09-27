@@ -56,8 +56,6 @@ App.prototype.initPlayer = function() {
 
     this.gui.updateMediaInfo(this.mediaInfo);
 
-    this.subtitles.getOpenSubtitlesHash();
-
     this.gui.setCurrentAudioTrack    (this.player.getCurrentAudioTrack());
     this.gui.setCurrentSubtitlesTrack(this.player.getCurrentSubtitlesTrack());
 
@@ -168,6 +166,10 @@ App.prototype.playUri = function(uri) {
 
   this.player.playUri(uri);
 
+  if(!(new RegExp('^magnet:')).test(uri) && !(new RegExp('^http://')).test(uri)) {
+    this.mediaInfo.filepath = uri;
+  }
+
   // hide user interface and make "playing" screen the active screen
   // so that we land directly there when we show the interface again
   this.gui.hideUI();
@@ -202,6 +204,8 @@ App.prototype.showDevTools = function () {
  *                      • play(uri)
  *                      • setAudioTrack(track number)
  *                      • setSubtitlesTrack(track number)
+ *                      • loadSubtitles(path or url to .srt)
+ *                      • searchSubtitles
  */
 App.prototype.command = function (cmd) {
 
@@ -225,5 +229,11 @@ App.prototype.command = function (cmd) {
 
   } else if(cmd == 'setSubtitlesTrack') {
     this.player.setSubtitlesTrack(args[0]);
+
+  } else if(cmd == 'loadSubtitles') {
+    this.subtitles.loadSubtitles(args[0]);
+
+  } else if(cmd == 'searchSubtitles') {
+    this.subtitles.searchSubtitles(this.mediaInfo);
   }
 }

@@ -26,6 +26,18 @@ function ScreenPlaying() {
   selectSubtitles.addEventListener('change', (function () {
     this.cmd('setSubtitlesTrack', +selectSubtitles.value);
   }).bind(this));
+
+  inputFileSubtitles.addEventListener('change', (function() {
+    this.cmd('loadSubtitles', inputFileSubtitles.value);
+  }).bind(this));
+
+  btnLoadOpenSubtitles.addEventListener('click', (function() {
+    this.cmd('searchSubtitles');
+  }).bind(this));
+
+  selectOpenSubtitles.addEventListener('change', (function () {
+    this.cmd('loadSubtitles', selectOpenSubtitles.value);
+  }).bind(this));
 }
 
 /**

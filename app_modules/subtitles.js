@@ -16,18 +16,6 @@ function Subtitles() {
 
   this.updateSubtitles = function() {};
   this.OpenSubtitles = new (require('opensubtitles-api'))('OSTestUserAgent');
-
-  inputFileSubtitles.addEventListener('change', (function() {
-    this.loadSubtitles(inputFileSubtitles.value);
-  }).bind(this));
-
-  btnLoadOpenSubtitles.addEventListener('click', (function() {
-    this.searchSubtitles();
-  }).bind(this));
-
-  selectOpenSubtitles.addEventListener('change', (function () {
-    this.loadSubtitles(selectOpenSubtitles.value);
-  }).bind(this));
 }
 
 /**
@@ -75,20 +63,21 @@ Subtitles.prototype.loadSubtitlesFromPath = function (path) {
 
 /**
  * Get available subtitles from OpenSubtitles for the media currently playing
+ *
+ * @param mediaInfo { MediaInfo }
  */
-Subtitles.prototype.searchSubtitles = function () {
+Subtitles.prototype.searchSubtitles = function (mediaInfo) {
+
+  // console.log(mediaInfo.filepath);
 
   this.OpenSubtitles.search({
 
-    sublanguageid: 'en',
     // search by hash
-    hash: app.mediaInfo.os_hash,
+    path   : mediaInfo.filepath,
     // search by imdb_id + season x episode
-    imdbid: app.mediaInfo.imdb_id,
-    episode: app.mediaInfo.episode_nb,
-    season: app.mediaInfo.season_nb,
-    // filename: mediaInfo.title,
-    // query: mediaInfo.name,
+    imdbid : mediaInfo.imdb_id,
+    episode: mediaInfo.episode_nb,
+    season : mediaInfo.season_nb,
 
   }).then((function (subtitles) {
 
@@ -103,29 +92,4 @@ Subtitles.prototype.searchSubtitles = function () {
     }
 
   }).bind(this));
-}
-
-/**
- * Subtitles - compute OpenSubtitles hash
- *
- * @param mediaInfo { MediaInfo }
- *
- * @return { MediaInfo }
- */
-Subtitles.prototype.getOpenSubtitlesHash = function () {
-
-  var path;
-  if (new RegExp('http://').test(app.mediaInfo.mrl)) {
-    path = app.mediaInfo.filepath;
-  }
-  else if (new RegExp('file://').test(app.mediaInfo.mrl)) {
-    path = app.mediaInfo.mrl.substring(7)
-  } else {
-    path = app.mediaInfo.mrl;
-  }
-  this.OpenSubtitles.extractInfo(path)
-  .then(function (infos) {
-      app.mediaInfo.os_hash = infos.moviehash;
-      app.gui.updateMediaInfo(app.mediaInfo);
-  });
 }
