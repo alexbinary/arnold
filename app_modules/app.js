@@ -124,7 +124,7 @@ App.prototype.initHotKeys = function() {
     }
   }).bind(this));
 
-  document.querySelector('#canvas').addEventListener('click', (function() {
+  canvas.addEventListener('click', (function() {
     this.player.togglePause();
   }).bind(this));
 }

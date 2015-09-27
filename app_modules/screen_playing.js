@@ -11,11 +11,21 @@
 
 /**
  * ScreenPlaying
+ *
+ * Init UI components
  */
 function ScreenPlaying() {
 
   // these should be set by class user
   this.cmd = function() {};
+
+  selectAudio.addEventListener('change', (function () {
+    this.cmd('setAudioTrack', +selectAudio.value);
+  }).bind(this));
+
+  selectSubtitles.addEventListener('change', (function () {
+    this.cmd('setSubtitlesTrack', +selectSubtitles.value);
+  }).bind(this));
 }
 
 /**
@@ -49,6 +59,7 @@ ScreenPlaying.prototype.updateMediaInfo = function(mediaInfo) {
   mediaIMDBID.innerHTML = mediaInfo.imdb_id;
   mediaHash.innerHTML   = mediaInfo.os_hash;
 
+  var selectedAudio = selectAudio.value;
   while (selectAudio.firstChild) {
     selectAudio.removeChild(selectAudio.firstChild);
   }
@@ -58,10 +69,9 @@ ScreenPlaying.prototype.updateMediaInfo = function(mediaInfo) {
     option.text  = mediaInfo.audio[i];
     selectAudio.add(option);
   }
-  selectAudio.addEventListener('change', (function () {
-    this.cmd('setAudioTrack', +selectAudio.value);
-  }).bind(this));
+  selectAudio.value = selectedAudio;
 
+  var selectedSubtitle = selectSubtitles.value;
   while (selectSubtitles.firstChild) {
     selectSubtitles.removeChild(selectSubtitles.firstChild);
   }
@@ -71,7 +81,5 @@ ScreenPlaying.prototype.updateMediaInfo = function(mediaInfo) {
     option.text  = mediaInfo.subtitles[i];
     selectSubtitles.add(option);
   }
-  selectSubtitles.addEventListener('change', (function () {
-    this.cmd('setSubtitlesTrack', +selectSubtitles.value);
-  }).bind(this));
+  selectSubtitles.value = selectedSubtitle;
 }

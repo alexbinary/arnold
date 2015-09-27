@@ -172,7 +172,6 @@ Player.prototype.playUri = function(uri) {
  */
 Player.prototype.playMagnet = function(magnet) {
 
-  app.gui.log('opening magnet');
   Torrent.playFromTorrentOrMagnet(magnet);
 }
 
@@ -197,13 +196,9 @@ Player.prototype.playTorrent = function(path) {
 Player.prototype.playFile = function(uri) {
 
   if (this.isHTTP(uri)) {
-
-    app.gui.log('playing url');
     this.playMRL(uri);
 
   } else {
-
-    app.gui.log('playing local media file');
     this.playMRL(uri.startsWith('file://') ? uri : 'file://'+uri);
   }
 }
@@ -211,7 +206,7 @@ Player.prototype.playFile = function(uri) {
 /**
  * Player - play MRL
  *
- * @param mrl { string } - mrl that VLC can play
+ * @param mrl { string } - MRL that VLC can play
  */
 Player.prototype.playMRL = function(mrl) {
 
@@ -221,17 +216,17 @@ Player.prototype.playMRL = function(mrl) {
 /**
  * Player - test if URI is HTTP URL
  *
- * @param uri { string } - uri to test
+ * @param uri { string } - URI to test
  */
 Player.prototype.isHTTP = function(uri) {
 
-  return new RegExp('http://').test(uri);
+  return new RegExp('^http://').test(uri);
 }
 
 /**
  * Player - test if URI is magnet link
  *
- * @param uri { string } - uri to test
+ * @param uri { string } - URI to test
  */
 Player.prototype.isMagnet = function(uri) {
 
@@ -241,7 +236,7 @@ Player.prototype.isMagnet = function(uri) {
 /**
  * Player - test if URI is .torrent file
  *
- * @param uri { string } - uri to test
+ * @param uri { string } - URI to test
  */
 Player.prototype.isTorrent = function(uri) {
 

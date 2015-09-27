@@ -44,7 +44,7 @@ Gui.prototype.createAppMenuBar = function() {
     mb.item('Toggle UI', (function () {
       this.toggleUI();
     }).bind(this),
-      'I',
+      'u',
       'cmd'
     ),
 
@@ -149,9 +149,11 @@ Gui.prototype.initUiMenu = function () {
   uiMenuHome.addEventListener('click', (function() {
     this.showScreen('home');
   }).bind(this));
+
   uiMenuPlaying.addEventListener('click', (function() {
     this.showScreen('playing');
   }).bind(this));
+
   uiMenuPopcorn.addEventListener('click', (function() {
     this.showScreen('popcorn');
   }).bind(this));
@@ -170,11 +172,11 @@ Gui.prototype.initScreenHome = function () {
   // these can be changed anytime, so we need a wrapper
 
   this.screenHome.cmd = (function() {
-    this.cmd.apply(this, arguments);
+    return this.cmd.apply(this, arguments);
   }).bind(this);
 
   this.screenHome.identifyMediaType = (function() {
-    this.identifyMediaType.apply(this, arguments);
+    return this.identifyMediaType.apply(this, arguments);
   }).bind(this);
 }
 
@@ -188,7 +190,7 @@ Gui.prototype.initScreenPlaying = function () {
   // these can be changed anytime, so we need a wrapper
 
   this.screenPlaying.cmd = (function() {
-    this.cmd.apply(this, arguments);
+    return this.cmd.apply(this, arguments);
   }).bind(this);
 }
 
@@ -210,11 +212,11 @@ Gui.prototype.start = function () {
  */
 Gui.prototype.showScreen = function (screen) {
 
-  uiMenuHome.className    = screen == 'home'    ? 'active' : 'inactive';
+  uiMenuHome   .className = screen == 'home'    ? 'active' : 'inactive';
   uiMenuPlaying.className = screen == 'playing' ? 'active' : 'inactive';
   uiMenuPopcorn.className = screen == 'popcorn' ? 'active' : 'inactive';
 
-  home.style.display    = screen == 'home'    ? 'block' : 'none';
+  home   .style.display = screen == 'home'    ? 'block' : 'none';
   playing.style.display = screen == 'playing' ? 'block' : 'none';
   popcorn.style.display = screen == 'popcorn' ? 'block' : 'none';
 }
