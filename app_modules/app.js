@@ -99,6 +99,17 @@ App.prototype.initPopcorn = function () {
 App.prototype.initGui = function () {
 
   this.gui = new Gui();
+
+  this.gui.identifyMediaType = function(filepath) {
+    if(new RegExp('\.torrent$').test(filepath)) {
+      return 'torrent file';
+    } else {
+      return 'media file';
+    }
+  };
+
+  this.gui.cmd = this.command.bind(this);
+
   this.gui.onResize();
 }
 
@@ -123,6 +134,7 @@ App.prototype.initHotKeys = function() {
  */
 App.prototype.start = function () {
 
+  this.gui.start();
   this.openFromArgv();
   this.popcorn.loadResults();
 }
@@ -155,8 +167,11 @@ App.prototype.playUri = function(uri) {
   this.gui.log('opening media');
 
   this.player.playUri(uri);
-  this.gui.hideControls();
-  this.gui.showClose();
+
+  // hide user interface and make "playing" screen the active screen
+  // so that we land directly there when we show the interface again
+  this.gui.hideUI();
+  this.gui.showScreen('playing');
 }
 
 /**
@@ -173,4 +188,42 @@ App.prototype.reload = function () {
 App.prototype.showDevTools = function () {
 
   require('nw.gui').Window.get().showDevTools();
+}
+
+/**
+ * App - Respond to command
+ *
+ * @param cmd  { string } - command identifier
+ * @param args { array  } - command arguments
+ *
+ * Supported commands : • togglePause
+ *                      • stop
+ *                      • jump(ms)
+ *                      • play(uri)
+ *                      • setAudioTrack(track number)
+ *                      • setSubtitlesTrack(track number)
+ */
+App.prototype.command = function (cmd) {
+
+  var args = Array.prototype.slice.call(arguments);
+  args.shift();
+
+  if(cmd == 'togglePause') {
+    this.player.togglePause();
+
+  } else if(cmd == 'stop') {
+    this.player.stop();
+
+  } else if(cmd == 'jump') {
+    this.player.jump(args[0]);
+
+  } else if(cmd == 'play') {
+    this.playUri(args[0]);
+
+  } else if(cmd == 'setAudioTrack') {
+    this.player.setAudioTrack(args[0]);
+
+  } else if(cmd == 'setSubtitlesTrack') {
+    this.player.setSubtitlesTrack(args[0]);
+  }
 }

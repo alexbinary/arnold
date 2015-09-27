@@ -9,8 +9,8 @@
 
 'use strict';
 
-const util = require('util');
-const EventEmitter = require('events');
+var util = require('util');
+var EventEmitter = require('events');
 
 /**
  * Player
@@ -48,6 +48,44 @@ util.inherits(Player, EventEmitter);
 Player.prototype.togglePause = function () {
 
   this.vlc.togglePause();
+}
+
+/**
+ * Player - stop
+ */
+Player.prototype.stop = function () {
+
+  this.vlc.stop();
+}
+
+/**
+ * Player - jump
+ *
+ * @param delta { number } - jump delta in ms (can be negative for backward jump)
+ */
+Player.prototype.jump = function (delta) {
+
+  this.vlc.time = this.vlc.time + delta;
+}
+
+/**
+ * Player - set active audio track
+ *
+ * @param track { number }
+ */
+Player.prototype.setAudioTrack = function (track) {
+
+  this.vlc.audio.track = track;
+}
+
+/**
+ * Player - set active subtitles track
+ *
+ * @param track { number }
+ */
+Player.prototype.setSubtitlesTrack = function (track) {
+
+  this.vlc.subtitles.track = track;
 }
 
 /**

@@ -10,18 +10,141 @@
 'use strict';
 
 /**
- * ArnoldGui
+ * Gui
+ *
+ * Setup and configure GUI components
  */
 function Gui() {
 
+  // these should be set by class user
+  this.cmd               = function() {};
+  this.identifyMediaType = function() {};
+
   this.createAppMenuBar();
 
-  this.initInputs();
-  this.initDragNDrop();
+  this.initWindow();
+  this.initUiMenu();
+
+  this.initScreenHome();
+  this.initScreenPlaying();
+}
+
+/**
+ * Gui - Create application native menu bar
+ */
+Gui.prototype.createAppMenuBar = function() {
+
+  var mb = new MenuBuilder();
+
+  mb.initMenuBar();
+  mb.createMacBuiltin();
+
+  mb.menu('View', [
+
+    mb.item('Toggle UI', (function () {
+      this.toggleUI();
+    }).bind(this),
+      'I',
+      'cmd'
+    ),
+
+    mb.separator(),
+
+    mb.item('Fullscreen', function () {
+      require('nw.gui').Window.get().toggleFullscreen();
+    }),
+
+    mb.item('Kiosk', function () {
+      require('nw.gui').Window.get().toggleKioskMode();
+    }),
+
+    mb.separator(),
+
+    mb.item('Open dev tools', function () {
+      require('nw.gui').Window.get().showDevTools();
+    }),
+
+    mb.item('Reload', function () {
+      require('nw.gui').Window.get().reloadDev();
+    }),
+  ]);
+
+  mb.menu('Play', [
+
+    mb.item('Play/Pause', (function () {
+      this.cmd('togglePause');
+    }).bind(this)),
+
+    mb.item('Stop', (function () {
+      this.cmd('stop');
+    }).bind(this)),
+
+    mb.separator(),
+
+    mb.item('Jump forward 1s', (function () {
+      this.cmd('jump', +1000*1);
+    }).bind(this),
+      String.fromCharCode(29), // arrow right
+      'shift'
+    ),
+
+    mb.item('Jump forward 10s', (function () {
+      this.cmd('jump', +1000*10);
+    }).bind(this),
+      String.fromCharCode(29), // arrow right
+      'alt'
+    ),
+
+    mb.item('Jump forward 1min', (function () {
+      this.cmd('jump', +1000*60);
+    }).bind(this),
+      String.fromCharCode(29), // arrow right
+      'cmd'
+    ),
+
+    mb.item('Jump backward 1s', (function () {
+      this.cmd('jump', -1000*1);
+    }).bind(this),
+      String.fromCharCode(28), // arrow left
+      'shift'
+    ),
+
+    mb.item('Jump backward 10s', (function () {
+      this.cmd('jump', -1000*10);
+    }).bind(this),
+      String.fromCharCode(28), // arrow left
+      'alt'
+    ),
+
+    mb.item('Jump backward 1min', (function () {
+      this.cmd('jump', -1000*60);
+    }).bind(this),
+      String.fromCharCode(28), // arrow left
+      'cmd'
+    ),
+  ]);
+}
+
+/**
+ * Gui - Configure window object
+ */
+Gui.prototype.initWindow = function () {
 
   window.addEventListener('resize', (function() {
     this.onResize();
   }).bind(this));
+}
+
+/**
+ * Gui - adapt to window size change
+ */
+Gui.prototype.onResize = function() {
+}
+
+/**
+ * Gui - Setup and configure in app main menu
+ */
+Gui.prototype.initUiMenu = function () {
 
   uiMenuHome.addEventListener('click', (function() {
     this.showScreen('home');
@@ -32,10 +155,59 @@ function Gui() {
   uiMenuPopcorn.addEventListener('click', (function() {
     this.showScreen('popcorn');
   }).bind(this));
-
-  this.showScreen('home');
 }
 
+/**
+ * Gui - Init UI screen "home"
+ */
+Gui.prototype.initScreenHome = function () {
+
+  this.screenHome = new ScreenHome();
+
+  this.screenHome.showOpenFileDialog  = this.showOpenFileDialog;
+  this.screenHome.getClipboardContent = this.getClipboardContent;
+
+  // these can be changed anytime, so we need a wrapper
+
+  this.screenHome.cmd = (function() {
+    this.cmd.apply(this, arguments);
+  }).bind(this);
+
+  this.screenHome.identifyMediaType = (function() {
+    this.identifyMediaType.apply(this, arguments);
+  }).bind(this);
+}
+
+/**
+ * Gui - Init UI screen "playing"
+ */
+Gui.prototype.initScreenPlaying = function () {
+
+  this.screenPlaying = new ScreenPlaying();
+
+  // these can be changed anytime, so we need a wrapper
+
+  this.screenPlaying.cmd = (function() {
+    this.cmd.apply(this, arguments);
+  }).bind(this);
+}
+
+/**
+ * Gui - Configure UI in its initial state
+ */
+Gui.prototype.start = function () {
+
+  this.showScreen('home');
+  this.showUI();
+}
+
+/**
+ * Gui - make a ui screen active
+ *
+ * @param screen { string } - • "home"    - controls for opening a file
+ *                            • "playing" - info & controls for currently playing media
+ *                            • "popcorn" - Popcorn Time API
+ */
 Gui.prototype.showScreen = function (screen) {
 
   uiMenuHome.className    = screen == 'home'    ? 'active' : 'inactive';
@@ -47,252 +219,52 @@ Gui.prototype.showScreen = function (screen) {
   popcorn.style.display = screen == 'popcorn' ? 'block' : 'none';
 }
 
-Gui.prototype.initInputs = function() {
+/**
+ * Gui - make main UI visible
+ */
+Gui.prototype.showUI = function() {
 
-  inputFile.addEventListener('change', (function() {
-    app.playUri(inputFile.value);
-  }).bind(this));
-
-  btnChooseFile.addEventListener('click', (function() {
-    this.showOpenFileDialog();
-  }).bind(this));
-
-  btnUriOpen.addEventListener('click', (function() {
-    app.playUri(inputUri.value);
-  }).bind(this));
-
-  btnUriPaste.addEventListener('click', (function() {
-    app.playUri(this.getClipboardContent());
-  }).bind(this));
+  ui.style.display = 'block';
+  this.uiVisible = true;
 }
 
+/**
+ * Gui - make main UI invisible
+ */
+Gui.prototype.hideUI = function() {
+
+  ui.style.display = 'none';
+  this.uiVisible = false;
+}
+
+/**
+ * Gui - make main UI in/visible
+ */
+Gui.prototype.toggleUI = function() {
+
+  if(this.uiVisible) {
+    this.hideUI();
+  } else {
+    this.showUI();
+  }
+}
+
+/**
+ * Gui - open "Open File" dialog
+ */
 Gui.prototype.showOpenFileDialog = function () {
 
   inputFile.click();
 }
 
-Gui.prototype.initDragNDrop = function() {
-
-  var holder = document.querySelector('#home');
-  holder.ondragover = function (e) {
-    this.className = 'hover';
-    var filepath = e.dataTransfer.files[0] && e.dataTransfer.files[0].path;
-    var url = e.dataTransfer.getData('URL');
-    var hint1 = "";
-    var hint2 = "";
-    if (filepath) {
-      hint1 = filepath;
-      if(/\.torrent$/.test(filepath)) {
-        hint2 = "torrent file";
-      } else {
-        hint2 = "media file";
-      }
-    }
-    document.querySelector('#dropHint1').innerHTML = hint1;
-    document.querySelector('#dropHint2').innerHTML = hint2;
-    return false;
-  };
-  holder.ondragleave = function () { this.className = ''; return false; };
-  holder.ondrop = function (e) {
-    e.preventDefault();
-    var filepath = e.dataTransfer.files[0] && e.dataTransfer.files[0].path;
-    if (filepath) {
-      app.playUri(filepath);
-      return false;
-    }
-    return false;
-  };
-}
-
 /**
- * Gui - update display with new media info
+ * Gui - configure UI in playing/idle mode
  *
- * @param mediaInfo { MediaInfo }
+ * @param playing { boolean }
  */
-Gui.prototype.updateMediaInfo = function(mediaInfo) {
-
-  document.querySelector('#mediaTitle').innerHTML=mediaInfo.title;
-  document.querySelector('#mediaIMDBID').innerHTML=mediaInfo.imdb_id;
-  document.querySelector('#mediaHash').innerHTML=mediaInfo.os_hash;
-  var selectAudio = document.querySelector('#selectAudio');
-  while (selectAudio.firstChild) {
-    selectAudio.removeChild(selectAudio.firstChild);
-  }
-  for (var i = 0; i < mediaInfo.audio.count; i++) {
-    var option = document.createElement('option');
-    option.value=i;
-    option.text=mediaInfo.audio[i];
-    selectAudio.add(option);
-  }
-  selectAudio.addEventListener('change', function () {
-    app.player.vlc.audio.track = +selectAudio.value;
-  })
-  var selectSubtitles = document.querySelector('#selectSubtitles');
-  while (selectSubtitles.firstChild) {
-    selectSubtitles.removeChild(selectSubtitles.firstChild);
-  }
-  for (var i = 0; i < mediaInfo.subtitles.count; i++) {
-    var option = document.createElement('option');
-    option.value=i;
-    option.text=mediaInfo.subtitles[i];
-    selectSubtitles.add(option);
-  }
-  selectSubtitles.addEventListener('change', function () {
-    app.player.vlc.subtitles.track = +selectSubtitles.value;
-  })
-}
-
-Gui.prototype.onResize = function() {
-}
-
-Gui.prototype.hideControls = function() {
-
-  document.querySelector('#home').style.visibility='hidden';
-  document.querySelector('#home').style.display='none';
-}
-
-Gui.prototype.showClose = function () {
-}
-
-Gui.prototype.createAppMenuBar = function() {
-
-  var nwgui = require('nw.gui');
-  var menubar = undefined;
-
-  function initMenuBar() {
-
-    menubar = new nwgui.Menu({ type: 'menubar' });
-    nwgui.Window.get().menu = menubar;
-
-    menubar.createMacBuiltin('Arnold',{
-      hideEdit: false,
-      hideWindow: false
-    });
-  }
-
-  function item(label, action, key, modifiers) {
-
-    return new nwgui.MenuItem({
-      label     : label,
-      click     : action,
-      key       : key,
-      modifiers : modifiers,
-    });
-  }
-
-  function separator() {
-
-    return new nwgui.MenuItem({ type: 'separator' });
-  }
-
-  function menu(label, items) {
-
-    var menu = new nwgui.Menu();
-
-    for (var i=0 ; i<items.length ; i++) {
-      menu.append(items[i]);
-    }
-
-    var item = new nwgui.MenuItem({
-      label   : label,
-      submenu : menu,
-    });
-
-    menubar.append(item);
-  }
-
-  initMenuBar();
-
-  menu('View', [
-
-    item('Fullscreen', function () {
-      nwgui.Window.get().toggleFullscreen();
-    }),
-
-    item('Kiosk', function () {
-      nwgui.Window.get().toggleKioskMode();
-    }),
-
-    separator(),
-
-    item('Open dev tools', function () {
-      nwgui.Window.get().showDevTools();
-    }),
-
-    item('Reload', function () {
-      app.reload();
-    }),
-  ]);
-
-  menu('Play', [
-
-    item('Play/Pause', function () {
-      app.player.vlc.togglePause();
-    }),
-
-    item('Stop', function () {
-      app.player.vlc.stop();
-    }),
-
-    separator(),
-
-    item('Jump forward 1s', function () {
-      app.player.vlc.time = app.player.vlc.time + 1000*1;
-    },
-      String.fromCharCode(29), // arrow right
-      'shift'
-    ),
-
-    item('Jump forward 10s', function () {
-      app.player.vlc.time = app.player.vlc.time + 1000*10;
-    },
-      String.fromCharCode(29), // arrow right
-      'alt'
-    ),
-
-    item('Jump forward 1min', function () {
-      app.player.vlc.time = app.player.vlc.time + 1000*60;
-    },
-      String.fromCharCode(29), // arrow right
-      'cmd'
-    ),
-
-    item('Jump backward 1s', function () {
-      app.player.vlc.time = app.player.vlc.time - 1000*1;
-    },
-      String.fromCharCode(28), // arrow left
-      'shift'
-    ),
-
-    item('Jump backward 10s', function () {
-      app.player.vlc.time = app.player.vlc.time - 1000*10;
-    },
-      String.fromCharCode(28), // arrow left
-      'alt'
-    ),
-
-    item('Jump backward 1min', function () {
-      app.player.vlc.time = app.player.vlc.time - 1000*60;
-    },
-      String.fromCharCode(28), // arrow left
-      'cmd'
-    ),
-  ]);
-}
-
-Gui.prototype.log = function(text) {
-
-  document.querySelector('#log').innerHTML += '<p> • '+text+'</p>';
-}
-
-Gui.prototype.getClipboardContent = function() {
-
-  return require('nw.gui').Clipboard.get().get('text');
-}
-
 Gui.prototype.setPlaying = function (playing) {
 
-  document.querySelector('#player').className = playing ? 'playing' : '';
+  document.body.className = playing ? 'playing' : '';
 }
 
 /**
@@ -302,7 +274,7 @@ Gui.prototype.setPlaying = function (playing) {
  */
 Gui.prototype.setCurrentAudioTrack = function (track) {
 
-  selectAudio.value = track;
+  this.screenPlaying.setCurrentAudioTrack(track);
 }
 
 /**
@@ -312,5 +284,35 @@ Gui.prototype.setCurrentAudioTrack = function (track) {
  */
 Gui.prototype.setCurrentSubtitlesTrack = function (track) {
 
-  selectSubtitles.value = track;
+  this.screenPlaying.setCurrentSubtitlesTrack(track);
+}
+
+/**
+ * Gui - update display with new media info
+ *
+ * @param mediaInfo { MediaInfo }
+ */
+Gui.prototype.updateMediaInfo = function(mediaInfo) {
+
+  this.screenPlaying.updateMediaInfo(mediaInfo);
+}
+
+/**
+ * Gui - add entry to log zone
+ *
+ * @param text { string } - text to log
+ */
+Gui.prototype.log = function(text) {
+
+  log.innerHTML += '<p> • ' + text + '</p>';
+}
+
+/**
+ * Gui - return text content from system clipboard
+ *
+ * @return { string }
+ */
+Gui.prototype.getClipboardContent = function() {
+
+  return require('nw.gui').Clipboard.get().get('text');
 }

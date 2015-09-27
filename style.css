@@ -51,7 +51,7 @@ body {
 }
 /*  player is fully transparent when not playing
     solid black background when playing */
-#player.playing {
+.playing #player {
   background: black;
 }
 #subtitles {
