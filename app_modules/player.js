@@ -39,6 +39,10 @@ function Player(canvas) {
   this.vlc.onTimeChanged = (function(time) {
     this.emit('timeChanged', time);
   }).bind(this);
+
+  // init torrent engine
+
+  this.torrentUtils = new TorrentUtils();
 }
 util.inherits(Player, EventEmitter);
 
@@ -153,10 +157,7 @@ Player.prototype.getCurrentSubtitlesTrack = function () {
  */
 Player.prototype.playUri = function(uri) {
 
-  if (this.isMagnet(uri)) {
-    this.playMagnet(uri);
-
-  } else if (this.isTorrent(uri)) {
+  if (this.isMagnet(uri) || this.isTorrent(uri)) {
     this.playTorrent(uri);
 
   } else {
@@ -165,25 +166,20 @@ Player.prototype.playUri = function(uri) {
 }
 
 /**
- * Player - play magnet link
+ * Player - play magnet link or torrent file
  *
- * @param magnet { string } - magnet link
- *                            e.g. magnet:?xt=urn:btih:72F242DB89E763B6CE390F25D576195C2169B149&dn=big+buck+bunny+4k+uhd+hfr+60fps+flac+webdl+2160p+x264+zmachine&tr=udp%3A%2F%2Fopen.demonii.com%3A1337%2Fannounce
+ * @param source { string } - magnet link
+ *                            • e.g. magnet:?xt=urn:btih:72F242DB89E763B6CE390F25D576195C2169B149&dn=big+buck+bunny+4k+uhd+hfr+60fps+flac+webdl+2160p+x264+zmachine&tr=udp%3A%2F%2Fopen.demonii.com%3A1337%2Fannounce
+ *                          - local path to a .torrent file
+ *                            • e.g. /User/john/file.torrent
  */
-Player.prototype.playMagnet = function(magnet) {
+Player.prototype.playTorrent = function(source) {
 
-  Torrent.playFromTorrentOrMagnet(magnet);
-}
-
-/**
- * Player - play from torrent file
- *
- * @param path { string } - local path to a .torrent file,
- *                          e.g. /User/john/file.torrent
- */
-Player.prototype.playTorrent = function(path) {
-
-  Torrent.playFromFile(path);
+  this.torrentUtils.createStreamFromTorrent(source, (function(err, stream) {
+    if(err) return;
+    this.playUri(stream.url);
+    app.mediaInfo.filepath = stream.filepath;
+  }).bind(this));
 }
 
 /**

@@ -9,42 +9,54 @@
 
 'use strict';
 
-var Torrent = {
+/**
+ * TorrentUtils
+ */
+function TorrentUtils() {
+}
 
-  /**
-   * create HTTP stream from .torrent file
-   *
-   * @param path { string } - local path to a .torrent file
-   *                          e.g. /User/john/file.torrent
-   */
-  playFromFile : function(path) {
+/**
+ * TorrentUtils - create HTTP stream from .torrent file or magnet link
+ *
+ * @param source   { mixed    } - { string } local path to a .torrent file
+ *                              - { string } magnet link as a string
+ *                              - { buffer } .torrent raw file content
+ * @param callback { function } - { Error  } - error
+ *                              - { object } - stream data
+ *                                  • {string } path of the file being streamed
+ *                                  • {string } url of the stream
+ */
+TorrentUtils.prototype.createStreamFromTorrent = function(source, callback) {
 
-    app.gui.log('reading torrent file ...');
-    var readTorrent = require('read-torrent');
-    readTorrent(path, function (err, torrent, raw) {
-      Torrent.playFromTorrentOrMagnet(raw);
+  var createStream = function(magnet_link_or_buffer) {
+
+    var filepath = '/tmp/'+(new Date().getTime());
+
+    var engine = require('peerflix')(magnet_link_or_buffer, {
+      port: 0,
+      path: filepath,
     });
-  },
-
-  /**
-   * create HTTP stream from .torrent file
-   *
-   * @param torrent { string } - torrent file content as buffer
-   *                             or magnet link
-   */
-  playFromTorrentOrMagnet : function(magnet_link_or_buffer) {
-
-    app.gui.log('initializing download ...');
-    var peerflix = require('peerflix');
-    app.mediaInfo.filepath = '/tmp/'+(new Date().getTime());
-    var engine = peerflix(magnet_link_or_buffer, { port: 0, path:app.mediaInfo.filepath});
     engine.server.on('listening', function () {
-      app.gui.log('stream is ready');
-      app.player.playMRL('http://localhost:'+engine.server.address().port);
+      callback(null, {
+        url      : 'http://localhost:'+engine.server.address().port,
+        filepath : filepath,
+      });
     });
-    // console.log(engine.files)
-    // for(var i=0 ; i<engine.files.length ; i++) {
-    //   console.log(engine.files[i].name, engine.files[i].path)
-    // }
+  };
+
+  if(typeof source == 'string' && !(new RegExp('^magnet')).test(source)) {
+
+    require('fs').readFile(source, function (err, data) {
+      if(err) callback(err);
+      else createStream(data);
+    });
+
+  } else {
+    createStream(source);
   }
+
+  // console.log(engine.files)
+  // for(var i=0 ; i<engine.files.length ; i++) {
+  //   console.log(engine.files[i].name, engine.files[i].path)
+  // }
 }

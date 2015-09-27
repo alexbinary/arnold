@@ -14,23 +14,27 @@
  */
 function Subtitles() {
 
-  this.updateSubtitles = function(){};
+  this.updateSubtitles = function() {};
   this.OpenSubtitles = new (require('opensubtitles-api'))('OSTestUserAgent');
 
-  var input = document.querySelector('#inputFileSubtitles');
-  input.addEventListener('change', (function(){
-    this.loadSubtitles(input.value);
+  inputFileSubtitles.addEventListener('change', (function() {
+    this.loadSubtitles(inputFileSubtitles.value);
   }).bind(this));
-  document.querySelector('#buttonLoadSubtitles').addEventListener('click', (function(){
+
+  btnLoadOpenSubtitles.addEventListener('click', (function() {
     this.searchSubtitles();
+  }).bind(this));
+
+  selectOpenSubtitles.addEventListener('change', (function () {
+    this.loadSubtitles(selectOpenSubtitles.value);
   }).bind(this));
 }
 
 /**
  * Setup subtitles from local or distant .srt file
  *
- * @param uri { string } - uri for the subtitles file
- *                         can be a http URL or a local file path to a .srt file
+ * @param uri { string } - URI for the subtitles file
+ *                         can be a HTTP URL or a local file path to a .srt file
  */
 Subtitles.prototype.loadSubtitles = function (uri) {
 
@@ -60,10 +64,13 @@ Subtitles.prototype.loadSubtitles = function (uri) {
  */
 Subtitles.prototype.loadSubtitlesFromPath = function (path) {
 
-  var srt = require('fs').readFileSync(path, 'utf-8');
-  this.updateSubtitles = require('subplay')(srt, function(text) {
-    document.querySelector('#subtitles').innerHTML = text;
-  });
+  require('fs').readFile(path, 'utf-8', (function(err, data) {
+
+    this.updateSubtitles = require('subplay')(srt, function(text) {
+      subtitles_container.innerHTML = text;
+    });
+
+  }).bind(this));
 }
 
 /**
@@ -72,29 +79,29 @@ Subtitles.prototype.loadSubtitlesFromPath = function (path) {
 Subtitles.prototype.searchSubtitles = function () {
 
   this.OpenSubtitles.search({
-      sublanguageid: 'en',
-      // search by hash
-      hash: app.mediaInfo.os_hash,
-      // search by imdb_id + season x episode
-      imdbid: app.mediaInfo.imdb_id,
-      episode: app.mediaInfo.episode_nb,
-      season: app.mediaInfo.season_nb,
-      // filename: mediaInfo.title,
-      // query: mediaInfo.name,
+
+    sublanguageid: 'en',
+    // search by hash
+    hash: app.mediaInfo.os_hash,
+    // search by imdb_id + season x episode
+    imdbid: app.mediaInfo.imdb_id,
+    episode: app.mediaInfo.episode_nb,
+    season: app.mediaInfo.season_nb,
+    // filename: mediaInfo.title,
+    // query: mediaInfo.name,
+
   }).then((function (subtitles) {
-    var select = document.querySelector('#selectOpenSubtitles');
-    while (select.firstChild) {
-      select.removeChild(select.firstChild);
+
+    while (selectOpenSubtitles.firstChild) {
+      selectOpenSubtitles.removeChild(selectOpenSubtitles.firstChild);
     }
     for (var i in subtitles) {
       var option = document.createElement('option');
-      option.value=subtitles[i].url;
-      option.text=i;
-      select.add(option);
+      option.value = subtitles[i].url;
+      option.text  = i;
+      selectOpenSubtitles.add(option);
     }
-    select.addEventListener('change', (function () {
-      this.loadSubtitles(select.value);
-    }).bind(this))
+
   }).bind(this));
 }
 
