@@ -274,9 +274,9 @@ Gui.prototype.setPlaying = function (playing) {
  *
  * @param track { number }
  */
-Gui.prototype.setCurrentAudioTrack = function (track) {
+Gui.prototype.onCurrentAudioTrackChanged = function (track) {
 
-  this.screenPlaying.setCurrentAudioTrack(track);
+  this.screenPlaying.onCurrentAudioTrackChanged(track);
 }
 
 /**
@@ -284,9 +284,9 @@ Gui.prototype.setCurrentAudioTrack = function (track) {
  *
  * @param track { number }
  */
-Gui.prototype.setCurrentSubtitlesTrack = function (track) {
+Gui.prototype.onCurrentSubtitlesTrackChanged = function (track) {
 
-  this.screenPlaying.setCurrentSubtitlesTrack(track);
+  this.screenPlaying.onCurrentSubtitlesTrackChanged(track);
 }
 
 /**
@@ -294,9 +294,19 @@ Gui.prototype.setCurrentSubtitlesTrack = function (track) {
  *
  * @param mediaInfo { MediaInfo }
  */
-Gui.prototype.updateMediaInfo = function(mediaInfo) {
+Gui.prototype.onMediaInfoChanged = function(mediaInfo) {
 
-  this.screenPlaying.updateMediaInfo(mediaInfo);
+  this.screenPlaying.onMediaInfoChanged(mediaInfo);
+}
+
+/**
+ * Gui - handle OpenSubtitles search result
+ *
+ * @param subtitles { object (see opensubtitles-api) }
+ */
+Gui.prototype.onOpenSubtitlesResult = function(subtitles) {
+
+  this.screenPlaying.onOpenSubtitlesResult(subtitles);
 }
 
 /**

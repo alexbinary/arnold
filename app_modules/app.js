@@ -54,10 +54,10 @@ App.prototype.initPlayer = function() {
     this.mediaInfo.audio     = this.player.getAudio();
     this.mediaInfo.subtitles = this.player.getSubtitles();
 
-    this.gui.updateMediaInfo(this.mediaInfo);
+    this.gui.onMediaInfoChanged(this.mediaInfo);
 
-    this.gui.setCurrentAudioTrack    (this.player.getCurrentAudioTrack());
-    this.gui.setCurrentSubtitlesTrack(this.player.getCurrentSubtitlesTrack());
+    this.gui.onCurrentAudioTrackChanged    (this.player.getCurrentAudioTrack());
+    this.gui.onCurrentSubtitlesTrackChanged(this.player.getCurrentSubtitlesTrack());
 
   }).bind(this));
 
@@ -234,6 +234,8 @@ App.prototype.command = function (cmd) {
     this.subtitles.loadSubtitles(args[0]);
 
   } else if(cmd == 'searchSubtitles') {
-    this.subtitles.searchSubtitles(this.mediaInfo);
+    this.subtitles.searchSubtitles(this.mediaInfo, (function onOpenSubtitlesResult(subtitles) {
+      this.gui.onOpenSubtitlesResult(subtitles);
+    }).bind(this));
   }
 }

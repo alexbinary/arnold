@@ -33,6 +33,7 @@ function ScreenPlaying() {
 
   btnLoadOpenSubtitles.addEventListener('click', (function() {
     this.cmd('searchSubtitles');
+    openSubtitlesLoading.style.visibility = 'visible';
   }).bind(this));
 
   selectOpenSubtitles.addEventListener('change', (function () {
@@ -41,31 +42,31 @@ function ScreenPlaying() {
 }
 
 /**
- * ScreenPlaying - update display for current audio track
+ * ScreenPlaying - reflect new current audio track
  *
  * @param track { number }
  */
-ScreenPlaying.prototype.setCurrentAudioTrack = function (track) {
+ScreenPlaying.prototype.onCurrentAudioTrackChanged = function (track) {
 
   selectAudio.value = track;
 }
 
 /**
- * ScreenPlaying - update display for current subtitles track
+ * ScreenPlaying - reflect new current subtitles track
  *
  * @param track { number }
  */
-ScreenPlaying.prototype.setCurrentSubtitlesTrack = function (track) {
+ScreenPlaying.prototype.onCurrentSubtitlesTrackChanged = function (track) {
 
   selectSubtitles.value = track;
 }
 
 /**
- * ScreenPlaying - update display with new media info
+ * ScreenPlaying - reflect new media info
  *
  * @param mediaInfo { MediaInfo }
  */
-ScreenPlaying.prototype.updateMediaInfo = function(mediaInfo) {
+ScreenPlaying.prototype.onMediaInfoChanged = function(mediaInfo) {
 
   mediaTitle.innerHTML  = mediaInfo.title;
   mediaIMDBID.innerHTML = mediaInfo.imdb_id;
@@ -94,4 +95,35 @@ ScreenPlaying.prototype.updateMediaInfo = function(mediaInfo) {
     selectSubtitles.add(option);
   }
   selectSubtitles.value = selectedSubtitle;
+}
+
+/**
+ * ScreenPlaying - reflect OpenSubtitles search result
+ *
+ * @param subtitles { object (see opensubtitles-api) }
+ */
+ScreenPlaying.prototype.onOpenSubtitlesResult = function(subtitles) {
+
+  openSubtitlesLoading.style.visibility = 'hidden';
+
+  while (selectOpenSubtitles.firstChild) {
+    selectOpenSubtitles.removeChild(selectOpenSubtitles.firstChild);
+  }
+  for (var i in subtitles) {
+    var option = document.createElement('option');
+    option.value = subtitles[i].url;
+    option.text  = i;
+    selectOpenSubtitles.add(option);
+  }
+  this.cmd('loadSubtitles', selectOpenSubtitles.value);
+}
+
+/**
+ * ScreenPlaying - get currently selected OpenSubtitle item
+ *
+ * @return { string } file url
+ */
+ScreenPlaying.prototype.getSelectedOpenSubtitle = function() {
+
+  return selectOpenSubtitles.value;
 }

@@ -52,7 +52,10 @@ Subtitles.prototype.loadSubtitles = function (uri) {
  */
 Subtitles.prototype.loadSubtitlesFromPath = function (path) {
 
-  require('fs').readFile(path, 'utf-8', (function(err, data) {
+  require('fs').readFile(path, (function(err, buffer) {
+
+    var encoding = 'utf8';
+    var data = buffer.toString(encoding);
 
     this.updateSubtitles = require('subplay')(data, function(text) {
       subtitles_container.innerHTML = text;
@@ -65,8 +68,9 @@ Subtitles.prototype.loadSubtitlesFromPath = function (path) {
  * Get available subtitles from OpenSubtitles for the media currently playing
  *
  * @param mediaInfo { MediaInfo }
+ * @param callback  { function  }
  */
-Subtitles.prototype.searchSubtitles = function (mediaInfo) {
+Subtitles.prototype.searchSubtitles = function (mediaInfo, callback) {
 
   // console.log(mediaInfo.filepath);
 
@@ -81,15 +85,8 @@ Subtitles.prototype.searchSubtitles = function (mediaInfo) {
 
   }).then((function (subtitles) {
 
-    while (selectOpenSubtitles.firstChild) {
-      selectOpenSubtitles.removeChild(selectOpenSubtitles.firstChild);
-    }
-    for (var i in subtitles) {
-      var option = document.createElement('option');
-      option.value = subtitles[i].url;
-      option.text  = i;
-      selectOpenSubtitles.add(option);
-    }
+    console.log(subtitles);
+    callback(subtitles);
 
   }).bind(this));
 }

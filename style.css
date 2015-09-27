@@ -228,6 +228,9 @@ input[type="text"]:hover {
   display: inline-block;
   width: 200px;
 }
+#openSubtitlesLoading {
+  visibility: hidden;
+}
 
 /*  "popcorn" section covers the entire screen  */
 #popcorn {
