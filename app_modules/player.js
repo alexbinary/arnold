@@ -81,6 +81,8 @@ Player.prototype.getCurrentAudioTrack = function () {
 
 /**
  * @return { WebChimera.VlcSubtitles }
+ * NB: .count returns the number of tracks
+ *     [i] returns the ith track
  */
 Player.prototype.getSubtitles = function () {
   return this.vlc.subtitles;
@@ -108,7 +110,7 @@ Player.prototype.getCurrentSubtitlesTrack = function () {
  *                      • setAudioTrack(track number)
  *                      • toggleMute
  *                      • setSubtitlesTrack(track number)
- *                      • setSubtitlesFile(path or url)
+ *                      • setSubtitlesFile(path or url, encoding)
  */
 Player.prototype.cmd = function (cmd) {
 
@@ -116,28 +118,18 @@ Player.prototype.cmd = function (cmd) {
   args.shift();
 
   if(cmd == 'play') {
-    if(args[0]) { var uri = args[0];
 
-      if (uri.startsWith('magnet:') || uri.endsWith('.torrent')) {
+    // play given uri
+    // calling without args resumes playing, if possible
 
-        require('../app_modules/torrent').createStreamFromTorrent(uri, (function(err, stream) {
-          if(err) return;
-          this.cmd('play', stream.url);
-        }).bind(this));
+    var uri = args[0];
 
-      } else {
-
-        if (uri.startsWith('http://')) {
-          this.vlc.play(uri);
-
-        } else {
-          this.vlc.play(uri.startsWith('file://') ? uri : 'file://'+uri);
-        }
-      }
-
+    if(uri) {
+      this.playURI(uri);
     } else {
       this.vlc.play();
     }
+
   } else if(cmd == 'pause') {
     this.vlc.pause();
 
@@ -161,38 +153,85 @@ Player.prototype.cmd = function (cmd) {
 
   } else if (cmd == 'setSubtitlesFile') {
 
-    if (args[0]) { var uri = args[0];
+    // load subtitle file from local path or url
+    // second arg is the file encoding
+    // calling with no args unload the current file
 
-      if (uri.startsWith('http://')) {
+    var uri      = args[0];
+    var encoding = args[1];
 
-        var dir = '/tmp/arnold/srt';
-        var name = new Date().getTime() + '.srt';
-        var path = dir+'/'+name;
-
-        new (require('download'))()
-        .get(uri)
-        .dest(dir)
-        .rename(name)
-        .run((function() {
-          this.cmd('setSubtitlesFile', path);
-        }).bind(this));
-
-      } else {
-
-        require('fs').readFile(uri, 'utf-8', (function(err, data) {
-          if(err) return;
-          this.updateSubtitles = (require('subplay'))(data, (function(text) {
-            this.writeSubtitle(text);
-          }).bind(this));
-        }).bind(this));
-      }
+    if (uri) {
+      this.setSubtitlesFile(uri, encoding);
 
     } else {
-
       this.updateSubtitles(-1);
       this.updateSubtitles = function(){};
       this.writeSubtitle('');
     }
+  }
+}
+
+/**
+ * Play local path to file, .torrent, URL, or magnet link
+ */
+Player.prototype.playURI = function (uri) {
+
+  if (uri.startsWith('magnet:') || uri.endsWith('.torrent')) {
+
+    require('../app_modules/torrent').createStreamFromTorrent(uri, (function(err, stream) {
+      if(err) return;
+      this.cmd('play', stream.url);
+    }).bind(this));
+
+  } else {
+
+    if (uri.startsWith('http://')) {
+      this.vlc.play(uri);
+
+    } else {
+      this.vlc.play(uri.startsWith('file://') ? uri : 'file://'+uri);
+    }
+  }
+}
+
+/**
+ * Setup subtitles from local path or URL
+ * try to detect encoding if omitted
+ */
+Player.prototype.setSubtitlesFile = function (uri, encoding) {
+
+  if (uri.startsWith('http://')) {
+
+    var dir = '/tmp/arnold/srt';
+    var name = new Date().getTime() + '.srt';
+    var path = dir+'/'+name;
+
+    new (require('download'))()
+    .get(uri)
+    .dest(dir)
+    .rename(name)
+    .run((function() {
+      this.setSubtitlesFile(path, encoding);
+    }).bind(this));
+
+  } else {
+
+    require('fs').readFile(uri, (function(err, buffer) {
+      if(err) return;
+      if(!encoding) {
+        var matches = require('charset-detector')(buffer);
+        encoding = matches[0] && matches[0].charsetName;
+      }
+      try {
+        var text = require('legacy-encoding').decode(buffer, encoding);
+      } catch(e) {
+        console.log(e);
+        var text = buffer.toString();
+      }
+      this.updateSubtitles = require('subplay')(text, (function(text) {
+        this.writeSubtitle(text);
+      }).bind(this));
+    }).bind(this));
   }
 }
 
