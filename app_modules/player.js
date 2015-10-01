@@ -46,12 +46,24 @@ function Player(root) {
     this.emit('timeChanged', time);
   }).bind(this);
 
-  // init subtitles engine
+  // init subtitles player
 
   this.updateSubtitles = function(){};
   this.on('timeChanged', (function(time) {
     this.updateSubtitles(time/1000);
   }).bind(this));
+
+  // init subtitles manager
+
+  this.loadedSubtitles = [];
+  this.subtitlesActiveIndex = undefined;
+  this.subtitlesActiveLocale = undefined;
+
+  // init audio manager
+
+  this.loadedAudioTracks = [];
+  this.audioActiveIndex = undefined;
+  this.audioActiveLocale = undefined;
 }
 util.inherits(Player, EventEmitter);
 
@@ -67,6 +79,8 @@ Player.prototype.getCurrentPlaylistItem = function () {
 
 /**
  * @return { WebChimera.VlcAudio }
+ * NB: .count returns the number of tracks
+ *     [i] returns the ith track
  */
 Player.prototype.getAudio = function () {
   return this.vlc.audio;
@@ -240,4 +254,200 @@ Player.prototype.setSubtitlesFile = function (uri, encoding) {
  */
 Player.prototype.writeSubtitle = function (text) {
   this.uiSubtitlesBox.innerHTML = text;
+}
+
+/**
+ * @param userLocale { string } e.g. 'fr-FR', 'fr', 'en', etc.
+ * each call will switch to the next best audio track
+ */
+Player.prototype.setNextBestAudioForLocale = function(locale) {
+
+  if(locale != this.audioActiveLocale) {
+
+    this.loadedAudioTracks = [];
+    this.audioActiveIndex = undefined;
+    this.audioActiveLocale = locale;
+  }
+
+  if(this.loadedAudioTracks.length == 0) {
+
+    var sortedAudioIndexes = this.sortTracksForLocale(
+      this.getAudio(),
+      this.audioActiveLocale
+    );
+
+    for(var i=0 ; i<sortedAudioIndexes.length ; i++) {
+      this.loadedAudioTracks.push({
+        type: 'internal',
+        internalIndex: sortedAudioIndexes[i],
+        name: this.getAudio()[sortedAudioIndexes[i]],
+      });
+    }
+  }
+
+  this.audioActiveIndex ++ ;
+  if(Number.isNaN(this.audioActiveIndex)) this.audioActiveIndex = 0;
+
+  if(this.audioActiveIndex == this.getAudio().count) {
+    this.audioActiveIndex = 0;
+  }
+
+  var audio = this.loadedAudioTracks[this.audioActiveIndex];
+  if(audio && audio.type == 'internal') {
+    this.cmd('setAudioTrack', audio.internalIndex);
+  }
+}
+
+/**
+ * @param userLocale { string } e.g. 'fr-FR', 'fr', 'en', etc.
+ * each call will switch to the next best subtitle
+ */
+Player.prototype.setNextBestSubtitleForLocale = function(locale) {
+
+  if(locale != this.subtitlesActiveLocale) {
+
+    this.loadedSubtitles = [];
+    this.subtitlesActiveIndex = undefined;
+    this.subtitlesActiveLocale = locale;
+  }
+
+  if(this.loadedSubtitles.length == 0) {
+
+    var sortedSubtitlesIndexes = this.sortTracksForLocale(
+      this.getSubtitles(),
+      this.subtitlesActiveLocale
+    );
+
+    for(var i=0 ; i<sortedSubtitlesIndexes.length ; i++) {
+      this.loadedSubtitles.push({
+        type: 'internal',
+        internalIndex: sortedSubtitlesIndexes[i],
+        name: this.getSubtitles()[sortedSubtitlesIndexes[i]],
+      });
+    }
+  }
+
+  this.cmd('setSubtitlesTrack', -1);  // disable current track
+
+  this.subtitlesActiveIndex ++ ;
+  if(Number.isNaN(this.subtitlesActiveIndex)) this.subtitlesActiveIndex = 0;
+
+  if(this.subtitlesActiveIndex == this.getSubtitles().count) {
+    console.log("no more subs");
+    return;
+  }
+
+  var subtitle = this.loadedSubtitles[this.subtitlesActiveIndex];
+  if(subtitle && subtitle.type == 'internal') {
+    this.cmd('setSubtitlesTrack', subtitle.internalIndex);
+  }
+}
+
+/**
+ * @param tracks { WebChimera.VlcAudio | WebChimera.VlcSubtitles }
+ * @param userLocale { string } e.g. 'fr-FR', 'fr', 'en', etc.
+ *
+ * @returns { array } sorted tacks indexes, preffered track first
+ */
+Player.prototype.sortTracksForLocale = function (tracks, userLocale) {
+
+  // extract lang from user locale
+  // and find locales with the same lang
+
+  var userLang = userLocale.split('-')[0];
+
+  var langmap = require('langmap');
+
+  var acceptedLocales = [ userLocale ]; // put user locale as first item
+  var acceptedItems = [ langmap[userLocale] ];
+
+  for(var locale in langmap) {
+    if(locale != userLocale && locale.split('-')[0] == userLang) {
+      acceptedLocales.push(locale);
+      acceptedItems.push(langmap[locale]);
+    }
+  }
+
+  // compute score for each track
+  // desired output must respect the following :
+  //
+  // - match on locale's english or native name is preffered over match on abbrevation,
+  //   regardless if the locale is the user locale or a compatible locale ;
+  // - match on abbreviation is preferred over no match at all ;
+  // - match on user locale is preferred over match on a compatible locale
+  // - match on a compatible locale is equally preferred over a match on another compatible locale
+  //
+  // here is the scoring function implemented below :
+  //
+  //   |> match on english or native name (4) or none (0)
+  //   |   |> match on user locale (2) or compatible locale (0)
+  //   |   |   |> match on abbreviation (1) or not (0)
+  //   0 + 0 + 0  = 0  --\
+  //   0 + 0 + 1  = 1     > these two does not match to anything and get 0
+  //   0 + 2 + 0  = 0  --/
+  //   0 + 2 + 1  = 3
+  //   4 + 0 + 0  = 4
+  //   4 + 0 + 1  = 5
+  //   4 + 2 + 0  = 6
+  //   4 + 2 + 1  = 7
+
+  var scores = [ null ];  // will contain one score for each track with corresponding indexes
+                          // skip track 0 which is always the 'disable' track
+  for(var i=1 ; i<tracks.count ; i++) {
+
+    var trackScores = []; // store scores for this track for each locales
+
+    for(var j=0 ; j<acceptedItems.length ; j++) {
+
+      // match on english or native name brings 4,
+      // match on the abbreviation brings 1
+
+      var matchScore = 0;
+
+      if(tracks[i].indexOf(acceptedItems[j]["englishName"]) != -1
+      || tracks[i].indexOf(acceptedItems[j]["nativeName"]) != -1 ) {
+        matchScore = 4;
+      }
+      if(tracks[i].indexOf(acceptedLocales[j]) != -1) {
+        matchScore = 1;
+      }
+
+      // match on the user locale brings 2,
+      // match on a compatible locale brings 0
+
+      var isUserLocale = j == 0;  // user locale is the first in the list
+
+      var localeScore = isUserLocale ? 2 : 0;
+
+      // matching score of 0 nulls the total score
+
+      trackScores.push(matchScore != 0
+        ? matchScore + localeScore
+        : 0
+      );
+    }
+
+    // final score for this track is the max of scores for each locales
+    // i.e. if it has a good score for one locale,
+    // we don't care if it has a lesser score for another locale
+
+    scores.push(Math.max.apply(null,trackScores));
+  }
+
+  // sort tracks indexes by score, greatest score first
+
+  var indexes = [];
+  // skip track 0 which is always the 'disable' track
+  for(var i=1 ; i<tracks.count ; i++) indexes.push(i);
+
+  var sortedTracks = indexes.sort(function(a,b){
+    return scores[a] == scores[b]
+      ? 0
+      : scores[a] > scores[b] // greatest score comes first
+        ? -1
+        : +1
+    ;
+  });
+
+  return sortedTracks;
 }
