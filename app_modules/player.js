@@ -90,6 +90,8 @@ module.exports = Player;
  *                      • setSubtitlesFile(path or url, [encoding])
  *                      • nextAudio([locale])
  *                      • nextSubtitles([locale])
+ *                      • setLoadedAudio(index)
+ *                      • setLoadedSubtitles(index)
  */
 Player.prototype.cmd = function (cmd) {
 
@@ -158,6 +160,16 @@ Player.prototype.cmd = function (cmd) {
 
     var locale = args[0];
     this.setNextBestSubtitlesForLocale(locale);
+
+  } else if (cmd == 'setLoadedAudio') {
+
+    var index = args[0];
+    this.setCurrentLoadedAudio(index);
+
+  } else if (cmd == 'setLoadedSubtitles') {
+
+    var index = args[0];
+    this.setCurrentLoadedSubtitles(index);
   }
 }
 
@@ -254,10 +266,7 @@ Player.prototype.setNextBestAudioForLocale = function(locale) {
     this.audioActiveIndex = 0;  // circle back to first track
   }
 
-  var audio = this.loadedAudio[this.audioActiveIndex];
-  if(audio && audio.type == 'internal') {
-    this.cmd('setAudioTrack', audio.internalIndex);
-  }
+  this.setCurrentLoadedAudio();
 }
 
 /**
@@ -287,10 +296,7 @@ Player.prototype.setNextBestSubtitlesForLocale = function(locale) {
     return;
   }
 
-  var subtitle = this.loadedSubtitles[this.subtitlesActiveIndex];
-  if(subtitle && subtitle.type == 'internal') {
-    this.cmd('setSubtitlesTrack', subtitle.internalIndex);
-  }
+  this.setCurrentLoadedSubtitles();
 }
 
 /**
@@ -303,12 +309,52 @@ Player.prototype.getLoadedAudio = function () {
 }
 
 /**
+ * @return { number } index of current loaded audio
+ */
+Player.prototype.getCurrentLoadedAudio = function () {
+  return this.audioActiveIndex;
+}
+
+/**
+ * @param index { number } index in this.loadedAudio
+ */
+Player.prototype.setCurrentLoadedAudio = function (index) {
+  // use existing audioActiveIndex if index omitted
+  // check for number type to allow 0
+  if(typeof index == 'number') this.audioActiveIndex = index;
+  var audio = this.loadedAudio[this.audioActiveIndex];
+  if(audio && audio.type == 'internal') {
+    this.cmd('setAudioTrack', audio.internalIndex);
+  }
+}
+
+/**
  * @return { array of objects } - type: 'internal',
  *                                internalIndex: { number },
  *                                name: { string },
  */
 Player.prototype.getLoadedSubtitles = function () {
   return this.loadedSubtitles;
+}
+
+/**
+ * @return { number } index of current loaded subtitles
+ */
+Player.prototype.getCurrentLoadedSubtitles = function () {
+  return this.subtitlesActiveIndex;
+}
+
+/**
+ * @param index { number } index in this.loadedSubtitles
+ */
+Player.prototype.setCurrentLoadedSubtitles = function (index) {
+  // use existing subtitlesActiveIndex if index omitted
+  // check for number type to allow 0
+  if(typeof index == 'number') this.subtitlesActiveIndex = index;
+  var subtitle = this.loadedSubtitles[this.subtitlesActiveIndex];
+  if(subtitle && subtitle.type == 'internal') {
+    this.cmd('setSubtitlesTrack', subtitle.internalIndex);
+  }
 }
 
 /**
@@ -453,18 +499,23 @@ Player.prototype.sortTracksForLocale = function (tracks, userLocale) {
   // extract lang from user locale
   // and find locales with the same lang
 
-  var userLang = userLocale.split('-')[0];
+  if(userLocale) {
+    var userLang = userLocale.split('-')[0];
 
-  var langmap = require('langmap');
+    var langmap = require('langmap');
 
-  var acceptedLocales = [ userLocale ]; // put user locale as first item
-  var acceptedItems = [ langmap[userLocale] ];
+    var acceptedLocales = [ userLocale ]; // put user locale as first item
+    var acceptedItems = [ langmap[userLocale] ];
 
-  for(var locale in langmap) {
-    if(locale != userLocale && locale.split('-')[0] == userLang) {
-      acceptedLocales.push(locale);
-      acceptedItems.push(langmap[locale]);
+    for(var locale in langmap) {
+      if(locale != userLocale && locale.split('-')[0] == userLang) {
+        acceptedLocales.push(locale);
+        acceptedItems.push(langmap[locale]);
+      }
     }
+  } else {
+    var acceptedLocales = [];
+    var acceptedItems = [];
   }
 
   // compute score for each track
