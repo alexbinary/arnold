@@ -35,33 +35,38 @@ function Player(root) {
   // map WebChimera callbacks to EventEmitter events for convenience
 
   this.vlc.onPlaying = (function() {
+    // load audio and subs when media starts playing
+    // do nothing when resuming playing from paused
+    if(this.loadAudioForLocaleIfNeeded()) {
+      // if audio was reloaded, setup first track
+      this.setNextBestAudioForLocale();
+    }
+    this.loadSubtitlesForLocaleIfNeeded();
     this.emit('playing');
   }).bind(this);
 
   this.vlc.onStopped = (function() {
+    this.unloadAudio();
+    this.unloadSubtitles();
     this.emit('stopped');
   }).bind(this);
 
   this.vlc.onTimeChanged = (function(time) {
+    this.updateSubtitles(time/1000);
     this.emit('timeChanged', time);
   }).bind(this);
 
   // init subtitles player
 
   this.updateSubtitles = function(){};
-  this.on('timeChanged', (function(time) {
-    this.updateSubtitles(time/1000);
-  }).bind(this));
 
-  // init subtitles manager
+  // init audio and subtitles manager
 
   this.loadedSubtitles = [];
   this.subtitlesActiveIndex = undefined;
   this.subtitlesActiveLocale = undefined;
 
-  // init audio manager
-
-  this.loadedAudioTracks = [];
+  this.loadedAudio = [];
   this.audioActiveIndex = undefined;
   this.audioActiveLocale = undefined;
 }
@@ -109,13 +114,85 @@ Player.prototype.getCurrentSubtitlesTrack = function () {
   return this.getSubtitles().track;
 }
 
+Player.prototype.getLoadedAudio = function () {
+  return this.loadedAudio;
+}
+
+Player.prototype.getLoadedSubtitles = function () {
+  return this.loadedSubtitles;
+}
+
+/**
+ * @param userLocale { string } e.g. 'fr-FR', 'fr', 'en', etc.
+ * each call will switch to the next best audio track
+ * circle back to first track if called on the last
+ * if locale is omitted last defined is used
+ */
+Player.prototype.setNextBestAudioForLocale = function(locale) {
+
+  // reload everything if locale changed
+  // uses existing audioActiveLocale if locale omitted
+  if(locale && locale != this.audioActiveLocale) {
+
+    this.unloadAudio();
+    this.audioActiveLocale = locale;
+  }
+
+  this.loadAudioForLocaleIfNeeded(this.audioActiveLocale);
+
+  this.audioActiveIndex ++ ;
+  if(Number.isNaN(this.audioActiveIndex)) this.audioActiveIndex = 0;
+
+  if(this.audioActiveIndex == this.loadedAudio.length) {
+    this.audioActiveIndex = 0;  // circle back to first track
+  }
+
+  var audio = this.loadedAudio[this.audioActiveIndex];
+  if(audio && audio.type == 'internal') {
+    this.cmd('setAudioTrack', audio.internalIndex);
+  }
+}
+
+/**
+ * @param userLocale { string } e.g. 'fr-FR', 'fr', 'en', etc.
+ * each call will switch to the next best subtitle
+ * if locale is omitted last defined is used
+ */
+Player.prototype.setNextBestSubtitleForLocale = function(locale) {
+
+  // reload everything if locale changed
+  // uses existing subtitlesActiveLocale if locale omitted
+  if(locale && locale != this.subtitlesActiveLocale) {
+
+    this.unloadSubtitles();
+    this.subtitlesActiveLocale = locale;
+  }
+
+  this.loadSubtitlesForLocaleIfNeeded(this.subtitlesActiveLocale);
+
+  this.cmd('setSubtitlesTrack', -1);  // disable current track
+
+  this.subtitlesActiveIndex ++ ;
+  if(Number.isNaN(this.subtitlesActiveIndex)) this.subtitlesActiveIndex = 0;
+
+  if(this.subtitlesActiveIndex == this.loadedSubtitles.length) {
+    console.log("no more subs");
+    return;
+  }
+
+  var subtitle = this.loadedSubtitles[this.subtitlesActiveIndex];
+  if(subtitle && subtitle.type == 'internal') {
+    this.cmd('setSubtitlesTrack', subtitle.internalIndex);
+  }
+}
+
 /**
  * App - Respond to command
  *
  * @param cmd  { string } - command identifier
  * @param args { array  } - command arguments
  *
- * Supported commands : • play(uri)
+ * Supported commands : • play(uri, [locale])
  *                      • play
  *                      • pause
  *                      • togglePause
@@ -124,7 +201,7 @@ Player.prototype.getCurrentSubtitlesTrack = function () {
  *                      • setAudioTrack(track number)
  *                      • toggleMute
  *                      • setSubtitlesTrack(track number)
- *                      • setSubtitlesFile(path or url, encoding)
+ *                      • setSubtitlesFile(path or url, [encoding])
  */
 Player.prototype.cmd = function (cmd) {
 
@@ -133,13 +210,14 @@ Player.prototype.cmd = function (cmd) {
 
   if(cmd == 'play') {
 
-    // play given uri
+    // play given uri with given locale
     // calling without args resumes playing, if possible
 
     var uri = args[0];
+    var loc = args[1];
 
     if(uri) {
-      this.playURI(uri);
+      this.playURI(uri, loc);
     } else {
       this.vlc.play();
     }
@@ -187,14 +265,15 @@ Player.prototype.cmd = function (cmd) {
 
 /**
  * Play local path to file, .torrent, URL, or magnet link
+ * init preferred subtitles and audio based on given locale (optional)
  */
-Player.prototype.playURI = function (uri) {
+Player.prototype.playURI = function (uri, locale) {
 
   if (uri.startsWith('magnet:') || uri.endsWith('.torrent')) {
 
     require('../app_modules/torrent').createStreamFromTorrent(uri, (function(err, stream) {
       if(err) return;
-      this.cmd('play', stream.url);
+      this.playURI(stream.url, locale);
     }).bind(this));
 
   } else {
@@ -205,6 +284,9 @@ Player.prototype.playURI = function (uri) {
     } else {
       this.vlc.play(uri.startsWith('file://') ? uri : 'file://'+uri);
     }
+
+    this.audioActiveLocale = locale;
+    this.subtitlesActiveLocale = locale;
   }
 }
 
@@ -256,92 +338,77 @@ Player.prototype.writeSubtitle = function (text) {
   this.uiSubtitlesBox.innerHTML = text;
 }
 
-/**
- * @param userLocale { string } e.g. 'fr-FR', 'fr', 'en', etc.
- * each call will switch to the next best audio track
- */
-Player.prototype.setNextBestAudioForLocale = function(locale) {
 
-  if(locale != this.audioActiveLocale) {
+Player.prototype.loadAudioForLocaleIfNeeded = function (locale) {
 
-    this.loadedAudioTracks = [];
-    this.audioActiveIndex = undefined;
-    this.audioActiveLocale = locale;
+  if(!this.loadedAudio || this.loadedAudio.length == 0) {
+    this.loadAudioForLocale(locale);
+    return true;
   }
+  return false;
+}
+Player.prototype.loadAudioForLocale = function (locale) {
 
-  if(this.loadedAudioTracks.length == 0) {
+  // use existing audioActiveLocale if no locale specified
+  if(locale) this.audioActiveLocale = locale;
 
-    var sortedAudioIndexes = this.sortTracksForLocale(
-      this.getAudio(),
-      this.audioActiveLocale
-    );
+  var sortedAudioIndexes = this.sortTracksForLocale(
+    this.getAudio(),
+    this.audioActiveLocale
+  );
 
-    for(var i=0 ; i<sortedAudioIndexes.length ; i++) {
-      this.loadedAudioTracks.push({
-        type: 'internal',
-        internalIndex: sortedAudioIndexes[i],
-        name: this.getAudio()[sortedAudioIndexes[i]],
-      });
-    }
+  this.loadedAudio = [];
+  for(var i=0 ; i<sortedAudioIndexes.length ; i++) {
+    this.loadedAudio.push({
+      type: 'internal',
+      internalIndex: sortedAudioIndexes[i],
+      name: this.getAudio()[sortedAudioIndexes[i]],
+    });
   }
-
-  this.audioActiveIndex ++ ;
-  if(Number.isNaN(this.audioActiveIndex)) this.audioActiveIndex = 0;
-
-  if(this.audioActiveIndex == this.getAudio().count) {
-    this.audioActiveIndex = 0;
-  }
-
-  var audio = this.loadedAudioTracks[this.audioActiveIndex];
-  if(audio && audio.type == 'internal') {
-    this.cmd('setAudioTrack', audio.internalIndex);
-  }
+  this.audioActiveIndex = undefined;
 }
 
-/**
- * @param userLocale { string } e.g. 'fr-FR', 'fr', 'en', etc.
- * each call will switch to the next best subtitle
- */
-Player.prototype.setNextBestSubtitleForLocale = function(locale) {
+Player.prototype.unloadAudio = function () {
 
-  if(locale != this.subtitlesActiveLocale) {
-
-    this.loadedSubtitles = [];
-    this.subtitlesActiveIndex = undefined;
-    this.subtitlesActiveLocale = locale;
-  }
-
-  if(this.loadedSubtitles.length == 0) {
-
-    var sortedSubtitlesIndexes = this.sortTracksForLocale(
-      this.getSubtitles(),
-      this.subtitlesActiveLocale
-    );
-
-    for(var i=0 ; i<sortedSubtitlesIndexes.length ; i++) {
-      this.loadedSubtitles.push({
-        type: 'internal',
-        internalIndex: sortedSubtitlesIndexes[i],
-        name: this.getSubtitles()[sortedSubtitlesIndexes[i]],
-      });
-    }
-  }
-
-  this.cmd('setSubtitlesTrack', -1);  // disable current track
-
-  this.subtitlesActiveIndex ++ ;
-  if(Number.isNaN(this.subtitlesActiveIndex)) this.subtitlesActiveIndex = 0;
-
-  if(this.subtitlesActiveIndex == this.getSubtitles().count) {
-    console.log("no more subs");
-    return;
-  }
-
-  var subtitle = this.loadedSubtitles[this.subtitlesActiveIndex];
-  if(subtitle && subtitle.type == 'internal') {
-    this.cmd('setSubtitlesTrack', subtitle.internalIndex);
-  }
+  this.loadedAudio = [];
+  this.audioActiveIndex = undefined;
 }
+
+Player.prototype.loadSubtitlesForLocaleIfNeeded = function (locale) {
+
+  if(!this.loadedSubtitles || this.loadedSubtitles.length == 0) {
+    this.loadSubtitlesForLocale(locale);
+    return true;
+  }
+  return false;
+}
+Player.prototype.loadSubtitlesForLocale = function (locale) {
+
+  // use existing subtitlesActiveLocale if no locale specified
+  if(locale) this.subtitlesActiveLocale = locale;
+
+  var sortedSubtitlesIndexes = this.sortTracksForLocale(
+    this.getSubtitles(),
+    this.subtitlesActiveLocale
+  );
+
+  this.loadedSubtitles = [];
+  for(var i=0 ; i<sortedSubtitlesIndexes.length ; i++) {
+    this.loadedSubtitles.push({
+      type: 'internal',
+      internalIndex: sortedSubtitlesIndexes[i],
+      name: this.getSubtitles()[sortedSubtitlesIndexes[i]],
+    });
+  }
+  this.subtitlesActiveIndex = undefined;
+}
+
+Player.prototype.unloadSubtitles = function () {
+
+  this.loadedSubtitles = [];
+  this.subtitlesActiveIndex = undefined;
+}
+
 
 /**
  * @param tracks { WebChimera.VlcAudio | WebChimera.VlcSubtitles }
