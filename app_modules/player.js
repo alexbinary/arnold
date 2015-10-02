@@ -39,7 +39,7 @@ function Player(root) {
     // do nothing when resuming playing from paused
     if(this.loadAudioForLocaleIfNeeded()) {
       // if audio was reloaded, setup first track
-      this.setNextBestAudioForLocale();
+      this.setCurrentLoadedAudio(0);
     }
     this.loadSubtitlesForLocaleIfNeeded();
     this.emit('playing');
@@ -295,34 +295,6 @@ Player.prototype.stopExternalSubtitle = function () {
 
 /**
  * @param userLocale { string } e.g. 'fr-FR', 'fr', 'en', etc.
- * each call will switch to the next best audio track
- * circle back to first track if called on the last
- * if locale is omitted last defined is used
- */
-Player.prototype.setNextBestAudioForLocale = function(locale) {
-
-  // reload everything if locale changed
-  // uses existing audioActiveLocale if locale omitted
-  if(locale && locale != this.audioActiveLocale) {
-
-    this.unloadAudio();
-    this.audioActiveLocale = locale;
-  }
-
-  this.loadAudioForLocaleIfNeeded(this.audioActiveLocale);
-
-  this.audioActiveIndex ++ ;
-  if(Number.isNaN(this.audioActiveIndex)) this.audioActiveIndex = 0;
-
-  if(this.audioActiveIndex == this.loadedAudio.length) {
-    this.audioActiveIndex = 0;  // circle back to first track
-  }
-
-  this.setCurrentLoadedAudio();
-}
-
-/**
- * @param userLocale { string } e.g. 'fr-FR', 'fr', 'en', etc.
  * each call will switch to the next best subtitle
  * if locale is omitted last defined is used
  */
@@ -338,8 +310,8 @@ Player.prototype.setNextBestSubtitlesForLocale = function(locale) {
 
   this.loadSubtitlesForLocaleIfNeeded(this.subtitlesActiveLocale);
 
-  if(!Number.isInteger(this.subtitlesActiveIndex)) this.subtitlesActiveIndex = -1;
-  if(this.subtitlesActiveIndex >= this.loadedSubtitles.length-1) {
+  if(!Number.isInteger(this.subtitlesDiscoveryIndex)) this.subtitlesDiscoveryIndex = -1;
+  if(this.subtitlesDiscoveryIndex >= this.loadedSubtitles.length-1) {
 
     // search levels :
     // 1 : OpenSubtitles by file hash
@@ -362,8 +334,8 @@ Player.prototype.setNextBestSubtitlesForLocale = function(locale) {
     return;
   }
 
-  this.subtitlesActiveIndex ++ ;
-  this.setCurrentLoadedSubtitles();
+  this.subtitlesDiscoveryIndex ++ ;
+  this.setCurrentLoadedSubtitles(this.subtitlesDiscoveryIndex);
 }
 
 /**
@@ -600,6 +572,7 @@ Player.prototype.unloadSubtitles = function () {
 
   this.loadedSubtitles = [];
   this.subtitlesActiveIndex = undefined;
+  this.subtitlesDiscoveryIndex = undefined;
 
   this.emit('loadedSubtitlesChanged');
 }
