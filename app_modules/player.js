@@ -244,7 +244,7 @@ Player.prototype.playFromCurrentMediaInfo = function (locale) {
         this.currentMediaInfo.mrl = 'file://'+uri;
         this.currentMediaInfo.filepath = uri;
       }
-      // TODO .filename
+      this.currentMediaInfo.filename = this.currentMediaInfo.filepath.split('/').pop();
     }
     this.playFromCurrentMediaInfo(locale);
   }
