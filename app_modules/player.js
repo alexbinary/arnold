@@ -72,6 +72,10 @@ function Player(root) {
   this.subtitlesSearchLevel = 0;
 
   this.OpenSubtitles = new (require('opensubtitles-api'))('OSTestUserAgent');
+
+  // init media info
+
+  this.currentMediaInfo = null;
 }
 util.inherits(Player, EventEmitter);
 
@@ -83,7 +87,7 @@ module.exports = Player;
  * @param cmd  { string } - command identifier
  * @param args { array  } - command arguments
  *
- * Supported commands : • play(uri, [locale])
+ * Supported commands : • play(uri|MediaInfo, [locale])
  *                      • play
  *                      • pause
  *                      • togglePause
@@ -109,14 +113,22 @@ Player.prototype.cmd = function (cmd) {
 
   if(cmd == 'play') {
 
-    // play given uri with given locale
+    // play from given data
     // calling without args resumes playing, if possible
 
-    var uri = args[0];
+    var src = args[0];
     var loc = args[1];
 
-    if(uri) {
-      this.playURI(uri, loc);
+    if(src) {
+
+      if(typeof src == 'string') {
+        this.currentMediaInfo = new (require('../app_modules/mediainfo'))();
+        this.currentMediaInfo.uri = src;
+      } else {
+        this.currentMediaInfo = src;
+      }
+      this.playFromCurrentMediaInfo(loc);
+
     } else {
       this.vlc.play();
     }
@@ -195,29 +207,41 @@ Player.prototype.cmd = function (cmd) {
 }
 
 /**
- * Play local path to file, .torrent, URL, or magnet link
  * init preferred subtitles and audio based on given locale (optional)
  */
-Player.prototype.playURI = function (uri, locale) {
+Player.prototype.playFromCurrentMediaInfo = function (locale) {
 
+  var mrl = this.currentMediaInfo.mrl;
+  if(mrl) {
+    this.vlc.play(mrl);
+    this.audioActiveLocale = locale;
+    this.subtitlesActiveLocale = locale;
+    return;
+  }
+
+  var uri = this.currentMediaInfo.uri;
   if (uri.startsWith('magnet:') || uri.endsWith('.torrent')) {
 
     require('../app_modules/torrent').createStreamFromTorrent(uri, (function(err, stream) {
       if(err) return;
-      this.playURI(stream.url, locale);
+      this.currentMediaInfo.mrl = stream.url;
+      this.playFromCurrentMediaInfo(locale);
     }).bind(this));
 
   } else {
 
     if (uri.startsWith('http://')) {
-      this.vlc.play(uri);
-
+      this.currentMediaInfo.mrl = uri;
     } else {
-      this.vlc.play(uri.startsWith('file://') ? uri : 'file://'+uri);
+      if(uri.startsWith('file://')) {
+        this.currentMediaInfo.mrl = uri;
+        this.currentMediaInfo.filepath = uri.substr('file://'.length);
+      } else {
+        this.currentMediaInfo.mrl = 'file://'+uri;
+        this.currentMediaInfo.filepath = uri;
+      }
     }
-
-    this.audioActiveLocale = locale;
-    this.subtitlesActiveLocale = locale;
+    this.playFromCurrentMediaInfo(locale);
   }
 }
 
