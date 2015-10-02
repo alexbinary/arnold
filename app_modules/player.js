@@ -384,14 +384,19 @@ Player.prototype.getCurrentLoadedAudio = function () {
 
 /**
  * @param index { number } index in this.loadedAudio
+ * invalid value disables audio
  */
 Player.prototype.setCurrentLoadedAudio = function (index) {
+
   // use existing audioActiveIndex if index omitted
   // check for number type to allow 0
   if(typeof index == 'number') this.audioActiveIndex = index;
+
   var audio = this.loadedAudio[this.audioActiveIndex];
   if(audio && audio.type == 'internal') {
     this.cmd('setAudioTrack', audio.internalIndex);
+  } else {
+    this.cmd('setAudioTrack', -1);
   }
   this.emit('loadedAudioChanged');
 }
