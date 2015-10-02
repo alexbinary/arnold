@@ -48,6 +48,7 @@ function Player(root) {
   this.vlc.onStopped = (function() {
     this.unloadAudio();
     this.unloadSubtitles();
+    this.subtitlesSearchLevel = 0;
     this.emit('stopped');
   }).bind(this);
 
@@ -67,6 +68,10 @@ function Player(root) {
 
   this.unloadSubtitles();
   this.subtitlesActiveLocale = undefined;
+
+  this.subtitlesSearchLevel = 0;
+
+  this.OpenSubtitles = new (require('opensubtitles-api'))('OSTestUserAgent');
 }
 util.inherits(Player, EventEmitter);
 
@@ -304,14 +309,31 @@ Player.prototype.setNextBestSubtitlesForLocale = function(locale) {
 
   this.cmd('setSubtitlesTrack', -1);  // disable current track
 
-  this.subtitlesActiveIndex ++ ;
-  if(Number.isNaN(this.subtitlesActiveIndex)) this.subtitlesActiveIndex = 0;
+  if(!Number.isInteger(this.subtitlesActiveIndex)) this.subtitlesActiveIndex = -1;
+  if(this.subtitlesActiveIndex >= this.loadedSubtitles.length-1) {
 
-  if(this.subtitlesActiveIndex == this.loadedSubtitles.length) {
-    console.log("no more subs");
+    // search levels :
+    // 1 : OpenSubtitles by file hash
+    // 2 : OpenSubtitles by imdb
+    // 3 : OpenSubtitles by filename
+
+    if(!Number.isInteger(this.subtitlesSearchLevel)) this.subtitlesSearchLevel = 0;
+    if(this.subtitlesSearchLevel < 3) {
+
+      this.subtitlesSearchLevel ++ ;
+
+      this.searchAndLoadSubtitlesForLocale(locale, (function(){
+        this.setNextBestSubtitlesForLocale(locale);
+      }).bind(this));
+
+    } else {
+      console.log('cannot find more subs');
+    }
+
     return;
   }
 
+  this.subtitlesActiveIndex ++ ;
   this.setCurrentLoadedSubtitles();
 }
 
@@ -342,6 +364,7 @@ Player.prototype.setCurrentLoadedAudio = function (index) {
   if(audio && audio.type == 'internal') {
     this.cmd('setAudioTrack', audio.internalIndex);
   }
+  this.emit('loadedAudioChanged');
 }
 
 /**
@@ -368,9 +391,14 @@ Player.prototype.setCurrentLoadedSubtitles = function (index) {
   // check for number type to allow 0
   if(typeof index == 'number') this.subtitlesActiveIndex = index;
   var subtitle = this.loadedSubtitles[this.subtitlesActiveIndex];
-  if(subtitle && subtitle.type == 'internal') {
-    this.cmd('setSubtitlesTrack', subtitle.internalIndex);
+  if(subtitle) {
+    if(subtitle.type == 'internal') {
+      this.cmd('setSubtitlesTrack', subtitle.internalIndex);
+    } else if(subtitle.type == 'opensubtitles.org') {
+      this.cmd('setSubtitlesFile', subtitle.url);
+    }
   }
+  this.emit('loadedSubtitlesChanged');
 }
 
 /**
@@ -475,12 +503,16 @@ Player.prototype.loadAudioForLocale = function (locale) {
     });
   }
   this.audioActiveIndex = undefined;
+
+  this.emit('loadedAudioChanged');
 }
 
 Player.prototype.unloadAudio = function () {
 
   this.loadedAudio = [];
   this.audioActiveIndex = undefined;
+
+  this.emit('loadedAudioChanged');
 }
 
 /**
@@ -517,12 +549,16 @@ Player.prototype.loadSubtitlesForLocale = function (locale) {
     });
   }
   this.subtitlesActiveIndex = undefined;
+
+  this.emit('loadedSubtitlesChanged', this.subtitlesActiveIndex);
 }
 
 Player.prototype.unloadSubtitles = function () {
 
   this.loadedSubtitles = [];
   this.subtitlesActiveIndex = undefined;
+
+  this.emit('loadedSubtitlesChanged');
 }
 
 /**
@@ -637,4 +673,79 @@ Player.prototype.sortTracksForLocale = function (tracks, userLocale) {
   });
 
   return sortedTracks;
+}
+
+Player.prototype.searchAndLoadSubtitlesForLocale = function (locale, callback) {
+
+  // search returns immediately if locale is not defined,
+  // lang cannot be extracte, or media info are not available
+
+  if(!this.audioActiveLocale) {
+    if(typeof callback == 'function') callback();
+    return;
+  }
+
+  var lang = this.audioActiveLocale.split('-')[0];
+  if(!lang) {
+    if(typeof callback == 'function') callback();
+    return;
+  }
+
+  if(!this.currentMediaInfo) {
+    if(typeof callback == 'function') callback();
+    return;
+  }
+
+  var query = {};
+
+  if(this.subtitlesSearchLevel <= 1) {
+
+    query.path = this.currentMediaInfo.filepath;
+  }
+  if(this.subtitlesSearchLevel <= 2) {
+
+    query.imdbid  = this.currentMediaInfo.imdb_id;
+    query.episode = this.currentMediaInfo.episode_nb;
+    query.season  = this.currentMediaInfo.season_nb;
+  }
+  if(this.subtitlesSearchLevel <= 3) {
+
+    query.sublanguageid = lang;
+    query.filename = this.currentMediaInfo.filename;
+  }
+  if(this.subtitlesSearchLevel <= 4) {
+
+    query.query = null;
+  }
+
+  this.OpenSubtitles.search(query).then((function (subtitles) {
+
+    console.log(subtitles);
+
+    if(lang in subtitles) {
+
+      var sub = subtitles[lang];
+
+      var found = false;
+      // TODO with a real OpenSubtitles account
+      // for(var i=0 ; i<this.loadedSubtitles.length ; i++) {
+      //   if() {
+      //     found = true;
+      //     break;
+      //   }
+      // }
+
+      if(!found) {
+        this.loadedSubtitles.push({
+          type: 'opensubtitles.org',
+          url : sub.url,
+          name: sub.langName,
+        });
+        this.emit('loadedSubtitlesChanged');
+      }
+    }
+
+    if(typeof callback == 'function') callback();
+
+  }).bind(this));
 }
