@@ -83,6 +83,7 @@ module.exports = Player;
  *                      • pause
  *                      • togglePause
  *                      • stop
+ *                      • seek(time in ms)
  *                      • jump(delta in ms)
  *                      • setAudioTrack(track number)
  *                      • toggleMute
@@ -120,6 +121,9 @@ Player.prototype.cmd = function (cmd) {
 
   } else if(cmd == 'stop') {
     this.vlc.stop();
+
+  } else if(cmd == 'seek') {
+    this.vlc.time = +args[0];
 
   } else if(cmd == 'jump') {
     this.vlc.time = this.vlc.time + args[0];
@@ -363,6 +367,27 @@ Player.prototype.setCurrentLoadedSubtitles = function (index) {
 Player.prototype.getCurrentPlaylistItem = function () {
   var index = this.vlc.playlist.currentItem;
   return this.vlc.playlist.items[index];
+}
+
+/**
+ * @return media length in ms
+ */
+Player.prototype.getLength = function () {
+  return this.vlc.length;
+}
+
+/**
+ * @return current time in ms
+ */
+Player.prototype.getTime = function () {
+  return this.vlc.time;
+}
+
+/**
+ * @return current position in [0,1]
+ */
+Player.prototype.getPosition = function () {
+  return this.vlc.position;
 }
 
 /**
