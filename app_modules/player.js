@@ -181,11 +181,6 @@ Player.prototype.cmd = function (cmd) {
         name: uri,
       });
       this.setCurrentLoadedSubtitles(this.loadedSubtitles.length-1);
-
-    // } else {
-    //   this.updateSubtitles(-1);
-    //   this.updateSubtitles = function(){};
-    //   this.writeSubtitle('');
     }
 
   } else if (cmd == 'nextAudio') {
@@ -291,6 +286,13 @@ Player.prototype.setSubtitlesFile = function (uri, encoding) {
   }
 }
 
+Player.prototype.stopExternalSubtitle = function () {
+
+  this.updateSubtitles(-1);
+  this.updateSubtitles = function(){};
+  this.writeSubtitle('');
+}
+
 /**
  * @param userLocale { string } e.g. 'fr-FR', 'fr', 'en', etc.
  * each call will switch to the next best audio track
@@ -335,8 +337,6 @@ Player.prototype.setNextBestSubtitlesForLocale = function(locale) {
   }
 
   this.loadSubtitlesForLocaleIfNeeded(this.subtitlesActiveLocale);
-
-  this.cmd('setSubtitlesTrack', -1);  // disable current track
 
   if(!Number.isInteger(this.subtitlesActiveIndex)) this.subtitlesActiveIndex = -1;
   if(this.subtitlesActiveIndex >= this.loadedSubtitles.length-1) {
@@ -414,11 +414,18 @@ Player.prototype.getCurrentLoadedSubtitles = function () {
 
 /**
  * @param index { number } index in this.loadedSubtitles
+ * invalid value disables subtitles
  */
 Player.prototype.setCurrentLoadedSubtitles = function (index) {
+
+  // disable any running subtitle
+  this.stopExternalSubtitle();
+  this.cmd('setSubtitlesTrack', -1);
+
   // use existing subtitlesActiveIndex if index omitted
   // check for number type to allow 0
   if(typeof index == 'number') this.subtitlesActiveIndex = index;
+
   var subtitle = this.loadedSubtitles[this.subtitlesActiveIndex];
   if(subtitle) {
     if(subtitle.type == 'internal') {
