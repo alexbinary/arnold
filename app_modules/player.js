@@ -86,6 +86,9 @@ module.exports = Player;
  *                      • seek(time in ms)
  *                      • jump(delta in ms)
  *                      • setAudioTrack(track number)
+ *                      • volume(value)
+ *                      • mute
+ *                      • unmute
  *                      • toggleMute
  *                      • setSubtitlesTrack(track number)
  *                      • setSubtitlesFile(path or url, [encoding])
@@ -130,6 +133,15 @@ Player.prototype.cmd = function (cmd) {
 
   } else if(cmd == 'setAudioTrack') {
     this.vlc.audio.track = args[0];
+
+  } else if(cmd == 'volume') {
+    this.vlc.volume = +args[0];
+
+  } else if(cmd == 'mute') {
+    this.vlc.mute = true;
+
+  } else if(cmd == 'unmute') {
+    this.vlc.mute = false;
 
   } else if(cmd == 'toggleMute') {
     this.vlc.toggleMute();
