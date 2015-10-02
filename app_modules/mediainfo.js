@@ -14,25 +14,32 @@
  */
 function MediaInfo() {
 
-  this.mrl        = undefined;  // media MRL as passed to VLC
-  this.filepath   = undefined;  // path of the actual source file
-                                // when playing local files filepath is the same as the MRL
-                                // when streaming from torrent MRL is the HTTP stream
-                                // while filepath is the path to the streamed file
-                                // filepath might be unset e.g. for Internet streams
+  // .uri is what the user intended to play, e.g. :
+  // - a local path to a media file,
+  // - a local path to a stream file,
+  // - a local path to a .torrent file,
+  // - a magnet link,
+  // - a HTTP URL to a file or stream,
+  // - etc.
+  this.uri = undefined;
 
-  this.title      = undefined;  // WebChimera.VlcMedia.title
-  this.audio      = undefined;  // WebChimera.VlcAudio
-  this.subtitles  = undefined;  // WebChimera.VlcSubtitles
+  // .mrl is what VLC is actually playing.
+  // For local media files or URLs this is the same as .uri.
+  // When streaming from torrent this is the HTTP URL of the stream.
+  this.mrl = undefined;
 
-  this.name       = undefined;  // human readable media name, something like :
-                                //  Another Earth
-                                //  Extant 1x01 Re-Entry
-                                //  Gravity, LukHash - Falling Apart
+  // .filepath is the local path to the actual source file.
+  // For local media files this is the same as .uri and .mrl.
+  // When streaming from torrent this is the path to the file being streamed.
+  // This is unset when playing from a URL.
+  this.filepath   = undefined;
 
-  this.imdb_id    = undefined;  // for TV show this is the id of the show, not the episode
-  this.season_nb  = undefined;  // season number starting at 1
-  this.episode_nb = undefined;  // episode number in the season starting at 1
+  // .filename is just the file name component of filepath
+  this.filename   = undefined;
 
-  this.os_hash    = undefined;  // OpenSubtitles file hash
+  this.imdb_id    = undefined;  // for TV shows this is the id of the show, not the episode
+  this.season_nb  = undefined;  // for "Castle 8x01" this is "8"
+  this.episode_nb = undefined;  // for "Castle 8x01" this is "1"
 }
+
+module.exports = MediaInfo;
