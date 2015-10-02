@@ -169,19 +169,23 @@ Player.prototype.cmd = function (cmd) {
   } else if (cmd == 'setSubtitlesFile') {
 
     // load subtitle file from local path or url
-    // second arg is the file encoding
-    // calling with no args unload the current file
+    // second arg is the file encoding (optional)
 
     var uri      = args[0];
     var encoding = args[1];
 
     if (uri) {
-      this.setSubtitlesFile(uri, encoding);
+      this.loadedSubtitles.push({
+        type: 'manual',
+        uri : uri,
+        name: uri,
+      });
+      this.setCurrentLoadedSubtitles(this.loadedSubtitles.length-1);
 
-    } else {
-      this.updateSubtitles(-1);
-      this.updateSubtitles = function(){};
-      this.writeSubtitle('');
+    // } else {
+    //   this.updateSubtitles(-1);
+    //   this.updateSubtitles = function(){};
+    //   this.writeSubtitle('');
     }
 
   } else if (cmd == 'nextAudio') {
@@ -240,6 +244,7 @@ Player.prototype.playFromCurrentMediaInfo = function (locale) {
         this.currentMediaInfo.mrl = 'file://'+uri;
         this.currentMediaInfo.filepath = uri;
       }
+      // TODO .filename
     }
     this.playFromCurrentMediaInfo(locale);
   }
@@ -419,7 +424,9 @@ Player.prototype.setCurrentLoadedSubtitles = function (index) {
     if(subtitle.type == 'internal') {
       this.cmd('setSubtitlesTrack', subtitle.internalIndex);
     } else if(subtitle.type == 'opensubtitles.org') {
-      this.cmd('setSubtitlesFile', subtitle.url);
+      this.setSubtitlesFile(subtitle.url);
+    } else if(subtitle.type == 'manual') {
+      this.setSubtitlesFile(subtitle.uri);
     }
   }
   this.emit('loadedSubtitlesChanged');
