@@ -16,12 +16,15 @@ var EventEmitter = require('events');
  * Player
  * inherits EventEmitter
  *
- * @param root { HTMLElement } - root element to find player components in
+ * @param root  { HTMLElement } - root element to find player components in
+ * @param Event { Event       } - DOM 'Event' interface
  */
-function Player(root) {
+function Player(root, Event) {
   EventEmitter.call(this);
 
-  // get ui elements
+  this.Event = Event;
+
+  // get UI elements
 
   this.uiRoot         = root;
   this.uiCanvas       = root.querySelector('.playerCanvas');
@@ -80,6 +83,14 @@ function Player(root) {
 util.inherits(Player, EventEmitter);
 
 module.exports = Player;
+
+/**
+ * resize video canvas to fit available space
+ * see node_modules_hacked/wcjs-renderer/index.js:191
+ */
+Player.prototype.resize = function () {
+  this.uiCanvas.dispatchEvent(new this.Event('webglcontextrestored'));
+}
 
 /**
  * App - Respond to command
