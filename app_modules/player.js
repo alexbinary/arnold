@@ -707,12 +707,12 @@ Player.prototype.searchAndLoadSubtitlesForLocale = function (locale, callback) {
   // search returns immediately if locale is not defined,
   // lang cannot be extracte, or media info are not available
 
-  if(!this.audioActiveLocale) {
+  if(!this.subtitlesActiveLocale) {
     if(typeof callback == 'function') callback();
     return;
   }
 
-  var lang = this.audioActiveLocale.split('-')[0];
+  var lang = this.subtitlesActiveLocale.split('-')[0];
   if(!lang) {
     if(typeof callback == 'function') callback();
     return;
@@ -727,7 +727,11 @@ Player.prototype.searchAndLoadSubtitlesForLocale = function (locale, callback) {
 
   if(this.subtitlesSearchLevel <= 1) {
 
-    query.path = this.currentMediaInfo.filepath;
+    if(this.currentMediaInfo.os_hash) {
+      query.hash = this.currentMediaInfo.os_hash;
+    } else {
+      query.path = this.currentMediaInfo.filepath;
+    }
   }
   if(this.subtitlesSearchLevel <= 2) {
 

@@ -40,6 +40,8 @@ function MediaInfo() {
   this.imdb_id    = undefined;  // for TV shows this is the id of the show, not the episode
   this.season_nb  = undefined;  // for "Castle 8x01" this is "8"
   this.episode_nb = undefined;  // for "Castle 8x01" this is "1"
+
+  this.os_hash    = undefined;  // OpenSubtitles.org file hash
 }
 
 module.exports = MediaInfo;
