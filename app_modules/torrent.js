@@ -4,61 +4,191 @@
  * torrent.js - Torrent utilities
  *
  * @author Alexandre Bintz <alexandre@bintz.io>
- * 09/2015
+ * 10/2015
  */
 
 'use strict';
 
+var util         = require('util');
+var EventEmitter = require('events');
+
 /**
- * TorrentUtils
+ * TorrentEngine
+ * inherits EventEmitter
+ *
+ * Create engine for given torrent
+ *
+ * @param torrent { string } - path to .torrent or magnet link
+ * @param opts    { object } - peerflix/torrent-stream options
  */
-function TorrentUtils() {
+function TorrentEngine(torrent, opts) {
+  EventEmitter.call(this);
+
+  this.torrent = torrent;
+  this.streamUrl = undefined;
+  this.state = 0; // stopped
+  this.paused = false;
+  this.status = {};
+  this.files = [];
+  this.filesDirty = true;
+  this.selectedFiles = [];
+
+  var torrentData = null;
+  if(this.torrent.startsWith('magnet:?')) torrentData = this.torrent;
+  else torrentData = require('fs').readFileSync(this.torrent);
+  this.engine = require('peerflix')(torrentData, opts);
+  this.engine.on('verifying', (function() {
+    this.state = 1; // verifying
+    this.emit('stateChanged');
+  }).bind(this));
+  this.engine.on('ready', (function() {
+    this.engine.server.index.deselect();
+    if(!this.files || !this.files.length) this.initFiles();
+    this.state = 2; // ready
+    this.emit('stateChanged');
+  }).bind(this));
+  this.engine.server.on('listening', (function () {
+    this.streamUrl = 'http://localhost:'+this.engine.server.address().port;
+    this.emit('stateChanged');
+  }).bind(this));
+  this.engine.on('verify', (function(pieceIndex){
+    if(!this.files || !this.files.length) this.initFiles();
+    var pieceByteOffset = pieceIndex*this.engine.torrent.pieceLength;
+    var pieceByteLength = pieceIndex == this.engine.torrent.pieces.length-1
+      ? this.engine.torrent.lastPieceLength
+      : this.engine.torrent.pieceLength;
+    for(var i=0 ; i<this.engine.files.length ; i++) {
+      var fileByteOffset = this.engine.files[i].offset;
+      var fileByteLength = this.engine.files[i].length;
+      if(pieceByteOffset >= fileByteOffset
+      && pieceByteOffset < (fileByteOffset+fileByteLength)) {
+        var e = fileByteOffset+fileByteLength - pieceByteOffset;
+        if(e >= pieceByteLength) {
+          this.files[i].dldLength += pieceByteLength;
+          break;
+        } else {
+          this.files[i].dldLength += e;
+          pieceByteLength -= e;
+          pieceByteOffset += e;
+        }
+      }
+    }
+    this.filesDirty = true;
+    this.emit('stateChanged');
+  }).bind(this));
+}
+util.inherits(TorrentEngine, EventEmitter);
+
+module.exports = TorrentEngine;
+
+TorrentEngine.prototype.selectFile = function (index) {
+  this.selectedFiles.push(index);
+  this.filesDirty = true;
+  this.applySelectedFiles();
 }
 
-module.exports = new TorrentUtils();
+TorrentEngine.prototype.deselectFile = function (index) {
+  this.selectedFiles = this.selectedFiles.filter(function(i){return i!=index});
+  this.filesDirty = true;
+  this.applySelectedFiles();
+}
 
-/**
- * TorrentUtils - create HTTP stream from .torrent file or magnet link
- *
- * @param source   { mixed    } - { string } local path to a .torrent file
- *                              - { string } magnet link as a string
- *                              - { buffer } .torrent raw file content
- * @param callback { function } - { Error  } - error
- *                              - { object } - stream data
- *                                  • {string } path of the file being streamed
- *                                  • {string } url of the stream
- */
-TorrentUtils.prototype.createStreamFromTorrent = function(source, callback) {
+TorrentEngine.prototype.setSelectedFiles = function (indexes) {
+  this.selectedFiles = indexes;
+  this.filesDirty = true;
+  this.applySelectedFiles();
+}
 
-  var createStream = function(magnet_link_or_buffer) {
+TorrentEngine.prototype.pause = function () {
+  this.engine.files.forEach(function(file, index){file.deselect()});
+  this.paused = true;
+  this.emit('stateChanged');
+}
 
-    var filepath = '/tmp/'+(new Date().getTime());
+TorrentEngine.prototype.start = function () {
+  this.applySelectedFiles();
+}
 
-    var engine = require('peerflix')(magnet_link_or_buffer, {
-      port: 0,
-      path: filepath,
-    });
-    engine.server.on('listening', function () {
-      callback(null, {
-        url      : 'http://localhost:'+engine.server.address().port,
-        filepath : filepath,
-      });
-    });
+TorrentEngine.prototype.applySelectedFiles = function () {
+  this.engine.files.forEach(function(file, index) {
+    this.selectedFiles.indexOf(index)!==-1 ? file.select() : file.deselect();
+  },this);
+  this.paused = false;
+  this.emit('stateChanged');
+}
+
+TorrentEngine.prototype.destroy = function () {
+  this.engine.server.close();
+  this.engine.destroy();
+  this.torrent = undefined;
+  this.streamUrl = undefined;
+  this.state = 3; // destroyed
+  this.paused = false;
+  this.status = {};
+  this.files = [];
+  this.filesDirty = true;
+  this.selectedFiles = [];
+  this.emit('stateChanged');
+}
+
+TorrentEngine.prototype.computeHash = function (index,cb) {
+  require('../node_modules_hacked/os-torrent-hash')
+  .computeHash(this.torrent, this.engine, index)
+  .then((function (res) {
+    this.files[index].osHash = res.movieHash;
+    this.filesDirty = true;
+    this.emit('stateChanged');
+    if(typeof cb=='function')cb(res.movieHash);
+  }).bind(this))
+  .catch(function (error) {
+  })
+  .done();
+}
+
+TorrentEngine.prototype.getStatus = function () {
+  this.refreshStatus();
+  return this.status;
+}
+
+TorrentEngine.prototype.getFiles = function () {
+  if(this.filesDirty) this.refreshFiles();
+  return this.files;
+}
+
+TorrentEngine.prototype.refreshStatus = function () {
+  this.status = {
+    stateCode  : this.state,
+    stateString: this.state==2 && this.paused ? 'paused' : ['stopped','verifying','ready','destroyed'][this.state],
+    streamUrl  : this.streamUrl,
+    downSession: this.engine && this.engine.swarm ? this.engine.swarm.downloaded : 0,
+    upSession  : this.engine && this.engine.swarm ? this.engine.swarm.uploaded : 0,
+    downTotal  : this.files.reduce(function(t,f){return t+f.dldLength},0),
+    downSpeed  : this.engine && this.engine.swarm ? this.engine.swarm.downloadSpeed() : 0,
+    upSpeed    : this.engine && this.engine.swarm ? this.engine.swarm.uploadSpeed() : 0,
+    totalPeers : this.engine && this.engine.swarm && this.engine.swarm.wires ? this.engine.swarm.wires.length : 0,
+    activePeers: this.engine && this.engine.swarm && this.engine.swarm.wires ? this.engine.swarm.wires.filter(function(w){return !w.peerChoking}).length : 0,
   };
+}
 
-  if(typeof source == 'string' && !(new RegExp('^magnet')).test(source)) {
+TorrentEngine.prototype.refreshFiles = function () {
+  this.engine.files.forEach(function(file, index) {
+    var f = this.files[index] || {};
+    f.streamUrl = this.streamUrl ? this.streamUrl+'/'+index : undefined
+    f.selected  = this.selectedFiles.indexOf(index) != -1;
+    f.progress  = Math.round(f.dldLength/f.totalLength*100*100)/100; // round to 0.01%
+    this.files[index] = f;
+  },this);
+}
 
-    require('fs').readFile(source, function (err, data) {
-      if(err) callback(err);
-      else createStream(data);
-    });
-
-  } else {
-    createStream(source);
-  }
-
-  // console.log(engine.files)
-  // for(var i=0 ; i<engine.files.length ; i++) {
-  //   console.log(engine.files[i].name, engine.files[i].path)
-  // }
+TorrentEngine.prototype.initFiles = function () {
+  this.files = [];
+  this.engine.files.forEach(function(file, index) {
+    var f = this.files[index] || {};
+    f.name         = file.name;
+    f.path         = file.path;
+    f.absolutePath = this.engine ? this.engine.path+'/'+file.path : undefined;
+    f.totalLength  = file.length;
+    f.dldLength    = f.dldLength || 0;
+    this.files[index] = f;
+  },this);
 }
