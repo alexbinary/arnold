@@ -47,6 +47,7 @@ module.exports = TracksMan;
 TracksMan.prototype.loadAudioTracks = function() {
   this.unloadAudioTracks();
   var audio = this.player.getAudio();
+  // native track 0 is 'disable'
   for(var i=1 ; i<audio.count ; i++) {
     this.audioTracks.push({
       type : 'internal',
@@ -55,6 +56,7 @@ TracksMan.prototype.loadAudioTracks = function() {
       lang : this.detectLang(audio[i]),
     });
   }
+  this.activeAudioTrack = this.player.getAudioTrack()-1;// native track 0 is 'disable'
   this.emit('audio');
 }
 TracksMan.prototype.unloadAudioTracks = function () {
@@ -84,6 +86,7 @@ TracksMan.prototype.audioTrack = function () {
 TracksMan.prototype.loadSubtitlesTracks = function() {
   this.unloadSubtitlesTracks();
   var subtitles = this.player.getSubtitles();
+  // native track 0 is 'disable'
   for(var i=1 ; i<subtitles.count ; i++) {
     this.subtitlesTracks.push({
       type : 'internal',
@@ -92,6 +95,7 @@ TracksMan.prototype.loadSubtitlesTracks = function() {
       lang : this.detectLang(subtitles[i]),
     });
   }
+  this.activeSubtitlesTrack = this.player.getSubtitlesTrack()-1;// native track 0 is 'disable'
   this.emit('subtitles');
 }
 TracksMan.prototype.unloadSubtitlesTracks = function () {
