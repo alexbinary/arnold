@@ -74,21 +74,5 @@
     <input type="file" id="dInputFile">
 
     <script src="index.js"></script>
-
-    <script>
-
-      // TODO incorporate into index.js
-      // HTML should not contain any script
-
-      var nwgui = require('nw.gui');
-      var menubar = new nwgui.Menu({ type: 'menubar' });
-      nwgui.Window.get().menu = menubar;
-      menubar.createMacBuiltin('Arnold DEV', {
-        hideEdit: false,
-        hideWindow: false
-      });
-      // nwgui.Window.get().showDevTools();
-
-    </script>
   </body>
 </html>

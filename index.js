@@ -77,6 +77,101 @@ gTracksman.on('subtitles',refreshSubtitles);
  * init UI
  */
 
+var mb = new (require('./app_modules/menubuilder'))(require('nw.gui'));
+
+mb.initMenuBar();
+mb.createMacBuiltin();
+
+mb.menu('Play', [
+
+  mb.item('Fullscreen',function(){
+   require('nw.gui').Window.get().toggleFullscreen();
+  },'f','cmd'
+  ),
+  mb.item('Play/Pause',function(){
+    gPlayer.togglePause();
+  },'p','cmd'
+  ),
+  mb.item('Stop',function(){
+    gPlayer.stop();
+  },'s','cmd'
+  ),
+  mb.item('Mute/Unmute',function(){
+    gPlayer.toggleMute();
+  },'m','ctrl'
+  ),
+  mb.item('Increase volume',function(){
+    gPlayer.volume(gPlayer.volume()+10);
+  },
+   String.fromCharCode(30), // arrow up
+   'cmd'
+  ),
+  mb.item('Decrease volume',function(){
+    gPlayer.volume(gPlayer.volume()-10);
+  },
+    String.fromCharCode(31), // arrow down
+    'cmd'
+  ),
+  mb.item('Toggle subtitles',function(){
+    toggleSubtitles();
+  },'l'),
+  mb.item('Manage subtitles',function(){
+    makeVisible(dSubtitles,true);
+  },'l','ctrl'
+  ),
+  mb.item('Manage audio',function(){
+    makeVisible(dAudio,true);
+  },'b','ctrl'
+  ),
+  mb.separator(
+  ),
+  mb.item('Jump +1s',function(){
+   gPlayer.jump(+1000*1);
+  },
+   String.fromCharCode(29), // arrow right
+   'shift'
+  ),
+  mb.item('Jump +10s',function(){
+   gPlayer.jump(+1000*10);
+  },
+   String.fromCharCode(29), // arrow right
+   'alt'
+  ),
+  mb.item('Jump +1min',function(){
+   gPlayer.jump(+1000*60);
+  },
+   String.fromCharCode(29), // arrow right
+   'cmd'
+  ),
+  mb.item('Jump -1s',function(){
+   gPlayer.jump(-1000*1);
+  },
+   String.fromCharCode(28), // arrow left
+   'shift'
+  ),
+  mb.item('Jump -10s',function(){
+   gPlayer.jump(-1000*10);
+  },
+   String.fromCharCode(28), // arrow left
+   'alt'
+  ),
+  mb.item('Jump -1min',function(){
+   gPlayer.jump(-1000*60);
+  },
+   String.fromCharCode(28), // arrow left
+   'cmd'
+  ),
+]);
+
+window.addEventListener('keypress',function(e){
+  if (e.keyCode == 32) {  // space
+    gPlayer.togglePause();
+  }
+});
+dPlayer.addEventListener('click',function(){
+  gPlayer.togglePause();
+});
+
 function makeVisible(e,visible){
   e.style.display = visible ? 'block' : 'none';
 }
@@ -117,6 +212,50 @@ function refreshAudio(){
 /*
  * subtitles management
  */
+
+var gLastSubtitlesTrack = undefined;
+
+function enableSubtitles(){
+  if(typeof gLastSubtitlesTrack != 'undefined') {
+    gTracksman.subtitles(gLastSubtitlesTrack);
+  } else {
+    var subtitles = gTracksman.subtitlesTracks;
+    if(subtitles.length > 0) {
+      for(var i=0 ; i<subtitles.length ; i++) {
+        if(subtitles[i].lang == lang) {
+          gTracksman.subtitles(i);
+          break;
+        }
+      }
+    }
+    if(typeof gTracksman.activeSubtitlesTrack == 'undefined') {
+      searchAndLoadSubtitles();
+    }
+  }
+}
+
+function disableSubtitles(){
+  gLastSubtitlesTrack = gTracksman.activeSubtitlesTrack;
+  gTracksman.subtitles(-1);
+}
+
+function toggleSubtitles(){
+  if(typeof gTracksman.activeSubtitlesTrack == 'undefined') enableSubtitles();
+  else disableSubtitles();
+}
+
+function searchAndLoadSubtitles(){
+  console.log('loading subs');
+  gTracksman.searchSubtitles(lang,1,function(found){
+    console.log('done loading subs');
+    if(found) {
+      console.log('found subs');
+      gTracksman.subtitles(gTracksman.subtitlesTracks.length-1);
+    } else {
+      console.log('no subs found');
+    }
+  });
+}
 
 function clearSubtitles(){
  while (dSubtitlesTable.firstChild) {
@@ -188,3 +327,5 @@ makeVisible(dHome,true);
 makeVisible(dWelcome,false);
 makeVisible(dAudio,false);
 makeVisible(dSubtitles,false);
+
+// nwgui.Window.get().showDevTools();
