@@ -103,9 +103,9 @@ body {
   border-color: white;
 }
 #dHomeDropHint {
-  margin-bottom: 70px;
 }
-#dHomeDropHintAuxiliary1 {
+#dHomeDropHintAuxiliary1,
+#dHomeDropHintAuxiliary3 {
   font-size: 0.7em;
 }
 #dHomeDropHintMain {
@@ -115,8 +115,9 @@ body {
 }
 #dHomeDropHintAuxiliary2 {
   font-size: 0.9em;
-  margin: 0;
   padding: 0;
+  margin: 0;
+  margin-bottom: 30px;
 }
 #dHomeLanguage {
   padding: 0 30px 15px 30px;
