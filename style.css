@@ -118,9 +118,10 @@ body {
   margin-bottom: 30px;
 }
 
-/*  audio interface appear on the center of the screen
+/*  audio & subtitles interfaces appear on the center of the screen
     and on top of the player  */
-#dAudio {
+#dAudio,
+#dSubtitles {
   position: absolute;
   z-index: 500;
   top: 0;
@@ -132,7 +133,8 @@ body {
   -webkit-justify-content: center;
   -webkit-align-items: center;
 }
-#dAudio table {
+#dAudio table,
+#dSubtitles table {
   font-weight: bold;
   font-size: 1em;
   padding: 5px;
@@ -142,21 +144,27 @@ body {
   color: lightgrey;
   text-align: center;
 }
-#dAudio table th {
+#dAudio table th,
+#dSubtitles table th {
   color: white;
 }
-#dAudio table td {
+#dAudio table td,
+#dSubtitles table td {
   cursor: pointer;
 }
-#dAudio table td:hover {
+#dAudio table td:hover,
+#dSubtitles table td:hover {
   color: rgb(225, 225, 225);
 }
 #dAudio table th,
-#dAudio table td {
+#dAudio table td,
+#dSubtitles table th,
+#dSubtitles table td {
   padding: 5px 25px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.8);
 }
-#dAudio table .active {
+#dAudio table .active,
+#dSubtitles table .active {
   color: white;
 }
 

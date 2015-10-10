@@ -116,11 +116,11 @@ mb.menu('Play', [
     toggleSubtitles();
   },'l'),
   mb.item('Manage subtitles',function(){
-    makeVisible(dSubtitles,true);
+    toggleSubtitlesVisible();
   },'l','ctrl'
   ),
   mb.item('Manage audio',function(){
-    makeVisible(dAudio,true);
+    toggleAudioVisible();
   },'b','ctrl'
   ),
   mb.separator(
@@ -167,6 +167,10 @@ window.addEventListener('keypress',function(e){
   if (e.keyCode == 32) {  // space
     gPlayer.togglePause();
   }
+});
+window.addEventListener('keydown',function(e){
+  if(audioVisible) audioKeydown(e);
+  if(subtitlesVisible) subtitlesKeydown(e);
 });
 dPlayer.addEventListener('click',function(){
   gPlayer.togglePause();
@@ -222,11 +226,25 @@ function refreshAudio(){
   }
 }
 
-window.addEventListener('keydown',function(e){
+var audioVisible = true;
+
+function showAudio(){
+  makeVisible(dAudio,true);
+  audioVisible = true;
+}
+function hideAudio(){
+  makeVisible(dAudio,false);
+  audioVisible = false;
+}
+function toggleAudioVisible(){
+  audioVisible ? hideAudio() : showAudio();
+}
+
+function audioKeydown(e){
   if (e.keyCode == 13 // enter
    || e.keyCode == 27 // escape
   ){
-    makeVisible(dAudio,false);
+    hideAudio();
   } else if (e.keyCode == 38  // up arrow
   ){
     var count = gTracksman.audioTracks.length;
@@ -244,7 +262,7 @@ window.addEventListener('keydown',function(e){
     gTracksman.audio(active);
     refreshAudio();
   }
-});
+}
 
 /*
  * subtitles management
@@ -332,6 +350,44 @@ dSubtitlesDisable.addEventListener('click',function(){
   gTracksman.subtitles(-1);
 });
 
+var subtitlesVisible = true;
+
+function showSubtitles(){
+  makeVisible(dSubtitles,true);
+  subtitlesVisible = true;
+}
+function hideSubtitles(){
+  makeVisible(dSubtitles,false);
+  subtitlesVisible = false;
+}
+function toggleSubtitlesVisible(){
+  subtitlesVisible ? hideSubtitles() : showSubtitles();
+}
+
+function subtitlesKeydown(e){
+  if (e.keyCode == 13 // enter
+   || e.keyCode == 27 // escape
+  ){
+    hideSubtitles();
+  } else if (e.keyCode == 38  // up arrow
+  ){
+    var count = gTracksman.subtitlesTracks.length;
+    var active = gTracksman.activeSubtitlesTrack;
+    if(active == 0) active=count-1;
+    else active--;
+    gTracksman.subtitles(active);
+    refreshSubtitles();
+  } else if (e.keyCode == 40  // down arrow
+  ){
+    var count = gTracksman.subtitlesTracks.length;
+    var active = gTracksman.activeSubtitlesTrack;
+    if(active == count-1) active=0;
+    else active++;
+    gTracksman.subtitles(active);
+    refreshSubtitles();
+  }
+}
+
 /*
  * General
  */
@@ -342,16 +398,18 @@ function onPlaying(){
   gPlaying = true;
   $(dPlayer).addClass('playing');
   makeVisible(dHome,false);
-  makeVisible(dAudio,false);
-  makeVisible(dSubtitles,false);
+  hideAudio();
+  hideSubtitles();
+
+  gPlayer.volume(50);
 }
 
 function onStop(){
   gPlaying = false;
   $(dPlayer).removeClass('playing');
   makeVisible(dHome,true);
-  makeVisible(dAudio,false);
-  makeVisible(dSubtitles,false);
+  hideAudio();
+  hideSubtitles();
   clearAudio();
   clearSubtitles();
 }
@@ -362,8 +420,8 @@ function playFile(path) {
 }
 
 makeVisible(dHome,true);
-makeVisible(dAudio,false);
-makeVisible(dSubtitles,false);
+hideAudio();
+hideSubtitles();
 
 require('nw.gui').Window.get().show();
 
