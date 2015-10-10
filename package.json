@@ -5,7 +5,8 @@
   "window": {
     "frame": false,
     "width": 700,
-    "height": 450
+    "height": 450,
+    "show": false
   },
   "dependencies": {
     "download": "^4.2.1",

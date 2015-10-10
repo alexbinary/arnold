@@ -365,6 +365,9 @@ makeVisible(dHome,true);
 makeVisible(dAudio,false);
 makeVisible(dSubtitles,false);
 
+require('nw.gui').Window.get().show();
+
+
 // require('nw.gui').Window.get().showDevTools();
 // require('nw.gui').Window.get().moveTo(20,100);
 // playFile('/Users/alexandrebintz/Movies/another_earth_2011_1080p_it_eng_es_fr_sub_it_eng_es_fr_de_da_ne_nor_su.mkv');
