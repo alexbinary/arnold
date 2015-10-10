@@ -25,19 +25,25 @@
     </div>
 
     <div id="dHome">
-
-      <p>Arnold can read almost any video file.</p>
-
-      <p>Drop a file  or click here to open a video.</p>
-
-      <p>Your preferred language for audio :</p>
-      <select>
-      </select>
-
-      <p>Your preferred language for subtitles :</p>
-      <select>
-      </select>
-
+      <div id="dHomeDropZone">
+        <div id="dHomeDropHint">
+          <p id="dHomeDropHintAuxiliary1">Arnold can read almost any video file.</p>
+          <p id="dHomeDropHintMain">Drop a file to play</p>
+          <p id="dHomeDropHintAuxiliary2">or click here to choose one</p>
+        </div>
+      </div>
+      <div id="dHomeLanguage">
+        <p>
+          Your preferred language for audio
+          <select>
+          </select>
+        </p>
+        <p>
+          Your preferred language for subtitles
+          <select>
+          </select>
+        </p>
+      </div>
     </div>
 
     <div id="dAudio">
@@ -73,6 +79,7 @@
 
     <input type="file" id="dInputFile">
 
+    <script src="rc/jquery-2.1.4.min.js"></script>
     <script src="index.js"></script>
   </body>
 </html>

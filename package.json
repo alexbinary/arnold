@@ -4,8 +4,8 @@
   "main": "index.html",
   "window": {
     "frame": false,
-    "width": 1340,
-    "height": 800
+    "width": 700,
+    "height": 450
   },
   "dependencies": {
     "download": "^4.2.1",

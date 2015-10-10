@@ -4,7 +4,7 @@
  * style.css - main CSS
  *
  * @author Alexandre Bintz <alexandre@bintz.io>
- * 09/2015
+ * 10/2015
  */
 
 ::-webkit-scrollbar {
@@ -14,12 +14,12 @@
 /*  <html> holds the general background */
 html {
   font-family: 'Helvetica Neue';
-  background: url(rc/background.jpg) black;
+  background: rgba(0, 0, 0, 0.8);
 }
 
 body {
-  -webkit-app-region: drag; /*  make all window draggable
-                                (needed in frameless mode)  */
+  -webkit-app-region: drag; /*  make whole window draggable
+                          (by default frameless windows cannot be dragged)  */
   padding: 0;
   margin: 0;
   /*  body covers the whole screen
@@ -30,15 +30,19 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  /* body holds a semi transparent background
-     to attenuate the background image */
-  background: rgba(0, 0, 0, 0.8);
+
   color: white;
+}
+
+/*  input[file] is there only to provide a file dialog
+    it is not visible  */
+#dInputFile {
+  display: none;
 }
 
 /*  player covers the whole screen and is at the bottom of the view stack
     canvas is centered in both direction inside player  */
-#player {
+#dPlayer {
   position: absolute;
   z-index: 100;
   top: 0;
@@ -51,10 +55,12 @@ body {
 }
 /*  player is fully transparent when not playing
     solid black background when playing */
-.playing #player {
+.playing #dPlayer {
   background: black;
 }
-#subtitles_container {
+/*  subtitles appear on top of the video,
+    on the bottom */
+#dPlayer .playerSubtitlesBox {
   position: absolute;
   left: 50px;
   right: 50px;
@@ -66,34 +72,58 @@ body {
   text-align: center;
 }
 
-/*  log appears behind the canvas
-    so it is covered by it when playing */
-#log {
-  position:absolute;
-  z-index: 50;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  text-align: left;
-  padding: 50px;
-}
-#log p {
-  margin: 2px;
-}
-
-/*  user interface covers the entire screen
-    and appears on top of the player
-    transparent by default */
-#ui {
+/*  home screen covers the entire screen
+    and appears on top of the player  */
+#dHome {
   position: absolute;
   z-index: 200;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 50px;
+  text-align: center;
+  font-size: 1.3em;
+  display: -webkit-flex;
+  -webkit-flex-direction: column;
+  color: darkgrey;
 }
+#dHomeDropZone {
+  -webkit-flex-grow: 1;
+  margin: 30px 30px 15px 30px;
+  display: -webkit-flex;
+  -webkit-flex-direction: column;
+  -webkit-justify-content: center;
+  -webkit-align-items: center;
+  border: 5px dashed darkgrey;
+  border-radius: 5px;
+  font-weight: bold;
+}
+#dHomeDropHint {
+  margin-bottom: 70px;
+}
+#dHomeDropHintAuxiliary1 {
+  font-size: 0.7em;
+}
+#dHomeDropHintMain {
+  font-size: 1.3em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#dHomeDropHintAuxiliary2 {
+  font-size: 0.9em;
+  margin: 0;
+  padding: 0;
+}
+#dHomeLanguage {
+  padding: 0 30px 15px 30px;
+  font-size: 0.6em;
+  text-align: right;
+}
+
+
+
+
+
 /*  menu appears on top of the screen
     and on top of ui content  */
 #uiMenu {
@@ -116,6 +146,8 @@ body {
 #uiMenu li.active {
   color: white;
 }
+
+
 
 /*  generic style */
 button {

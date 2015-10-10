@@ -173,7 +173,7 @@ dPlayer.addEventListener('click',function(){
 });
 
 function makeVisible(e,visible){
-  e.style.display = visible ? 'block' : 'none';
+  $(e).toggle(visible);
 }
 
 dHome.addEventListener('click',function(){
@@ -329,3 +329,4 @@ makeVisible(dAudio,false);
 makeVisible(dSubtitles,false);
 
 // nwgui.Window.get().showDevTools();
+// require('nw.gui').Window.get().moveTo(20,100);
