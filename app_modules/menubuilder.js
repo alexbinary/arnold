@@ -12,11 +12,13 @@
 /**
  * MenuBuilder
  */
-function MenuBuilder() {
+function MenuBuilder(gui) {
 
-  this.gui = require('nw.gui');
+  this.gui = gui;
   this.menubar = undefined;
 }
+
+module.exports = MenuBuilder;
 
 /**
  * MenuBuilder - Setup application menu bar
