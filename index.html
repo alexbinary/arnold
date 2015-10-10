@@ -2,136 +2,93 @@
 <html>
   <head>
   	<meta charset="utf-8">
-    <title>Arnold technical demo</title>
+    <title>Arnold</title>
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
 
-    <!-- player = canvas for video + subtitles section -->
+    <div id="dWelcome">
 
-    <div id="player">
-      <canvas id="canvas"></canvas>
-      <div id="subtitles_container"></div>
-    </div>
+      <p>Welcome to Arnold !</p>
 
-    <!-- log widget -->
+      <p>Arnold is a video player who cares about you.</p>
 
-    <div id="log">
-    </div>
+      <p>Please select your preferred language for audio and subtitles
+      so that Arnold can ensure you always understand what you are watching.</p>
 
-    <!-- main interface -->
+      <select>
+      </select>
 
-    <div id="ui">
-
-      <!-- menu -->
-
-      <div id="uiMenu">
-        <ul>
-          <li id="uiMenuHome">Home</li>
-          <li id="uiMenuPlaying">Playing</li>
-          <li id="uiMenuPopcorn">Popcorn</li>
-        </ul>
-      </div>
-
-      <!-- home screen = controls for opening a file -->
-
-      <div id="home" class="_hover">
-
-        <div id="home_content">
-
-          <p class="mainHint">Drop a file to play it</p>
-
-          <p class="secondHint">You can use any file <b>VLC</b> would play, including <b>audio</b> files and <b>streams</b></p>
-          <p class="secondHint">You can also drop a <b>torrent file</b> to start streaming it</p>
-
-          <div class="thirdHint">
-            <p>
-              Or <button id="btnChooseFile">select a file</button>,
-              enter a <b>path</b> or a <b>url</b> to a file or a <b>magnet</b> link below,<br>
-              or <button id="btnUriPaste">use the one in your clipboard</button>
-            </p>
-            <p>
-              <input id="inputUri" type="text"/>
-              <button id="btnUriOpen">Play</button>
-            </p>
-            <input id="inputFile" type="file" />
-          </div>
-        </div>
-
-        <div id="dropIndicator">
-          <p>Drop to play</p>
-          <p class="dropHint" id="dropHint1"></p>
-          <p class="dropHint" id="dropHint2"></p>
-        </div>
-      </div>
-
-      <!-- info & controls about playing content -->
-
-      <div id="playing">
-
-        <section>
-
-          <h2>Media info</h2>
-
-          <p><label>Title</label> <span id="mediaTitle"></span></p>
-          <p><label>IMDB ID</label> <span id="mediaIMDBID"></span></p>
-          <p>
-            <label>Audio</label>
-            <select id="selectAudio"></select>
-          </p>
-          <p>
-            <label>Subtitles</label>
-            <select id="selectSubtitles"></select>
-          </p>
-          <p><label>OpenSubtitles.org hash:</label> <span id="mediaHash"></span></p>
-
-        </section>
-
-        <section>
-
-          <h2>Subtitles</h2>
-
-          <p>
-            <label>Choose file</label>
-            <input id="inputFileSubtitles" type="file">
-          </p>
-          <p>
-            <button id="btnLoadOpenSubtitles">Load from OpenSubtitles</button>
-            <select id="selectOpenSubtitles"></select>
-            <span id="openSubtitlesLoading">Loading</span>
-          </p>
-
-        </section>
-
-      </div>
-
-      <!-- Popcorn Time API -->
-
-      <div id="popcorn">
-
-        <h2>Content from Popcorn Time</h2>
-
-        <p>
-          <input id="inputSearch" type="text">
-          <button id="buttonSearch">Search</button>
-        </p>
-
-        <p id="loading">Loading</p>
-
-        <div id="results"></div>
-
-      </div>
+      <select>
+      </select>
 
     </div>
 
-    <script src="app_modules/menubuilder.js"></script>
-    <script src="app_modules/mediainfo.js"></script>
-    <script src="app_modules/popcorn.js"></script>
-    <script src="app_modules/player.js"></script>
-    <script src="app_modules/app.js"></script>
-    <script src="app_modules/gui.js"></script>
-    <script src="app_modules/screen_home.js"></script>
-    <script src="app_modules/screen_playing.js"></script>
+    <div id="dHome">
+
+      <p>Arnold can read almost any video file.</p>
+
+      <p>Drop a file  or click here to open a video.</p>
+
+      <p>Your preferred language for audio :</p>
+      <select>
+      </select>
+
+      <p>Your preferred language for subtitles :</p>
+      <select>
+      </select>
+
+    </div>
+
+    <div id="dAudio">
+
+      <table>
+        <tbody id="dAudioTable">
+        </tbody>
+      </table>
+
+    </div>
+
+    <div id="dSubtitles">
+
+      <table>
+        <thead>
+          <tr><th>Language:  - Change</th></tr>
+        </thead>
+        <tbody id="dSubtitlesTable">
+        </tbody>
+        <tfoot>
+          <tr id="dSubtitlesSearch"><th>Search subtitles on OpenSubtitles.org</th></tr>
+          <tr id="dSubtitlesLoad"><th>Load a file</th></tr>
+          <tr id="dSubtitlesDisable"><th>Disable subtitles</th></tr>
+        </tfoot>
+      </table>
+
+    </div>
+
+    <div class="player" id="dPlayer">
+      <canvas class="playerCanvas"></canvas>
+      <div class="playerSubtitlesBox"></div>
+    </div>
+
+    <input type="file" id="dInputFile">
+
     <script src="index.js"></script>
+
+    <script>
+
+      // TODO incorporate into index.js
+      // HTML should not contain any script
+
+      var nwgui = require('nw.gui');
+      var menubar = new nwgui.Menu({ type: 'menubar' });
+      nwgui.Window.get().menu = menubar;
+      menubar.createMacBuiltin('Arnold DEV', {
+        hideEdit: false,
+        hideWindow: false
+      });
+      // nwgui.Window.get().showDevTools();
+
+    </script>
   </body>
 </html>
