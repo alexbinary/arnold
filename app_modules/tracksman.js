@@ -118,6 +118,8 @@ TracksMan.prototype.subtitles = function (index) {
       } else {
         this.activeSubtitlesTrack = undefined;
       }
+    } else {
+      this.activeSubtitlesTrack = undefined;
     }
     this.emit('subtitles');
   }
