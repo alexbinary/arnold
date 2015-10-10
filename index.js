@@ -362,7 +362,6 @@ function playFile(path) {
 }
 
 makeVisible(dHome,true);
-makeVisible(dWelcome,false);
 makeVisible(dAudio,false);
 makeVisible(dSubtitles,false);
 
