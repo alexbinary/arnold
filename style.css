@@ -55,7 +55,7 @@ body {
 }
 /*  player is fully transparent when not playing
     solid black background when playing */
-.playing #dPlayer {
+#dPlayer.playing {
   background: black;
 }
 /*  subtitles appear on top of the video,

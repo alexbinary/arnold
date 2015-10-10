@@ -316,14 +316,15 @@ var gPlaying = false;
 
 function onPlaying(){
   gPlaying = true;
+  $(dPlayer).addClass('playing');
   makeVisible(dHome,false);
-  gPlayer.seek(50000);
   makeVisible(dAudio,false);
   makeVisible(dSubtitles,false);
 }
 
 function onStop(){
   gPlaying = false;
+  $(dPlayer).removeClass('playing');
   makeVisible(dHome,true);
   makeVisible(dAudio,false);
   makeVisible(dSubtitles,false);
