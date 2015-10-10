@@ -98,6 +98,10 @@ body {
   border-radius: 5px;
   font-weight: bold;
 }
+#dHomeDropZone.hover {
+  color: white;
+  border-color: white;
+}
 #dHomeDropHint {
   margin-bottom: 70px;
 }

@@ -176,9 +176,22 @@ function makeVisible(e,visible){
   $(e).toggle(visible);
 }
 
-dHome.addEventListener('click',function(){
+dHomeDropZone.addEventListener('click',function(){
   selectFile(playFile);
 })
+
+dHomeDropZone.ondragover = function(){$(this).addClass('hover');};
+dHomeDropZone.ondragleave = function(){$(this).removeClass('hover');};
+dHomeDropZone.ondrop = function(e){
+  e.preventDefault();
+  var filepath = e
+              && e.dataTransfer
+              && e.dataTransfer.files
+              && e.dataTransfer.files[0]
+              && e.dataTransfer.files[0].path;
+  if(filepath) playFile(filepath);
+  return false;
+};
 
 /*
  * audio management
