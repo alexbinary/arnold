@@ -62,12 +62,15 @@ gTracksman.mediaInfo = new (require('./app_modules/mediainfo'))();
 var lang = 'en';  // TODO
 
 gTracksman.on('playing',function() {
+  // select preferred audio
   var audio = gTracksman.audioTracks;
   for(var i=0 ; i<audio.length ; i++) {
     if(audio[i].lang == lang) {
       gTracksman.audio(i);
     }
   }
+  // disable subtitles
+  gTracksman.subtitles(null);
 });
 
 gTracksman.on('audio',refreshAudio);
@@ -169,6 +172,7 @@ window.addEventListener('keypress',function(e){
   }
 });
 window.addEventListener('keydown',function(e){
+  if(e.metaKey) return;
   if(audioVisible) audioKeydown(e);
   if(subtitlesVisible) subtitlesKeydown(e);
 });
@@ -339,11 +343,16 @@ function refreshSubtitles(){
 
 dSubtitlesSearch.addEventListener('click',function(){
   gTracksman.searchSubtitles(lang,1,function(){
+    gTracksman.subtitles(gTracksman.subtitlesTracks.length-1);
+    $(dSubtitlesSearch).removeClass('active');
   });
 });
 dSubtitlesLoad.addEventListener('click',function(){
   selectFile(function(path){
     gTracksman.addSubtitles(path);
+    gTracksman.subtitles(gTracksman.subtitlesTracks.length-1);
+    hideSubtitles();
+    $(dSubtitlesLoad).removeClass('active');
   });
 });
 dSubtitlesDisable.addEventListener('click',function(){
@@ -368,21 +377,79 @@ function subtitlesKeydown(e){
   if (e.keyCode == 13 // enter
    || e.keyCode == 27 // escape
   ){
-    hideSubtitles();
+    if($(dSubtitlesLang).hasClass('active')){
+      dSubtitlesLang.click();
+    } else if($(dSubtitlesDisable).hasClass('active')){
+      dSubtitlesDisable.click();
+      hideSubtitles();
+    } else if($(dSubtitlesLoad).hasClass('active')){
+      dSubtitlesLoad.click();
+    } else if($(dSubtitlesSearch).hasClass('active')){
+      dSubtitlesSearch.click();
+      hideSubtitles();
+    } else {
+      hideSubtitles();
+    }
   } else if (e.keyCode == 38  // up arrow
   ){
     var count = gTracksman.subtitlesTracks.length;
     var active = gTracksman.activeSubtitlesTrack;
-    if(active == 0) active=count-1;
-    else active--;
+
+    if(typeof gTracksman.activeSubtitlesTrack == 'undefined'){
+      if($(dSubtitlesLang).hasClass('active')){
+        return;
+      } else if($(dSubtitlesDisable).hasClass('active')){
+        $(dSubtitlesDisable).removeClass('active');
+        $(dSubtitlesLoad).addClass('active');
+      } else if($(dSubtitlesLoad).hasClass('active')){
+        $(dSubtitlesLoad).removeClass('active');
+        $(dSubtitlesSearch).addClass('active');
+      } else if($(dSubtitlesSearch).hasClass('active')){
+        $(dSubtitlesSearch).removeClass('active');
+        active=count-1;
+      } else if(count>0){
+        active = 0;
+      } else {
+        $(dSubtitlesSearch).addClass('active');
+      }
+    } else {
+      if(active == 0){
+        active = null;
+        $(dSubtitlesLang).addClass('active');
+      }
+      else active--;
+    }
     gTracksman.subtitles(active);
     refreshSubtitles();
   } else if (e.keyCode == 40  // down arrow
   ){
     var count = gTracksman.subtitlesTracks.length;
     var active = gTracksman.activeSubtitlesTrack;
-    if(active == count-1) active=0;
-    else active++;
+
+    if(typeof gTracksman.activeSubtitlesTrack == 'undefined'){
+      if($(dSubtitlesLang).hasClass('active')){
+        $(dSubtitlesLang).removeClass('active');
+        active=0;
+      } else if($(dSubtitlesSearch).hasClass('active')){
+        $(dSubtitlesSearch).removeClass('active');
+        $(dSubtitlesLoad).addClass('active');
+      } else if($(dSubtitlesLoad).hasClass('active')){
+        $(dSubtitlesLoad).removeClass('active');
+        $(dSubtitlesDisable).addClass('active');
+      } else if($(dSubtitlesDisable).hasClass('active')){
+        return;
+      } else if(count>0){
+        active = 0;
+      } else {
+        $(dSubtitlesSearch).addClass('active');
+      }
+    } else {
+      if(active == count-1){
+        active = null;
+        $(dSubtitlesSearch).addClass('active');
+      }
+      else active++;
+    }
     gTracksman.subtitles(active);
     refreshSubtitles();
   }
