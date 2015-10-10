@@ -222,6 +222,30 @@ function refreshAudio(){
   }
 }
 
+window.addEventListener('keydown',function(e){
+  if (e.keyCode == 13 // enter
+   || e.keyCode == 27 // escape
+  ){
+    makeVisible(dAudio,false);
+  } else if (e.keyCode == 38  // up arrow
+  ){
+    var count = gTracksman.audioTracks.length;
+    var active = gTracksman.activeAudioTrack;
+    if(active == 0) active=count-1;
+    else active--;
+    gTracksman.audio(active);
+    refreshAudio();
+  } else if (e.keyCode == 40  // down arrow
+  ){
+    var count = gTracksman.audioTracks.length;
+    var active = gTracksman.activeAudioTrack;
+    if(active == count-1) active=0;
+    else active++;
+    gTracksman.audio(active);
+    refreshAudio();
+  }
+});
+
 /*
  * subtitles management
  */
@@ -342,5 +366,7 @@ makeVisible(dWelcome,false);
 makeVisible(dAudio,false);
 makeVisible(dSubtitles,false);
 
-// nwgui.Window.get().showDevTools();
+// require('nw.gui').Window.get().showDevTools();
 // require('nw.gui').Window.get().moveTo(20,100);
+// playFile('/Users/alexandrebintz/Movies/another_earth_2011_1080p_it_eng_es_fr_sub_it_eng_es_fr_de_da_ne_nor_su.mkv');
+// playFile('/Users/alexandrebintz/Movies/The.Big.Bang.Theory.S09E01.720p.HDTV.X264-DIMENSION[EtHD].mkv');

@@ -124,6 +124,48 @@ body {
   text-align: right;
 }
 
+/*  audio interface appear on the center of the screen
+    and on top of the player  */
+#dAudio {
+  position: absolute;
+  z-index: 500;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: -webkit-flex;
+  -webkit-flex-direction: column;
+  -webkit-justify-content: center;
+  -webkit-align-items: center;
+}
+#dAudio table {
+  font-weight: bold;
+  font-size: 1em;
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: 0 0 75px black;
+  background: rgb(80, 80, 80);
+  color: lightgrey;
+  text-align: center;
+}
+#dAudio table th {
+  color: white;
+}
+#dAudio table td {
+  cursor: pointer;
+}
+#dAudio table td:hover {
+  color: rgb(225, 225, 225);
+}
+#dAudio table th,
+#dAudio table td {
+  padding: 5px 25px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+}
+#dAudio table .active {
+  color: white;
+}
+
 
 
 
