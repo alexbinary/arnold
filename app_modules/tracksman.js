@@ -19,7 +19,7 @@ var EventEmitter = require('events');
  */
 function TracksMan(player) {
   EventEmitter.call(this);
-  this.mediaInfo = null;
+  this.mediaInfo = new (require('../app_modules/mediainfo'))();
   this.unloadAudioTracks();
   this.unloadSubtitlesTracks();
   this.tracksLoaded = false;

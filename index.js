@@ -14,7 +14,7 @@ onload = function(){
   var selectFile = require('./app_modules/selectfile')($);
 
   /*
-   * init player
+   * player
    */
 
   var gPlayer = new (require('./app_modules/player'))(dPlayer,Event);
@@ -29,8 +29,11 @@ onload = function(){
     $(dPlayer).hide();
   }
 
+  /*
+   * tracks manager
+   */
+
   var gTracksman = new (require('./app_modules/tracksman'))(gPlayer);
-  gTracksman.mediaInfo = new (require('./app_modules/mediainfo'))();
 
   var lang = 'en';  // TODO
 
@@ -495,10 +498,6 @@ onload = function(){
     gPlayer.play(path);
   }
 
-
-
-
-  console.log('after');
 
   hidePlayer();
   hideAudio();
