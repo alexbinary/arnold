@@ -9,18 +9,7 @@
 
 'use strict';
 
-/*
- * utility to select a file on the disk
- */
-
-function selectFile(cb) {
-  var listener = function(){
-    if(typeof cb == 'function') cb(dInputFile.value);
-    dInputFile.removeEventListener('change',listener);
-  }
-  dInputFile.addEventListener('change',listener);
-  dInputFile.click();
-}
+var selectFile = require('./app_modules/selectfile')($);
 
 /*
  * init player
