@@ -17,9 +17,7 @@ var selectFile = require('./app_modules/selectfile')($);
 
 var gPlayer = new (require('./app_modules/player'))(dPlayer,Event);
 
-gPlayer.on('playing',function(){
-  if(!gPlaying) onPlaying();
-})
+gPlayer.on('started',onStart);
 
 var gTracksman = new (require('./app_modules/tracksman'))(gPlayer);
 gTracksman.mediaInfo = new (require('./app_modules/mediainfo'))();
@@ -448,10 +446,7 @@ function subtitlesKeydown(e){
  * General
  */
 
-var gPlaying = false;
-
-function onPlaying(){
-  gPlaying = true;
+function onStart(){
   $(dPlayer).addClass('playing');
   makeVisible(dHome,false);
   hideAudio();
@@ -462,7 +457,6 @@ function onPlaying(){
 }
 
 function onStop(){
-  gPlaying = false;
   $(dPlayer).removeClass('playing');
   makeVisible(dHome,true);
   hideAudio();

@@ -36,10 +36,14 @@ function Player(root, Event) {
   this.vlc = wcjs.init(this.uiCanvas);
 
   // map WebChimera callbacks to EventEmitter events for convenience
+  this.stopped = true;
   this.vlc.onPlaying = (function() {
+    if(this.stopped) this.emit('started');
+    this.stopped = false;
     this.emit('playing');
   }).bind(this);
   this.vlc.onStopped = (function() {
+    this.stopped = true;
     this.emit('stopped');
   }).bind(this);
   this.vlc.onTimeChanged = (function(time) {
