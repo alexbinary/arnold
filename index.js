@@ -339,6 +339,14 @@ function refreshSubtitles(){
     })(i);
     dSubtitlesTable.appendChild(tr);
   }
+  // select "disable subtitles" if nothing is selected
+  if(typeof gTracksman.activeSubtitlesTrack == 'undefined'){
+    if(!$(dSubtitlesSearch).hasClass('active')
+    && !$(dSubtitlesLoad).hasClass('active')
+    && !$(dSubtitlesDisable).hasClass('active')){
+      $(dSubtitlesDisable).addClass('active');
+    }
+  }
 }
 
 dSubtitlesSearch.addEventListener('click',function(){
@@ -430,6 +438,7 @@ function subtitlesKeydown(e){
         $(dSubtitlesLoad).removeClass('active');
         $(dSubtitlesDisable).addClass('active');
       } else if($(dSubtitlesDisable).hasClass('active')){
+        $(dSubtitlesDisable).removeClass('active');
         active = 0;
       } else if(count>0){
         active = 0;
