@@ -135,38 +135,44 @@ body {
 }
 #dAudio table,
 #dSubtitles table {
+  border-collapse: collapse;
+  border-radius: 5px;
+  background: rgb(80, 80, 80);
+  box-shadow: 0 0 75px black;
   font-weight: bold;
   font-size: 1em;
-  padding: 5px;
-  border-radius: 5px;
-  box-shadow: 0 0 75px black;
-  background: rgb(80, 80, 80);
-  color: lightgrey;
   text-align: center;
+  color: lightgrey;
 }
-#dAudio table th,
-#dSubtitles table th {
-  color: white;
+#dAudio th,
+#dAudio td,
+#dSubtitles th,
+#dSubtitles td {
+  padding: 5px 25px;
 }
-#dAudio table td,
-#dSubtitles table td {
+#dAudio td,
+#dSubtitles td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+#dAudio thead th,
+#dSubtitles thead th {
+  font-weight: normal;
+  padding: 20px;
+}
+#dAudio td,
+#dSubtitles td {
   cursor: pointer;
 }
-#dAudio table td:hover,
-#dSubtitles table td:hover {
-  color: rgb(225, 225, 225);
+#dAudio td:hover,
+#dSubtitles td:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
-#dAudio table th,
-#dAudio table td,
-#dSubtitles table th,
-#dSubtitles table td {
-  padding: 5px 25px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+#dAudio tr.active,
+#dSubtitles tr.active {
+  background: rgba(255, 255, 255, 0.2);
 }
-#dAudio table .active,
-#dSubtitles table .active {
-  color: white;
-}
+
 
 
 
