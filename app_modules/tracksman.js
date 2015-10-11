@@ -136,7 +136,7 @@ TracksMan.prototype.addSubtitles = function (uri) {
   this.subtitlesTracks.push({
     type: 'manual',
     uri : uri,
-    name: uri,
+    name: uri.split('/').pop(),
   });
   this.emit('subtitles');
 }
