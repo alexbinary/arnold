@@ -87,7 +87,7 @@ body {
 }
 #dHomeDropZone {
   -webkit-flex-grow: 1;
-  margin: 30px;
+  margin: 4%;
   display: -webkit-flex;
   -webkit-flex-direction: column;
   -webkit-justify-content: center;
