@@ -511,14 +511,16 @@ function playFile(path) {
   gPlayer.play(path);
 }
 
-makeVisible(dHome,true);
-hideAudio();
-hideSubtitles();
+onload = function(){
 
-require('nw.gui').Window.get().show();
+  makeVisible(dHome,true);
+  hideAudio();
+  hideSubtitles();
 
+  require('nw.gui').Window.get().show();
+};
 
 // require('nw.gui').Window.get().showDevTools();
 // require('nw.gui').Window.get().moveTo(20,100);
 // playFile('/Users/alexandrebintz/Movies/another_earth_2011_1080p_it_eng_es_fr_sub_it_eng_es_fr_de_da_ne_nor_su.mkv');
-playFile('/Users/alexandrebintz/Movies/The.Big.Bang.Theory.S09E01.720p.HDTV.X264-DIMENSION[EtHD].mkv');
+// playFile('/Users/alexandrebintz/Movies/The.Big.Bang.Theory.S09E01.720p.HDTV.X264-DIMENSION[EtHD].mkv');
