@@ -377,9 +377,7 @@ function subtitlesKeydown(e){
   if (e.keyCode == 13 // enter
    || e.keyCode == 27 // escape
   ){
-    if($(dSubtitlesLang).hasClass('active')){
-      dSubtitlesLang.click();
-    } else if($(dSubtitlesDisable).hasClass('active')){
+    if($(dSubtitlesDisable).hasClass('active')){
       dSubtitlesDisable.click();
       hideSubtitles();
     } else if($(dSubtitlesLoad).hasClass('active')){
@@ -396,9 +394,7 @@ function subtitlesKeydown(e){
     var active = gTracksman.activeSubtitlesTrack;
 
     if(typeof gTracksman.activeSubtitlesTrack == 'undefined'){
-      if($(dSubtitlesLang).hasClass('active')){
-        return;
-      } else if($(dSubtitlesDisable).hasClass('active')){
+      if($(dSubtitlesDisable).hasClass('active')){
         $(dSubtitlesDisable).removeClass('active');
         $(dSubtitlesLoad).addClass('active');
       } else if($(dSubtitlesLoad).hasClass('active')){
@@ -415,7 +411,7 @@ function subtitlesKeydown(e){
     } else {
       if(active == 0){
         active = null;
-        $(dSubtitlesLang).addClass('active');
+        $(dSubtitlesDisable).addClass('active');
       }
       else active--;
     }
@@ -427,17 +423,14 @@ function subtitlesKeydown(e){
     var active = gTracksman.activeSubtitlesTrack;
 
     if(typeof gTracksman.activeSubtitlesTrack == 'undefined'){
-      if($(dSubtitlesLang).hasClass('active')){
-        $(dSubtitlesLang).removeClass('active');
-        active=0;
-      } else if($(dSubtitlesSearch).hasClass('active')){
+      if($(dSubtitlesSearch).hasClass('active')){
         $(dSubtitlesSearch).removeClass('active');
         $(dSubtitlesLoad).addClass('active');
       } else if($(dSubtitlesLoad).hasClass('active')){
         $(dSubtitlesLoad).removeClass('active');
         $(dSubtitlesDisable).addClass('active');
       } else if($(dSubtitlesDisable).hasClass('active')){
-        return;
+        active = 0;
       } else if(count>0){
         active = 0;
       } else {
@@ -467,8 +460,6 @@ function onPlaying(){
   makeVisible(dHome,false);
   hideAudio();
   hideSubtitles();
-
-  gPlayer.volume(50);
 }
 
 function onStop(){
