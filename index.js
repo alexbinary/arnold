@@ -18,6 +18,14 @@ var selectFile = require('./app_modules/selectfile')($);
 var gPlayer = new (require('./app_modules/player'))(dPlayer,Event);
 
 gPlayer.on('started',onStart);
+gPlayer.on('stopped',onStop);
+
+function showPlayer(){
+  $(dPlayer).show();
+}
+function hidePlayer(){
+  $(dPlayer).hide();
+}
 
 var gTracksman = new (require('./app_modules/tracksman'))(gPlayer);
 gTracksman.mediaInfo = new (require('./app_modules/mediainfo'))();
@@ -151,16 +159,29 @@ dHomeDropZone.addEventListener('click',function(){
   selectFile(playFile);
 })
 
-dHomeDropZone.ondragover = function(){$(this).addClass('hover');};
-dHomeDropZone.ondragleave = function(){$(this).removeClass('hover');};
+dHomeDropZone.ondragover = function(){
+  $(this).addClass('hover');
+};
+dHomeDropZone.ondragleave = function(){
+  $(this).removeClass('hover');
+};
 dHomeDropZone.ondrop = function(e){
-  e.preventDefault();
+  $(this).removeClass('hover');
   var filepath = e
               && e.dataTransfer
               && e.dataTransfer.files
               && e.dataTransfer.files[0]
               && e.dataTransfer.files[0].path;
   if(filepath) playFile(filepath);
+};
+
+document.body.ondragover = function(){
+  return false;
+};
+document.body.ondragleave = function(){
+  return false;
+};
+document.body.ondrop = function(e){
   return false;
 };
 
@@ -447,20 +468,22 @@ function subtitlesKeydown(e){
  */
 
 function onStart(){
-  $(dPlayer).addClass('playing');
-  makeVisible(dHome,false);
   hideAudio();
   hideSubtitles();
+  makeVisible(dHome,false);
+  $(dPlayer).addClass('playing');
+  showPlayer();
 
   //
   gPlayer.volume(50);
 }
 
 function onStop(){
-  $(dPlayer).removeClass('playing');
-  makeVisible(dHome,true);
+  hidePlayer();
   hideAudio();
   hideSubtitles();
+  makeVisible(dHome,true);
+  $(dPlayer).removeClass('playing');
   clearAudio();
   clearSubtitles();
 }
@@ -472,14 +495,15 @@ function playFile(path) {
 
 onload = function(){
 
-  makeVisible(dHome,true);
+  hidePlayer();
   hideAudio();
   hideSubtitles();
+  makeVisible(dHome,true);
 
   require('nw.gui').Window.get().show();
 };
 
-// require('nw.gui').Window.get().showDevTools();
+require('nw.gui').Window.get().showDevTools();
 // require('nw.gui').Window.get().moveTo(20,100);
 // playFile('/Users/alexandrebintz/Movies/another_earth_2011_1080p_it_eng_es_fr_sub_it_eng_es_fr_de_da_ne_nor_su.mkv');
 // playFile('/Users/alexandrebintz/Movies/The.Big.Bang.Theory.S09E01.720p.HDTV.X264-DIMENSION[EtHD].mkv');

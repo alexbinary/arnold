@@ -32,8 +32,8 @@ function Player(root, Event) {
   this.updateSubtitles = function(){};
 
   // WebChimera player & renderer
-  var wcjs = require("../node_modules_hacked/wcjs-renderer");
-  this.vlc = wcjs.init(this.uiCanvas);
+  this.wcjs = require("../node_modules_hacked/wcjs-renderer");
+  this.vlc = this.wcjs.init(this.uiCanvas);
 
   // map WebChimera callbacks to EventEmitter events for convenience
   this.stopped = true;
@@ -86,6 +86,7 @@ Player.prototype.togglePause = function () {
 }
 Player.prototype.stop = function () {
   this.vlc.stop();
+  this.wcjs.clearCanvas();
 }
 // return length in ms
 Player.prototype.length = function () {
