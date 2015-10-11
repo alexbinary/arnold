@@ -13,6 +13,8 @@ onload = function(){
 
   var selectFile = require('./app_modules/selectfile')($);
 
+  var lang = 'en';  // TODO
+
   /*
    * player
    */
@@ -35,9 +37,7 @@ onload = function(){
 
   var gTracksman = new (require('./app_modules/tracksman'))(gPlayer);
 
-  var lang = 'en';  // TODO
-
-  gTracksman.on('playing',function() {
+  gTracksman.on('started',function() {
     // select preferred audio
     var audio = gTracksman.audioTracks;
     for(var i=0 ; i<audio.length ; i++) {

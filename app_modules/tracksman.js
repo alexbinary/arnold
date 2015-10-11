@@ -26,13 +26,11 @@ function TracksMan(player) {
   this.activeAudioTrack = undefined;
   this.activeSubtitlesTrack = undefined;
   this.player = player;
-  this.player.on('playing', (function(){
-    if(!this.tracksLoaded) {
-      this.loadAudioTracks();
-      this.loadSubtitlesTracks();
-      this.tracksLoaded = true;
-      this.emit('playing');
-    }
+  this.player.on('started', (function(){
+    this.loadAudioTracks();
+    this.loadSubtitlesTracks();
+    this.tracksLoaded = true;
+    this.emit('started');
   }).bind(this));
   this.player.on('stopped', (function(){
     this.unloadAudioTracks();
