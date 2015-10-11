@@ -61,21 +61,25 @@ TracksMan.prototype.unloadAudioTracks = function () {
   this.audioTracks = [];
   this.emit('audio');
 }
-// invalid index disable audio
-// return active audio track
-TracksMan.prototype.audio = function (index) {
-  if(typeof index != 'undefined') {
-    var audio = this.audioTracks[index];
-    if(audio && audio.type == 'internal') {
-      this.player.audio(audio.track);
-      this.activeAudioTrack = index;
-    } else {
-      this.player.audio(-1);
-      this.activeAudioTrack = undefined;
-    }
+// pass track number to set corresponding track
+// pass lang as string to set corresponding track if available
+// fallback to first built-in audio track
+// return active audio track index
+// emit 'audio'
+TracksMan.prototype.audio = function (track) {
+  var audio = this.audioTracks[track];
+  if(audio && audio.type == 'internal') {
+    this.player.audio(audio.track);
+    this.activeAudioTrack = track;
     this.emit('audio');
+    return this.activeAudioTrack;
   }
-  return this.activeAudioTrack;
+  for(var i=0 ; i<this.audioTracks.length ; i++) {
+    if(this.audioTracks[i].lang == track) {
+      return this.audio(i);
+    }
+  }
+  return this.audio(1);
 }
 TracksMan.prototype.audioTrack = function () {
   return this.audioTracks[this.activeAudioTrack];
