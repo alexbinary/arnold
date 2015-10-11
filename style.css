@@ -50,10 +50,6 @@ body {
   display: -webkit-flex;
   -webkit-justify-content: center;
   -webkit-align-items: center;
-}
-/*  player is fully transparent when not playing
-    solid black background when playing */
-#dPlayer.playing {
   background: black;
 }
 /*  subtitles appear on top of the video,
@@ -120,7 +116,7 @@ body {
 
 /*  audio & subtitles interfaces appear on the center of the screen
     and on top of the player  */
-#dAudio,
+#dAudioWidget,
 #dSubtitles {
   position: absolute;
   z-index: 500;
@@ -133,7 +129,7 @@ body {
   -webkit-justify-content: center;
   -webkit-align-items: center;
 }
-#dAudio table,
+#dAudioWidget table,
 #dSubtitles table {
   border-collapse: collapse;
   border-radius: 5px;
@@ -144,31 +140,31 @@ body {
   text-align: center;
   color: lightgrey;
 }
-#dAudio th,
-#dAudio td,
+#dAudioWidget th,
+#dAudioWidget td,
 #dSubtitles th,
 #dSubtitles td {
   padding: 5px 25px;
 }
-#dAudio td,
+#dAudioWidget td,
 #dSubtitles td {
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
-#dAudio thead th,
+#dAudioWidget thead th,
 #dSubtitles thead th {
   font-weight: normal;
   padding: 20px;
 }
-#dAudio td,
+#dAudioWidget td,
 #dSubtitles td {
   cursor: pointer;
 }
-#dAudio td:hover,
+#dAudioWidget td:hover,
 #dSubtitles td:hover {
   background: rgba(255, 255, 255, 0.2);
 }
-#dAudio tr.active,
+#dAudioWidget tr.active,
 #dSubtitles tr.active {
   background: rgba(255, 255, 255, 0.2);
 }

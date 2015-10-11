@@ -17,7 +17,7 @@ onload = function(){
     $(e).toggle(visible);
   }
 
-  var lang = 'en';  // TODO
+  var lang = 'en';
 
   /*
    * player
@@ -46,7 +46,6 @@ onload = function(){
     gTracksman.subtitles(null);
   });
 
-  gTracksman.on('audio',refreshAudio);
   gTracksman.on('subtitles',refreshSubtitles);
 
   /*
@@ -95,9 +94,11 @@ onload = function(){
     if (e.which == 32  // space
     ){
      gPlayer.togglePause();
+     return;
     }
-    if(e.metaKey) return;
-    if(audioVisible) audioKeydown(e);
+    if(audioWidget.visible) {
+      if(audioWidget.keydown(e)) return;
+    }
     if(subtitlesVisible) subtitlesKeydown(e);
   });
 
@@ -115,6 +116,12 @@ onload = function(){
   function hideHome(){
     makeVisible(dHome,false);
   }
+
+  /*
+   * audio management
+   */
+
+  var audioWidget = new (require('./app_modules/audio'))(dAudioWidget,gTracksman);
 
   /*
    * application menu
@@ -163,7 +170,7 @@ onload = function(){
     },'l','ctrl'
     ),
     mb.item('Manage audio',function(){
-      toggleAudioVisible();
+      audioWidget.toggleVisible();
     },'b','ctrl'
     ),
     mb.separator(
@@ -205,73 +212,6 @@ onload = function(){
      'cmd'
     ),
   ]);
-
-  /*
-   * audio management
-   */
-
-  function clearAudio(){
-    while (dAudioTable.firstChild) {
-      dAudioTable.removeChild(dAudioTable.firstChild);
-    }
-  }
-
-  function refreshAudio(){
-    clearAudio();
-    var audio = gTracksman.audioTracks;
-    var active = gTracksman.activeAudioTrack;
-    for(var i=0 ; i<audio.length ; i++) {
-      var tr = document.createElement('tr');
-      var td = document.createElement('td');
-      td.appendChild(document.createTextNode(audio[i].name));
-      tr.appendChild(td);
-      tr.className = active==i ? 'active' : '';
-      (function(i){
-        tr.addEventListener('click',function(){
-          gTracksman.audio(i);
-        });
-      })(i);
-      dAudioTable.appendChild(tr);
-    }
-  }
-
-  var audioVisible = true;
-
-  function showAudio(){
-    makeVisible(dAudio,true);
-    audioVisible = true;
-  }
-  function hideAudio(){
-    makeVisible(dAudio,false);
-    audioVisible = false;
-  }
-  function toggleAudioVisible(){
-    audioVisible ? hideAudio() : showAudio();
-  }
-
-  function audioKeydown(e){
-    if (e.keyCode == 13 // enter
-     || e.keyCode == 27 // escape
-    ){
-      hideAudio();
-    } else if (e.keyCode == 38  // up arrow
-    ){
-      var count = gTracksman.audioTracks.length;
-      var active = gTracksman.activeAudioTrack;
-      if(active == 0) active=count-1;
-      else active--;
-      gTracksman.audio(active);
-      refreshAudio();
-    } else if (e.keyCode == 40  // down arrow
-    ){
-      var count = gTracksman.audioTracks.length;
-      var active = gTracksman.activeAudioTrack;
-      if(active == count-1) active=0;
-      else active++;
-      gTracksman.audio(active);
-      refreshAudio();
-    }
-  }
 
   /*
    * subtitles management
@@ -494,7 +434,7 @@ onload = function(){
   }
 
   function onStarted(){
-    hideAudio();
+    audioWidget.hide();
     hideSubtitles();
     hideHome();
     showPlayer();
@@ -504,7 +444,7 @@ onload = function(){
 
   function onStopped(){
     hidePlayer();
-    hideAudio();
+    audioWidget.hide();
     hideSubtitles();
     showHome();
 
@@ -513,7 +453,7 @@ onload = function(){
   }
 
   hidePlayer();
-  hideAudio();
+  audioWidget.hide();
   hideSubtitles();
   showHome();
 
