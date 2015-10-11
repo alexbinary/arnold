@@ -175,7 +175,7 @@ TracksMan.prototype.searchSubtitles = function (lang, searchLevel, cb) {
         this.subtitlesTracks.push({
           type: 'opensubtitles.org',
           url : sub.url,
-          name: sub.langName,
+          name: 'OpenSubtitles.org ['+sub.langName+']',
           lang: lang,
         });
         this.emit('subtitles');
