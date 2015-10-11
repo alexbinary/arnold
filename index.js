@@ -10,26 +10,6 @@
 'use strict';
 
 /*
- * throttle event window.resize using requestAnimationFrame
- * since we will use it to resize the video
- */
-
-var throttleEvent = function(type, name, obj) {
-  var obj = obj || window;
-  var running = false;
-  var func = function() {
-    if (running) { return; }
-    running = true;
-    requestAnimationFrame(function() {
-      obj.dispatchEvent(new CustomEvent(name));
-      running = false;
-    });
-  };
-  obj.addEventListener(type, func);
-};
-throttleEvent('resize', 'optimizedResize');
-
-/*
  * utility to select a file on the disk
  */
 
@@ -47,10 +27,6 @@ function selectFile(cb) {
  */
 
 var gPlayer = new (require('./app_modules/player'))(dPlayer,Event);
-
-window.addEventListener('optimizedResize', function() {
-  gPlayer.resize();
-});
 
 gPlayer.on('playing',function(){
   if(!gPlaying) onPlaying();

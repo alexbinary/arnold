@@ -46,6 +46,12 @@ function Player(root, Event) {
     this.updateSubtitles(time/1000);
     this.emit('timeChanged', time);
   }).bind(this);
+
+  // resize canvas on window resize
+  require('../app_modules/throttleevent')('resize', 'optimizedResize', window);
+  window.addEventListener('optimizedResize',(function(){
+    this.resize();
+  }).bind(this));
 }
 util.inherits(Player, EventEmitter);
 
