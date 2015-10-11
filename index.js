@@ -288,7 +288,7 @@ function enableSubtitles(){
       }
     }
     if(typeof gTracksman.activeSubtitlesTrack == 'undefined') {
-      searchAndLoadSubtitles();
+      dSubtitlesSearch.click();
     }
   }
 }
@@ -301,19 +301,6 @@ function disableSubtitles(){
 function toggleSubtitles(){
   if(typeof gTracksman.activeSubtitlesTrack == 'undefined') enableSubtitles();
   else disableSubtitles();
-}
-
-function searchAndLoadSubtitles(){
-  console.log('loading subs');
-  gTracksman.searchSubtitles(lang,1,function(found){
-    console.log('done loading subs');
-    if(found) {
-      console.log('found subs');
-      gTracksman.subtitles(gTracksman.subtitlesTracks.length-1);
-    } else {
-      console.log('no subs found');
-    }
-  });
 }
 
 function clearSubtitles(){
@@ -344,12 +331,27 @@ function refreshSubtitles(){
     if(!$(dSubtitlesSearch).hasClass('active')
     && !$(dSubtitlesLoad).hasClass('active')
     && !$(dSubtitlesDisable).hasClass('active')){
-      $(dSubtitlesDisable).addClass('active');
+      if(openSubtitlesFired){
+        $(dSubtitlesSearch).addClass('active');
+        $(dSubtitlesLoad).removeClass('active');
+        $(dSubtitlesDisable).removeClass('active');
+      } else {
+        $(dSubtitlesDisable).addClass('active');
+        $(dSubtitlesSearch).removeClass('active');
+        $(dSubtitlesLoad).removeClass('active');
+      }
     }
+  } else {
+    $(dSubtitlesSearch).removeClass('active');
+    $(dSubtitlesLoad).removeClass('active');
+    $(dSubtitlesDisable).removeClass('active');
   }
 }
 
 dSubtitlesSearch.addEventListener('click',function(){
+  openSubtitlesFired = true;
+  $(dSubtitlesDisable).removeClass('active');
+  gTracksman.subtitles(null);
   $(dSubtitlesSearch).find('td').text('Loading subtitles...');
   gTracksman.searchSubtitles(lang,1,function(){
     openSubtitlesComplete = true;
@@ -398,7 +400,6 @@ function subtitlesKeydown(e){
       dSubtitlesLoad.click();
     } else if($(dSubtitlesSearch).hasClass('active')){
       if(!openSubtitlesFired){
-        openSubtitlesFired = true;
         dSubtitlesSearch.click();
         hideSubtitles();
       }
@@ -489,7 +490,7 @@ function onPlaying(){
   $(dPlayer).addClass('playing');
   makeVisible(dHome,false);
   hideAudio();
-  // hideSubtitles();
+  hideSubtitles();
 
   //
   gPlayer.volume(50);
@@ -512,12 +513,12 @@ function playFile(path) {
 
 makeVisible(dHome,true);
 hideAudio();
-// hideSubtitles();
+hideSubtitles();
 
 require('nw.gui').Window.get().show();
 
 
 // require('nw.gui').Window.get().showDevTools();
 // require('nw.gui').Window.get().moveTo(20,100);
-playFile('/Users/alexandrebintz/Movies/another_earth_2011_1080p_it_eng_es_fr_sub_it_eng_es_fr_de_da_ne_nor_su.mkv');
-// playFile('/Users/alexandrebintz/Movies/The.Big.Bang.Theory.S09E01.720p.HDTV.X264-DIMENSION[EtHD].mkv');
+// playFile('/Users/alexandrebintz/Movies/another_earth_2011_1080p_it_eng_es_fr_sub_it_eng_es_fr_de_da_ne_nor_su.mkv');
+playFile('/Users/alexandrebintz/Movies/The.Big.Bang.Theory.S09E01.720p.HDTV.X264-DIMENSION[EtHD].mkv');
