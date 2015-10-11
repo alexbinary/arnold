@@ -104,31 +104,36 @@ TracksMan.prototype.unloadSubtitlesTracks = function () {
   this.subtitlesTracks = [];
   this.emit('subtitles');
 }
-// invalid index disable subtitles
-// return active subtitles track
-TracksMan.prototype.subtitles = function (index) {
-  if(typeof index != 'undefined') {
-    this.player.stopExternalSubtitle();
-    this.player.subtitles(-1);
-    var subtitle = this.subtitlesTracks[index];
-    if(subtitle) {
-      if(subtitle.type == 'internal') {
-        this.player.subtitles(subtitle.track);
-        this.activeSubtitlesTrack = index;
-      } else if(subtitle.type == 'opensubtitles.org') {
-        this.player.subtitles(subtitle.url);
-        this.activeSubtitlesTrack = index;
-      } else if(subtitle.type == 'manual') {
-        this.player.subtitles(subtitle.uri);
-        this.activeSubtitlesTrack = index;
-      } else {
-        this.activeSubtitlesTrack = undefined;
-      }
-    } else {
-      this.activeSubtitlesTrack = undefined;
+// pass track number to set corresponding track
+// pass lang as string to set corresponding track if available
+// fallback disables subtitles
+// return active subtitles track index
+// emit 'subtitles'
+TracksMan.prototype.subtitles = function (track) {
+  this.player.stopExternalSubtitle();
+  this.player.subtitles(null);
+  this.activeSubtitlesTrack = undefined;
+  var subtitle = this.subtitlesTracks[track];
+  if(subtitle) {
+    if(subtitle.type == 'internal') {
+      this.player.subtitles(subtitle.track);
+      this.activeSubtitlesTrack = track;
+    } else if(subtitle.type == 'opensubtitles.org') {
+      this.player.subtitles(subtitle.url);
+      this.activeSubtitlesTrack = track;
+    } else if(subtitle.type == 'manual') {
+      this.player.subtitles(subtitle.uri);
+      this.activeSubtitlesTrack = track;
     }
-    this.emit('subtitles');
   }
+  if(this.activeSubtitlesTrack === undefined){
+    for(var i=0 ; i<this.subtitlesTracks.length ; i++) {
+      if(this.subtitlesTracks[i].lang == track) {
+        return this.subtitles(i);
+      }
+    }
+  }
+  this.emit('subtitles');
   return this.activeSubtitlesTrack;
 }
 TracksMan.prototype.subtitlesTrack = function () {
