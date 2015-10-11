@@ -13,6 +13,10 @@ onload = function(){
 
   var selectFile = require('./app_modules/selectfile')($);
 
+  function makeVisible(e,visible){
+    $(e).toggle(visible);
+  }
+
   var lang = 'en';  // TODO
 
   /*
@@ -21,8 +25,8 @@ onload = function(){
 
   var gPlayer = new (require('./app_modules/player'))(dPlayer,Event);
 
-  gPlayer.on('started',onStart);
-  gPlayer.on('stopped',onStop);
+  gPlayer.on('started',onStarted);
+  gPlayer.on('stopped',onStopped);
 
   function showPlayer(){
     $(dPlayer).show();
@@ -46,7 +50,74 @@ onload = function(){
   gTracksman.on('subtitles',refreshSubtitles);
 
   /*
-   * init UI
+   * open file
+   */
+
+  function pickAndOpenMediaFile(){
+    selectFile(openFile);
+  }
+
+  dHomeDropZone.addEventListener('click',function(){
+    pickAndOpenMediaFile();
+  })
+
+  dHomeDropZone.ondragover = function(){
+   $(this).addClass('hover');
+  };
+  dHomeDropZone.ondragleave = function(){
+   $(this).removeClass('hover');
+  };
+  dHomeDropZone.ondrop = function(e){
+   $(this).removeClass('hover');
+   var filepath = e
+               && e.dataTransfer
+               && e.dataTransfer.files
+               && e.dataTransfer.files[0]
+               && e.dataTransfer.files[0].path;
+   if(filepath) openFile(filepath);
+  };
+
+  document.body.ondragover = function(){
+   return false;
+  };
+  document.body.ondragleave = function(){
+   return false;
+  };
+  document.body.ondrop = function(e){
+   return false;
+  };
+
+  /*
+   * general controls
+   */
+
+  $(window).keydown(function(e){
+    if (e.which == 32  // space
+    ){
+     gPlayer.togglePause();
+    }
+    if(e.metaKey) return;
+    if(audioVisible) audioKeydown(e);
+    if(subtitlesVisible) subtitlesKeydown(e);
+  });
+
+  dPlayer.addEventListener('click',function(){
+   gPlayer.togglePause();
+  });
+
+  /*
+   * home screen
+   */
+
+  function showHome(){
+    makeVisible(dHome,true);
+  }
+  function hideHome(){
+    makeVisible(dHome,false);
+  }
+
+  /*
+   * application menu
    */
 
   var mb = new (require('./app_modules/menubuilder'))(require('nw.gui'));
@@ -134,54 +205,6 @@ onload = function(){
      'cmd'
     ),
   ]);
-
-  window.addEventListener('keypress',function(e){
-    if (e.keyCode == 32) {  // space
-      gPlayer.togglePause();
-    }
-  });
-  window.addEventListener('keydown',function(e){
-    if(e.metaKey) return;
-    if(audioVisible) audioKeydown(e);
-    if(subtitlesVisible) subtitlesKeydown(e);
-  });
-  dPlayer.addEventListener('click',function(){
-    gPlayer.togglePause();
-  });
-
-  function makeVisible(e,visible){
-    $(e).toggle(visible);
-  }
-
-  dHomeDropZone.addEventListener('click',function(){
-    selectFile(playFile);
-  })
-
-  dHomeDropZone.ondragover = function(){
-    $(this).addClass('hover');
-  };
-  dHomeDropZone.ondragleave = function(){
-    $(this).removeClass('hover');
-  };
-  dHomeDropZone.ondrop = function(e){
-    $(this).removeClass('hover');
-    var filepath = e
-                && e.dataTransfer
-                && e.dataTransfer.files
-                && e.dataTransfer.files[0]
-                && e.dataTransfer.files[0].path;
-    if(filepath) playFile(filepath);
-  };
-
-  document.body.ondragover = function(){
-    return false;
-  };
-  document.body.ondragleave = function(){
-    return false;
-  };
-  document.body.ondrop = function(e){
-    return false;
-  };
 
   /*
    * audio management
@@ -462,47 +485,45 @@ onload = function(){
   }
 
   /*
-   * General
+   * application logic
    */
 
-  function onStart(){
-    hideAudio();
-    hideSubtitles();
-    makeVisible(dHome,false);
-    $(dPlayer).addClass('playing');
-    showPlayer();
-
-    //
-    gPlayer.volume(50);
-  }
-
-  function onStop(){
-    hidePlayer();
-    hideAudio();
-    hideSubtitles();
-    makeVisible(dHome,true);
-    $(dPlayer).removeClass('playing');
-    clearAudio();
-    clearSubtitles();
-  }
-
-  function playFile(path) {
+  function openFile(path) {
     gTracksman.mediaInfo.filepath = path;
     gPlayer.play(path);
   }
 
+  function onStarted(){
+    hideAudio();
+    hideSubtitles();
+    hideHome();
+    showPlayer();
+    //
+    gPlayer.volume(50);
+  }
+
+  function onStopped(){
+    hidePlayer();
+    hideAudio();
+    hideSubtitles();
+    showHome();
+
+    clearAudio();
+    clearSubtitles();
+  }
 
   hidePlayer();
   hideAudio();
   hideSubtitles();
-  makeVisible(dHome,true);
+  showHome();
 
   require('nw.gui').Window.get().show();
 
+  // --
 
   require('nw.gui').Window.get().showDevTools();
   // require('nw.gui').Window.get().moveTo(20,100);
-  playFile('/Users/alexandrebintz/Movies/another_earth_2011_1080p_it_eng_es_fr_sub_it_eng_es_fr_de_da_ne_nor_su.mkv');
-  // playFile('/Users/alexandrebintz/Movies/The.Big.Bang.Theory.S09E01.720p.HDTV.X264-DIMENSION[EtHD].mkv');
+  openFile('/Users/alexandrebintz/Movies/another_earth_2011_1080p_it_eng_es_fr_sub_it_eng_es_fr_de_da_ne_nor_su.mkv');
+  // openFile('/Users/alexandrebintz/Movies/The.Big.Bang.Theory.S09E01.720p.HDTV.X264-DIMENSION[EtHD].mkv');
 
 };
