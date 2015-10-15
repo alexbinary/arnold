@@ -57,8 +57,8 @@ SubtitlesWidget.prototype.refresh = function(){
   var tracks = this.tracksman.subtitlesTracks;
   var activeTrack = this.tracksman.activeSubtitlesTrack;
   // save selected and highlighted items
-  var selectedItem = this.items && this.items[this.selectedItem];
-  var highlightedItem = this.items && this.items[this.highlightedItem];
+  var selectedItem = this.items && this.items[this.selectedItemIndex];
+  var highlightedItem = this.items && this.items[this.highlightedItemIndex];
   // items = tracks + actions
   this.items = [];
   for(var i=0, l=tracks.length ; i<l ; i++){
@@ -105,36 +105,36 @@ SubtitlesWidget.prototype.refresh = function(){
   }
   // select item to reflect the active track if any
   if(activeTrack !== undefined){
-    this.selectedItem = this.getItemIndexForActiveTrack();
+    this.selectedItemIndex = this.getItemIndexForActiveTrack();
   } else {
     // attempt to restore previously selected item
-    this.selectedItem = this.findItem(selectedItem);
+    this.selectedItemIndex = this.getItemIndexForItem(selectedItem);
     // clear selected item if obsolete
-    if(this.items[this.selectedItem]
-      && this.items[this.selectedItem].type == 'track'){
-      this.selectedItem = undefined;
+    if(this.items[this.selectedItemIndex]
+      && this.items[this.selectedItemIndex].type == 'track'){
+      this.selectedItemIndex = undefined;
     }
   }
   // attempt to restore previously highlighted item
-  this.highlightedItem = this.findItem(highlightedItem);
+  this.highlightedItemIndex = this.getItemIndexForItem(highlightedItem);
   this.update();
 }
 SubtitlesWidget.prototype.update = function(){
   // if no item is selected, make the item that corresponds
   // to the active track the selected item
   // if no active track, select the 'disable' action
-  if(this.selectedItem === undefined){
+  if(this.selectedItemIndex === undefined){
     if(this.tracksman.activeSubtitlesTrack !== undefined){
-      this.selectedItem = this.getItemIndexForActiveTrack();
+      this.selectedItemIndex = this.getItemIndexForActiveTrack();
     } else {
-      this.selectedItem = this.getItemIndexForAction('disable');
+      this.selectedItemIndex = this.getItemIndexForAction('disable');
     }
   }
   for(var i=0, l=this.items.length ; i<l ; i++){
     var element = this.items[i].element;
     if(element) {
-      element.toggleClass('selected',this.selectedItem == i);
-      element.toggleClass('highlighted',this.highlightedItem == i);
+      element.toggleClass('selected',this.selectedItemIndex == i);
+      element.toggleClass('highlighted',this.highlightedItemIndex == i);
       if(this.items[i].type == 'action' && this.items[i].action == 'search'){
         element.toggleClass('loading',this.searchPending);
       }
@@ -150,7 +150,7 @@ SubtitlesWidget.prototype.getItemIndexForActiveTrack = function(){
   }
   return undefined;
 }
-SubtitlesWidget.prototype.findItem = function(item){
+SubtitlesWidget.prototype.getItemIndexForItem = function(item){
   if(item){
     for(var i=0, l=this.items.length ; i<l ; i++){
       if((this.items[i].type == 'track'
@@ -176,27 +176,24 @@ SubtitlesWidget.prototype.getItemIndexForAction = function(action){
   return undefined;
 }
 SubtitlesWidget.prototype.initHighlightedItemIfNeeded = function(){
-  if(this.highlightedItem === undefined){
-    if(this.selectedItem !== undefined){
-      this.highlightedItem = this.selectedItem;
+  if(this.highlightedItemIndex === undefined){
+    if(this.selectedItemIndex !== undefined){
+      this.highlightedItemIndex = this.selectedItemIndex;
     } else {
-      this.highlightedItem = 0;
+      this.highlightedItemIndex = 0;
     }
   }
 }
-// TODO rename item to index
-SubtitlesWidget.prototype.highlightItem = function(item){
-  this.highlightedItem = item;
+SubtitlesWidget.prototype.highlightItem = function(index){
+  this.highlightedItemIndex = index;
   this.update();
 }
-// TODO rename item to index
-SubtitlesWidget.prototype.setSelectedItem = function(item){
-  this.selectedItem = item;
+SubtitlesWidget.prototype.setSelectedItem = function(index){
+  this.selectedItemIndex = index;
   this.update();
 }
-// TODO rename item to index
-SubtitlesWidget.prototype.selectItem = function(item,userInitiated){
-  var item = this.items[item];
+SubtitlesWidget.prototype.selectItem = function(index,userInitiated){
+  var item = this.items[index];
   if(item){
     if(item.type == 'track'){
       this.tracksman.subtitles(item.index);
@@ -234,11 +231,11 @@ SubtitlesWidget.prototype.keydown = function(e){
   }
   if (e.keyCode == 13 // enter
   ){
-    if(this.items[this.highlightedItem].type != 'action'
-    || this.items[this.highlightedItem].action != 'load'){
-      this.setSelectedItem(this.highlightedItem);
+    if(this.items[this.highlightedItemIndex].type != 'action'
+    || this.items[this.highlightedItemIndex].action != 'load'){
+      this.setSelectedItem(this.highlightedItemIndex);
     }
-    this.selectItem(this.highlightedItem,true);
+    this.selectItem(this.highlightedItemIndex,true);
     return true;
   }
   // meta + arrow is bound to volume control
@@ -249,7 +246,7 @@ SubtitlesWidget.prototype.keydown = function(e){
   ){
     this.initHighlightedItemIfNeeded();
     var count = this.items.length;
-    var active = this.highlightedItem;
+    var active = this.highlightedItemIndex;
     if(active == 0) active=count-1;
     else active--;
     this.highlightItem(active);
@@ -259,7 +256,7 @@ SubtitlesWidget.prototype.keydown = function(e){
   ){
     this.initHighlightedItemIfNeeded();
     var count = this.items.length;
-    var active = this.highlightedItem;
+    var active = this.highlightedItemIndex;
     if(active == count-1) active=0;
     else active++;
     this.highlightItem(active);
