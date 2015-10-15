@@ -56,6 +56,9 @@ SubtitlesWidget.prototype.clear = function(){
 SubtitlesWidget.prototype.refresh = function(){
   var tracks = this.tracksman.subtitlesTracks;
   var activeTrack = this.tracksman.activeSubtitlesTrack;
+  // save selected and highlighted items
+  var selectedItem = this.items && this.items[this.selectedItem];
+  var highlightedItem = this.items && this.items[this.highlightedItem];
   // items = tracks + actions
   this.items = [];
   for(var i=0, l=tracks.length ; i<l ; i++){
@@ -103,13 +106,17 @@ SubtitlesWidget.prototype.refresh = function(){
   // select item to reflect the active track if any
   if(activeTrack !== undefined){
     this.selectedItem = this.getItemIndexForActiveTrack();
+  } else {
+    // attempt to restore previously selected item
+    this.selectedItem = this.findItem(selectedItem);
+    // clear selected item if obsolete
+    if(this.items[this.selectedItem]
+      && this.items[this.selectedItem].type == 'track'){
+      this.selectedItem = undefined;
+    }
   }
-  // clear selected item if active track is reset
-  if(activeTrack === undefined
-    && this.items[this.selectedItem]
-    && this.items[this.selectedItem].type == 'track'){
-    this.selectedItem = undefined;
-  }
+  // attempt to restore previously highlighted item
+  this.highlightedItem = this.findItem(highlightedItem);
   this.update();
 }
 SubtitlesWidget.prototype.update = function(){
@@ -143,6 +150,22 @@ SubtitlesWidget.prototype.getItemIndexForActiveTrack = function(){
   }
   return undefined;
 }
+SubtitlesWidget.prototype.findItem = function(item){
+  if(item){
+    for(var i=0, l=this.items.length ; i<l ; i++){
+      if((this.items[i].type == 'track'
+      && item.type == 'track'
+      && item.track == this.items[i].track
+      )||(this.items[i].type == 'action'
+      && item.type == 'action'
+      && item.action == this.items[i].action
+      )){
+        return i;
+      }
+    }
+  }
+  return undefined;
+}
 SubtitlesWidget.prototype.getItemIndexForAction = function(action){
   for(var i=0 ; i<this.items.length ; i++) {
     if(this.items[i].type == 'action'
@@ -161,14 +184,17 @@ SubtitlesWidget.prototype.initHighlightedItemIfNeeded = function(){
     }
   }
 }
+// TODO rename item to index
 SubtitlesWidget.prototype.highlightItem = function(item){
   this.highlightedItem = item;
   this.update();
 }
+// TODO rename item to index
 SubtitlesWidget.prototype.setSelectedItem = function(item){
   this.selectedItem = item;
   this.update();
 }
+// TODO rename item to index
 SubtitlesWidget.prototype.selectItem = function(item,userInitiated){
   var item = this.items[item];
   if(item){
