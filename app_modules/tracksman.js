@@ -196,7 +196,7 @@ TracksMan.prototype.searchSubtitles = function (lang, searchLevel, cb) {
         foundSubs = true;
       }
     }
-    if(typeof cb == 'function') cb(foundSubs);
+    if(typeof cb == 'function') cb(foundSubs,foundSubs?this.subtitlesTracks.length-1:undefined);
   }).bind(this));
 }
 
