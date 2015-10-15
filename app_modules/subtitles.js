@@ -167,7 +167,6 @@ SubtitlesWidget.prototype.setSelectedItem = function(item){
   this.update();
 }
 SubtitlesWidget.prototype.selectItem = function(item,userInitiated){
-  this.setSelectedItem(item);
   var item = this.items[item];
   if(item){
     if(item.type == 'track'){
@@ -206,6 +205,10 @@ SubtitlesWidget.prototype.keydown = function(e){
   }
   if (e.keyCode == 13 // enter
   ){
+    if(this.items[this.highlightedItem].type != 'action'
+    || this.items[this.highlightedItem].action != 'load'){
+      this.setSelectedItem(this.highlightedItem);
+    }
     this.selectItem(this.highlightedItem,true);
     return true;
   }
@@ -247,7 +250,9 @@ SubtitlesWidget.prototype.enableSubtitles = function(){
     this.tracksman.subtitles(this.lastSubtitlesTrack);
   } else {
     if(this.tracksman.subtitles('en') === undefined){
-      this.selectItem(this.getItemIndexForAction('search'));
+      var index = this.getItemIndexForAction('search');
+      this.setSelectedItem(index);
+      this.selectItem(index);
     }
   }
 }
