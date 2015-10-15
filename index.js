@@ -234,11 +234,9 @@ onload = function(){
 
   function onStarted(){
     audioWidget.hide();
-    // subtitlesWidget.hide();
+    subtitlesWidget.hide();
     hideHome();
     showPlayer();
-    //
-    gPlayer.volume(50);
   }
 
   function onStopped(){
@@ -253,16 +251,16 @@ onload = function(){
 
   hidePlayer();
   audioWidget.hide();
-  // subtitlesWidget.hide();
+  subtitlesWidget.hide();
   showHome();
 
   require('nw.gui').Window.get().show();
 
   // --
 
-  require('nw.gui').Window.get().showDevTools();
+  // require('nw.gui').Window.get().showDevTools();
   // require('nw.gui').Window.get().moveTo(20,100);
-  openFile('/Users/alexandrebintz/Movies/another_earth_2011_1080p_it_eng_es_fr_sub_it_eng_es_fr_de_da_ne_nor_su.mkv');
+  // openFile('/Users/alexandrebintz/Movies/another_earth_2011_1080p_it_eng_es_fr_sub_it_eng_es_fr_de_da_ne_nor_su.mkv');
   // openFile('/Users/alexandrebintz/Movies/The.Big.Bang.Theory.S09E01.720p.HDTV.X264-DIMENSION[EtHD].mkv');
 
 };
