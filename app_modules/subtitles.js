@@ -93,7 +93,9 @@ SubtitlesWidget.prototype.refresh = function(){
         }).bind(this));
         element.off('hover');
         element.hover((function(){
-          this.highlightItem(i,true);
+          this.highlightItem(i);
+        }).bind(this),(function(){
+          this.highlightItem(null);
         }).bind(this));
       }).bind(this)(i);
     }
