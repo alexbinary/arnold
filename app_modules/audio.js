@@ -17,6 +17,7 @@ function AudioWidget(root,tracksman){
   this.tracksman = tracksman;
   this.tracksman.on('audio',this.refresh.bind(this));
   this.refresh();
+  this.visible = true;
 }
 module.exports = AudioWidget;
 

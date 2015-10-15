@@ -79,7 +79,7 @@ TracksMan.prototype.audio = function (track) {
       return this.audio(i);
     }
   }
-  return this.audio(1);
+  return this.audio(0);
 }
 TracksMan.prototype.audioTrack = function () {
   return this.audioTracks[this.activeAudioTrack];

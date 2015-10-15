@@ -139,18 +139,15 @@ Player.prototype.audio = function (track) {
 }
 // pass a number to set built-in track
 // or a uri to load from file
-// return new active subtitles index
-// set -1 to disable subtitles (built-in and external)
+// invalid value disable all subtitles
 Player.prototype.subtitles = function (s) {
-  if(Number.isInteger(s)) {
+  this.vlc.subtitles.track = -1;
+  this.stopExternalSubtitle();
+  if(Number.isInteger(s)){
     this.vlc.subtitles.track = s;
-    if(s == -1) {
-      this.stopExternalSubtitle();
-    }
-  } else if(s) {
+  } else if(typeof s == 'string' && s){
     this.setSubtitlesFile(s);
   }
-  return this.vlc.subtitles.track;
 }
 
 // try to detect encoding if omitted

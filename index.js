@@ -46,8 +46,6 @@ onload = function(){
     gTracksman.subtitles(null);
   });
 
-  gTracksman.on('subtitles',refreshSubtitles);
-
   /*
    * open file
    */
@@ -99,7 +97,9 @@ onload = function(){
     if(audioWidget.visible) {
       if(audioWidget.keydown(e)) return;
     }
-    if(subtitlesVisible) subtitlesKeydown(e);
+    if(subtitlesWidget.visible) {
+      if(subtitlesWidget.keydown(e)) return;
+    }
   });
 
   dPlayer.addEventListener('click',function(){
@@ -121,7 +121,17 @@ onload = function(){
    * audio management
    */
 
-  var audioWidget = new (require('./app_modules/audio'))(dAudioWidget,gTracksman);
+  var audioWidget = new (require('./app_modules/audio'))(
+    dAudioWidget,gTracksman
+  );
+
+  /*
+   * subtitles management
+   */
+
+  var subtitlesWidget = new (require('./app_modules/subtitles'))(
+    dSubtitlesWidget,gTracksman,selectFile
+  );
 
   /*
    * application menu
@@ -163,10 +173,10 @@ onload = function(){
       'cmd'
     ),
     mb.item('Toggle subtitles',function(){
-      toggleSubtitles();
+      subtitlesWidget.toggleSubtitles();
     },'l'),
     mb.item('Manage subtitles',function(){
-      toggleSubtitlesVisible();
+      subtitlesWidget.toggleVisible();
     },'l','ctrl'
     ),
     mb.item('Manage audio',function(){
@@ -214,217 +224,6 @@ onload = function(){
   ]);
 
   /*
-   * subtitles management
-   */
-
-  var gLastSubtitlesTrack = undefined;
-
-  function enableSubtitles(){
-    if(typeof gLastSubtitlesTrack != 'undefined') {
-      gTracksman.subtitles(gLastSubtitlesTrack);
-    } else {
-      var subtitles = gTracksman.subtitlesTracks;
-      if(subtitles.length > 0) {
-        for(var i=0 ; i<subtitles.length ; i++) {
-          if(subtitles[i].lang == lang) {
-            gTracksman.subtitles(i);
-            break;
-          }
-        }
-      }
-      if(typeof gTracksman.activeSubtitlesTrack == 'undefined') {
-        dSubtitlesSearch.click();
-      }
-    }
-  }
-
-  function disableSubtitles(){
-    gLastSubtitlesTrack = gTracksman.activeSubtitlesTrack;
-    gTracksman.subtitles(-1);
-  }
-
-  function toggleSubtitles(){
-    if(typeof gTracksman.activeSubtitlesTrack == 'undefined') enableSubtitles();
-    else disableSubtitles();
-  }
-
-  function clearSubtitles(){
-   while (dSubtitlesTable.firstChild) {
-     dSubtitlesTable.removeChild(dSubtitlesTable.firstChild);
-   }
-  }
-
-  function refreshSubtitles(){
-    clearSubtitles();
-    var subtitles = gTracksman.subtitlesTracks;
-    var active = gTracksman.activeSubtitlesTrack;
-    for(var i=0 ; i<subtitles.length ; i++) {
-      var tr = document.createElement('tr');
-      var td = document.createElement('td');
-      td.appendChild(document.createTextNode(subtitles[i].name));
-      tr.appendChild(td);
-      tr.className = active==i ? 'active' : '';
-      (function(i){
-        tr.addEventListener('click',function(){
-          gTracksman.subtitles(i);
-        });
-      })(i);
-      dSubtitlesTable.appendChild(tr);
-    }
-    // select "disable subtitles" if nothing is selected
-    if(typeof gTracksman.activeSubtitlesTrack == 'undefined'){
-      if(!$(dSubtitlesSearch).hasClass('active')
-      && !$(dSubtitlesLoad).hasClass('active')
-      && !$(dSubtitlesDisable).hasClass('active')){
-        if(openSubtitlesFired){
-          $(dSubtitlesSearch).addClass('active');
-          $(dSubtitlesLoad).removeClass('active');
-          $(dSubtitlesDisable).removeClass('active');
-        } else {
-          $(dSubtitlesDisable).addClass('active');
-          $(dSubtitlesSearch).removeClass('active');
-          $(dSubtitlesLoad).removeClass('active');
-        }
-      }
-    } else {
-      $(dSubtitlesSearch).removeClass('active');
-      $(dSubtitlesLoad).removeClass('active');
-      $(dSubtitlesDisable).removeClass('active');
-    }
-  }
-
-  dSubtitlesSearch.addEventListener('click',function(){
-    openSubtitlesFired = true;
-    $(dSubtitlesDisable).removeClass('active');
-    gTracksman.subtitles(null);
-    $(dSubtitlesSearch).find('td').text('Loading subtitles...');
-    gTracksman.searchSubtitles(lang,1,function(){
-      openSubtitlesComplete = true;
-      gTracksman.subtitles(gTracksman.subtitlesTracks.length-1);
-      $(dSubtitlesSearch).removeClass('active');
-      $(dSubtitlesSearch).hide();
-    });
-  });
-  dSubtitlesLoad.addEventListener('click',function(){
-    selectFile(function(path){
-      gTracksman.addSubtitles(path);
-      gTracksman.subtitles(gTracksman.subtitlesTracks.length-1);
-      hideSubtitles();
-      $(dSubtitlesLoad).removeClass('active');
-    });
-  });
-  dSubtitlesDisable.addEventListener('click',function(){
-    gTracksman.subtitles(-1);
-  });
-
-  var subtitlesVisible = true;
-
-  function showSubtitles(){
-    makeVisible(dSubtitles,true);
-    subtitlesVisible = true;
-  }
-  function hideSubtitles(){
-    makeVisible(dSubtitles,false);
-    subtitlesVisible = false;
-  }
-  function toggleSubtitlesVisible(){
-    subtitlesVisible ? hideSubtitles() : showSubtitles();
-  }
-
-  var openSubtitlesFired = false;
-  var openSubtitlesComplete = false;
-
-  function subtitlesKeydown(e){
-    if (e.keyCode == 13 // enter
-     || e.keyCode == 27 // escape
-    ){
-      if($(dSubtitlesDisable).hasClass('active')){
-        dSubtitlesDisable.click();
-        hideSubtitles();
-      } else if($(dSubtitlesLoad).hasClass('active')){
-        dSubtitlesLoad.click();
-      } else if($(dSubtitlesSearch).hasClass('active')){
-        if(!openSubtitlesFired){
-          dSubtitlesSearch.click();
-          hideSubtitles();
-        }
-      } else {
-        hideSubtitles();
-      }
-    } else if (e.keyCode == 38  // up arrow
-    ){
-      var count = gTracksman.subtitlesTracks.length;
-      var active = gTracksman.activeSubtitlesTrack;
-
-      if(typeof gTracksman.activeSubtitlesTrack == 'undefined'){
-        if($(dSubtitlesDisable).hasClass('active')){
-          $(dSubtitlesDisable).removeClass('active');
-          $(dSubtitlesLoad).addClass('active');
-        } else if($(dSubtitlesLoad).hasClass('active')){
-          $(dSubtitlesLoad).removeClass('active');
-          if(openSubtitlesComplete){
-            active=count-1;
-          } else {
-            $(dSubtitlesSearch).addClass('active');
-          }
-        } else if($(dSubtitlesSearch).hasClass('active')){
-          $(dSubtitlesSearch).removeClass('active');
-          active=count-1;
-        } else if(count>0){
-          active = 0;
-        } else {
-          $(dSubtitlesSearch).addClass('active');
-        }
-      } else {
-        if(active == 0){
-          active = null;
-          $(dSubtitlesDisable).addClass('active');
-        }
-        else active--;
-      }
-      gTracksman.subtitles(active);
-      refreshSubtitles();
-    } else if (e.keyCode == 40  // down arrow
-    ){
-      var count = gTracksman.subtitlesTracks.length;
-      var active = gTracksman.activeSubtitlesTrack;
-
-      if(typeof gTracksman.activeSubtitlesTrack == 'undefined'){
-        if($(dSubtitlesSearch).hasClass('active')){
-          $(dSubtitlesSearch).removeClass('active');
-          $(dSubtitlesLoad).addClass('active');
-        } else if($(dSubtitlesLoad).hasClass('active')){
-          $(dSubtitlesLoad).removeClass('active');
-          $(dSubtitlesDisable).addClass('active');
-        } else if($(dSubtitlesDisable).hasClass('active')){
-          $(dSubtitlesDisable).removeClass('active');
-          if(count>0){
-            active = 0;
-          } else {
-            $(dSubtitlesSearch).addClass('active');
-          }
-        } else if(count>0){
-          active = 0;
-        } else {
-          $(dSubtitlesSearch).addClass('active');
-        }
-      } else {
-        if(active == count-1){
-          active = null;
-          if(openSubtitlesComplete){
-            $(dSubtitlesLoad).addClass('active');
-          } else {
-            $(dSubtitlesSearch).addClass('active');
-          }
-        }
-        else active++;
-      }
-      gTracksman.subtitles(active);
-      refreshSubtitles();
-    }
-  }
-
-  /*
    * application logic
    */
 
@@ -435,7 +234,7 @@ onload = function(){
 
   function onStarted(){
     audioWidget.hide();
-    hideSubtitles();
+    // subtitlesWidget.hide();
     hideHome();
     showPlayer();
     //
@@ -445,7 +244,7 @@ onload = function(){
   function onStopped(){
     hidePlayer();
     audioWidget.hide();
-    hideSubtitles();
+    subtitlesWidget.hide();
     showHome();
 
     clearAudio();
@@ -454,7 +253,7 @@ onload = function(){
 
   hidePlayer();
   audioWidget.hide();
-  hideSubtitles();
+  // subtitlesWidget.hide();
   showHome();
 
   require('nw.gui').Window.get().show();

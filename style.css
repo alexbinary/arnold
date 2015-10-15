@@ -117,7 +117,7 @@ body {
 /*  audio & subtitles interfaces appear on the center of the screen
     and on top of the player  */
 #dAudioWidget,
-#dSubtitles {
+#dSubtitlesWidget {
   position: absolute;
   z-index: 500;
   top: 0;
@@ -130,7 +130,7 @@ body {
   -webkit-align-items: center;
 }
 #dAudioWidget table,
-#dSubtitles table {
+#dSubtitlesWidget table {
   border-collapse: collapse;
   border-radius: 5px;
   background: rgb(80, 80, 80);
@@ -142,31 +142,50 @@ body {
 }
 #dAudioWidget th,
 #dAudioWidget td,
-#dSubtitles th,
-#dSubtitles td {
+#dSubtitlesWidget th,
+#dSubtitlesWidget td {
   padding: 5px 25px;
 }
 #dAudioWidget td,
-#dSubtitles td {
+#dSubtitlesWidget td {
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 #dAudioWidget thead th,
-#dSubtitles thead th {
+#dSubtitlesWidget thead th {
   font-weight: normal;
   padding: 20px;
 }
 #dAudioWidget td,
-#dSubtitles td {
+#dSubtitlesWidget td {
   cursor: pointer;
 }
-#dAudioWidget td:hover,
-#dSubtitles td:hover {
+#dAudioWidget tr.selected,
+#dSubtitlesWidget tr.selected {
   background: rgba(255, 255, 255, 0.2);
+  background: green;
 }
-#dAudioWidget tr.active,
-#dSubtitles tr.active {
-  background: rgba(255, 255, 255, 0.2);
+#dAudioWidget td:hover,
+#dSubtitlesWidget td:hover,
+#dAudioWidget tr.highlighted,
+#dSubtitlesWidget tr.highlighted {
+  background: rgba(255, 255, 255, 0.1);
+  background: red;
+}
+.subtitlesSearch.complete {
+  display: none;
+}
+.subtitlesSearch:not(.loading) .contentIdle {
+  display: inline;
+}
+.subtitlesSearch:not(.loading) .contentLoading {
+  display: none;
+}
+.subtitlesSearch.loading .contentIdle {
+  display: none;
+}
+.subtitlesSearch.loading .contentLoading {
+  display: inline;
 }
 
 
