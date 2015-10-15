@@ -90,6 +90,10 @@ SubtitlesWidget.prototype.refresh = function(){
         element.click((function(){
           this.selectItem(i,true);
         }).bind(this));
+        element.off('hover');
+        element.hover((function(){
+          this.highlightItem(i,true);
+        }).bind(this));
       }).bind(this)(i);
     }
   }

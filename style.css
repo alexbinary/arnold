@@ -165,8 +165,6 @@ body {
   background: rgba(255, 255, 255, 0.2);
   background: green;
 }
-#dAudioWidget td:hover,
-#dSubtitlesWidget td:hover,
 #dAudioWidget tr.highlighted,
 #dSubtitlesWidget tr.highlighted {
   background: rgba(255, 255, 255, 0.1);
