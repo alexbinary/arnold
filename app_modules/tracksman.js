@@ -152,6 +152,7 @@ TracksMan.prototype.addSubtitles = function (uri) {
     name: uri.split('/').pop(),
   });
   this.emit('subtitles');
+  return this.subtitlesTracks.length-1;
 }
 TracksMan.prototype.searchSubtitles = function (lang, searchLevel, cb) {
   var query = {};
