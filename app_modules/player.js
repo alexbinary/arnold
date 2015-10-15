@@ -38,8 +38,10 @@ function Player(root, Event) {
   // map WebChimera callbacks to EventEmitter events for convenience
   this.stopped = true;
   this.vlc.onPlaying = (function() {
-    if(this.stopped) this.emit('started');
-    this.stopped = false;
+    if(this.stopped){
+      this.stopped = false;
+      this.emit('started');
+    }
     this.emit('playing');
   }).bind(this);
   this.vlc.onStopped = (function() {
