@@ -88,7 +88,8 @@ TracksMan.prototype.audioTrack = function () {
 TracksMan.prototype.loadSubtitlesTracks = function() {
   this.unloadSubtitlesTracks();
   var subtitles = this.player.getSubtitles();
-  // native track 0 is 'disable'
+  var active = this.player.getSubtitlesTrack();
+  // subtitles[0] is 'disable'
   for(var i=1 ; i<subtitles.count ; i++) {
     this.subtitlesTracks.push({
       type : 'internal',
@@ -97,7 +98,12 @@ TracksMan.prototype.loadSubtitlesTracks = function() {
       lang : this.detectLang(subtitles[i]),
     });
   }
-  this.activeSubtitlesTrack = this.player.getSubtitlesTrack()-1;// native track 0 is 'disable'
+  for(var i=0 ; i<this.subtitlesTracks.length ; i++) {
+    if(this.subtitlesTracks[i].type == 'internal'
+    && this.subtitlesTracks[i].track == active) {
+      this.activeSubtitlesTrack = i;
+    }
+  }
   this.emit('subtitles');
 }
 TracksMan.prototype.unloadSubtitlesTracks = function () {
