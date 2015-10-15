@@ -43,6 +43,7 @@ SubtitlesWidget.prototype.show = function(){
   this.visible = true;
 }
 SubtitlesWidget.prototype.hide = function(){
+  this.highlightItem(undefined);
   this.uiRoot.hide();
   this.visible = false;
 }
