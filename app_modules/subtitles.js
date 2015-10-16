@@ -10,15 +10,21 @@
 'use strict';
 
 var $ = require('jquery');
+var TrackListWidget = require('../app_modules/tracklistwidget');
 
 function SubtitlesWidget(root,tracksman,selectFile){
-  this.uiRoot = $(root);
-  this.uiTable = this.uiRoot.find('.subtitlesTable');
-  this.tracksman = tracksman;
+  TrackListWidget.call(this,root,tracksman);
   this.selectFile = selectFile;
+}
+require('util').inherits(SubtitlesWidget, TrackListWidget);
+
+SubtitlesWidget.prototype.getUi = function(root){
+  TrackListWidget.prototype.getUi.call(this,root);
+  this.uiTable = this.uiRoot.find('.subtitlesTable');
+}
+SubtitlesWidget.prototype.init = function(){
   this.searchPending = false;
   this.searchComplete = false;
-  this.visible = true;
   this.actions = [
     { type: 'action',
       action: 'search',
@@ -34,40 +40,9 @@ function SubtitlesWidget(root,tracksman,selectFile){
     }
   ];
   this.tracksman.on('subtitles',this.refresh.bind(this));
-  this.refresh();
 }
-module.exports = SubtitlesWidget;
-
-SubtitlesWidget.prototype.show = function(){
-  this.uiRoot.show();
-  this.visible = true;
-}
-SubtitlesWidget.prototype.hide = function(){
-  this.highlightItem(undefined);
-  this.uiRoot.hide();
-  this.visible = false;
-}
-SubtitlesWidget.prototype.toggleVisible = function(){
-  this.visible ? this.hide() : this.show();
-}
-SubtitlesWidget.prototype.clear = function(){
-  this.uiTable.children().remove();
-}
-SubtitlesWidget.prototype.refresh = function(){
-  var tracks = this.tracksman.subtitlesTracks;
-  var activeTrack = this.tracksman.activeSubtitlesTrack;
-  // save selected and highlighted items
-  var selectedItem = this.items && this.items[this.selectedItemIndex];
-  var highlightedItem = this.items && this.items[this.highlightedItemIndex];
-  // items = tracks + actions
-  this.items = [];
-  for(var i=0, l=tracks.length ; i<l ; i++){
-    this.items.push({
-      type: 'track',
-      index: i,
-      track: tracks[i],
-    });
-  }
+SubtitlesWidget.prototype.initItemList = function(){
+  TrackListWidget.prototype.initItemList.call(this);
   for(var i=0, l=this.actions.length ; i<l ; i++){
     if(this.actions[i].action != 'search' || !this.searchComplete){
       this.items.push(this.actions[i]);
@@ -76,95 +51,38 @@ SubtitlesWidget.prototype.refresh = function(){
       this.actions[i].element.toggleClass('complete',this.searchComplete);
     }
   }
-  // build item list (action items are already ready)
-  this.clear();
-  for(var i=0, l=this.items.length ; i<l ; i++){
-    if(this.items[i].type == 'track'){
-      var tr = $('<tr></tr>');
-      var td = $('<td></td>');
-      td.text(this.items[i].track.name);
-      tr.append(td);
-      this.uiTable.append(tr);
-      this.items[i].element = tr;
-    }
-    var element = this.items[i].element;
-    if(element){
-      (function(i){
-        element.off('click');
-        element.click((function(){
-          this.selectItem(i,true);
-        }).bind(this));
-        element.off('hover');
-        element.hover((function(){
-          this.highlightItem(i);
-        }).bind(this),(function(){
-          this.highlightItem(null);
-        }).bind(this));
-      }).bind(this)(i);
-    }
-  }
-  // select item to reflect the active track if any
-  if(activeTrack !== undefined){
-    this.selectedItemIndex = this.getItemIndexForActiveTrack();
-  } else {
-    // attempt to restore previously selected item
-    this.selectedItemIndex = this.getItemIndexForItem(selectedItem);
-    // clear selected item if obsolete
-    if(this.items[this.selectedItemIndex]
-      && this.items[this.selectedItemIndex].type == 'track'){
-      this.selectedItemIndex = undefined;
-    }
-  }
-  // attempt to restore previously highlighted item
-  this.highlightedItemIndex = this.getItemIndexForItem(highlightedItem);
-  this.update();
 }
 SubtitlesWidget.prototype.update = function(){
-  // if no item is selected, make the item that corresponds
-  // to the active track the selected item
+  TrackListWidget.prototype.update.call(this);
+  var index = this.getItemIndexForAction('search');
+  if(this.items[index] && this.items[index].element){
+    this.items[index].element.toggleClass('loading',this.searchPending);
+  }
+}
+SubtitlesWidget.prototype.getTracksmanTracks = function(){
+  return this.tracksman.subtitlesTracks;
+}
+SubtitlesWidget.prototype.getTracksmanActiveTrack = function(){
+  return this.tracksman.activeSubtitlesTrack;
+}
+SubtitlesWidget.prototype.compareItems = function(item1,item2){
+  if((item1.type == 'track'
+  && item2.type == 'track'
+  && item2.track == item1.track
+  )||(item1.type == 'action'
+  && item2.type == 'action'
+  && item2.action == item1.action
+  )){
+    return true;
+  }
+  return false;
+}
+SubtitlesWidget.prototype.initSelectedItemIfNeeded = function(){
   // if no active track, select the 'disable' action
+  TrackListWidget.prototype.initSelectedItemIfNeeded.call(this);
   if(this.selectedItemIndex === undefined){
-    if(this.tracksman.activeSubtitlesTrack !== undefined){
-      this.selectedItemIndex = this.getItemIndexForActiveTrack();
-    } else {
-      this.selectedItemIndex = this.getItemIndexForAction('disable');
-    }
+    this.selectedItemIndex = this.getItemIndexForAction('disable');
   }
-  for(var i=0, l=this.items.length ; i<l ; i++){
-    var element = this.items[i].element;
-    if(element) {
-      element.toggleClass('selected',this.selectedItemIndex == i);
-      element.toggleClass('highlighted',this.highlightedItemIndex == i);
-      if(this.items[i].type == 'action' && this.items[i].action == 'search'){
-        element.toggleClass('loading',this.searchPending);
-      }
-    }
-  }
-}
-SubtitlesWidget.prototype.getItemIndexForActiveTrack = function(){
-  for(var i=0, l=this.items.length ; i<l ; i++) {
-    if(this.items[i].type == 'track'
-    && this.items[i].index == this.tracksman.activeSubtitlesTrack){
-      return i;
-    }
-  }
-  return undefined;
-}
-SubtitlesWidget.prototype.getItemIndexForItem = function(item){
-  if(item){
-    for(var i=0, l=this.items.length ; i<l ; i++){
-      if((this.items[i].type == 'track'
-      && item.type == 'track'
-      && item.track == this.items[i].track
-      )||(this.items[i].type == 'action'
-      && item.type == 'action'
-      && item.action == this.items[i].action
-      )){
-        return i;
-      }
-    }
-  }
-  return undefined;
 }
 SubtitlesWidget.prototype.getItemIndexForAction = function(action){
   for(var i=0 ; i<this.items.length ; i++) {
@@ -174,23 +92,6 @@ SubtitlesWidget.prototype.getItemIndexForAction = function(action){
     }
   }
   return undefined;
-}
-SubtitlesWidget.prototype.initHighlightedItemIfNeeded = function(){
-  if(this.highlightedItemIndex === undefined){
-    if(this.selectedItemIndex !== undefined){
-      this.highlightedItemIndex = this.selectedItemIndex;
-    } else {
-      this.highlightedItemIndex = 0;
-    }
-  }
-}
-SubtitlesWidget.prototype.highlightItem = function(index){
-  this.highlightedItemIndex = index;
-  this.update();
-}
-SubtitlesWidget.prototype.setSelectedItem = function(index){
-  this.selectedItemIndex = index;
-  this.update();
 }
 SubtitlesWidget.prototype.selectItem = function(index,userInitiated){
   var item = this.items[index];
@@ -222,46 +123,13 @@ SubtitlesWidget.prototype.selectItem = function(index,userInitiated){
     }
   }
 }
-// e is the jQuery keydown event
-SubtitlesWidget.prototype.keydown = function(e){
-  if(e.keyCode == 27 // escape
-  ){
-    this.hide();
-    return true;
+SubtitlesWidget.prototype.keydownEnter = function(e){
+  if(this.items[this.highlightedItemIndex].type != 'action'
+  || this.items[this.highlightedItemIndex].action != 'load'){
+    this.setSelectedItem(this.highlightedItemIndex);
   }
-  if (e.keyCode == 13 // enter
-  ){
-    if(this.items[this.highlightedItemIndex].type != 'action'
-    || this.items[this.highlightedItemIndex].action != 'load'){
-      this.setSelectedItem(this.highlightedItemIndex);
-    }
-    this.selectItem(this.highlightedItemIndex,true);
-    return true;
-  }
-  // meta + arrow is bound to volume control
-  // we dont catch the arrows if used for that
-  if(e.metaKey) return false;
-
-  if (e.keyCode == 38  // up arrow
-  ){
-    this.initHighlightedItemIfNeeded();
-    var count = this.items.length;
-    var active = this.highlightedItemIndex;
-    if(active == 0) active=count-1;
-    else active--;
-    this.highlightItem(active);
-    return true;
-  }
-  if (e.keyCode == 40  // down arrow
-  ){
-    this.initHighlightedItemIfNeeded();
-    var count = this.items.length;
-    var active = this.highlightedItemIndex;
-    if(active == count-1) active=0;
-    else active++;
-    this.highlightItem(active);
-    return true;
-  }
+  this.selectItem(this.highlightedItemIndex,true);
+  return true;
 }
 SubtitlesWidget.prototype.toggleSubtitles = function(){
   if(this.tracksman.activeSubtitlesTrack === undefined) this.enableSubtitles();
@@ -282,3 +150,5 @@ SubtitlesWidget.prototype.enableSubtitles = function(){
     }
   }
 }
+
+module.exports = SubtitlesWidget;
