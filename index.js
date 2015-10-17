@@ -137,6 +137,10 @@ onload = function(){
   subtitlesWidget.on('loading',function(loading){
     $(dSubtitlesHint).toggle(loading);
   });
+  subtitlesWidget.on('searchFailure',function(err){
+    $(dSubtitlesHint).toggle(false);
+    onError(err);
+  });
 
   /*
    * application menu

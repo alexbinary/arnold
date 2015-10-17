@@ -108,12 +108,13 @@ SubtitlesWidget.prototype.selectItem = function(index,userInitiated){
         this.searchPending = true;
         this.update();
         this.emit('loading',true);
-        this.tracksman.searchSubtitles('en',1,(function(found,index){
+        this.tracksman.searchSubtitles('en',1,(function(err,index){
           this.searchPending = false;
           this.searchComplete = true;
           this.refresh(); // changing this.searchComplete requires a refresh
           this.emit('loading',false);
-          if(found) this.tracksman.subtitles(index);
+          if(index) this.tracksman.subtitles(index);
+          else this.emit('searchFailure',err);
         }).bind(this));
       } else if(item.action == 'load'){
         this.selectFile((function(path){

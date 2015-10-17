@@ -196,8 +196,11 @@ TracksMan.prototype.searchSubtitles = function (lang, searchLevel, cb) {
         foundSubs = true;
       }
     }
-    if(typeof cb == 'function') cb(foundSubs,foundSubs?this.subtitlesTracks.length-1:undefined);
-  }).bind(this));
+    if(typeof cb == 'function') cb(null,foundSubs?this.subtitlesTracks.length-1:undefined);
+  }).bind(this))
+  .catch(function(reason){
+    if(typeof cb == 'function') cb(reason);
+  });
 }
 
 TracksMan.prototype.detectLang = function (name) {
