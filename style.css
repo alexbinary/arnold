@@ -196,13 +196,13 @@ body {
 }
 #dAudioWidget tr.selected,
 #dSubtitlesWidget tr.selected {
-  background: rgba(255, 255, 255, 0.2);
-  background: green;
+  background: lightgrey;
+  color: rgba(0, 0, 0, 0.5);
 }
-#dAudioWidget tr.highlighted,
-#dSubtitlesWidget tr.highlighted {
-  background: rgba(255, 255, 255, 0.1);
-  background: red;
+#dAudioWidget tr.highlighted:not(.selected),
+#dSubtitlesWidget tr.highlighted:not(.selected) {
+  background: rgba(0, 0, 0, 0.5);
+  color: lightgrey;
 }
 .subtitlesSearch.complete {
   display: none;
