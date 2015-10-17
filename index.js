@@ -237,7 +237,7 @@ onload = function(){
     mb.separator(
     ),
     miToggleSubtitles = mb.item('Toggle subtitles',function(){
-      if(gPlayer.playing) subtitlesWidget.toggleSubtitles();
+      subtitlesWidget.toggleSubtitles();
     },'l'),
     miManageSubtitles = mb.item('Manage subtitles',function(){
       subtitlesWidget.toggleVisible();
