@@ -241,12 +241,14 @@ onload = function(){
     },'l'),
     miManageSubtitles = mb.item('Manage subtitles',function(){
       subtitlesWidget.toggleVisible();
+      if(subtitlesWidget.visible) audioWidget.hide();
     },'l','ctrl'
     ),
     mb.separator(
     ),
     miManageAudio = mb.item('Manage audio',function(){
       audioWidget.toggleVisible();
+      if(audioWidget.visible) subtitlesWidget.hide();
     },'b','ctrl'
     ),
   ]);
