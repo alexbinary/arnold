@@ -160,7 +160,7 @@ onload = function(){
       'cmd'
     ),
     mb.item('Toggle subtitles',function(){
-      if(!gPlayer.stopped) subtitlesWidget.toggleSubtitles();
+      if(gPlayer.playing) subtitlesWidget.toggleSubtitles();
     },'l'),
     mb.item('Manage subtitles',function(){
       subtitlesWidget.toggleVisible();
