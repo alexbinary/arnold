@@ -285,6 +285,7 @@ onload = function(){
     onPaused();
     audioWidget.hide();
     subtitlesWidget.hide();
+    subtitlesWidget.initState();
     $(dHome).show();
     $(dPlayer).hide();
     miPlay.enabled = false;

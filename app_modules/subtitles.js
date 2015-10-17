@@ -23,8 +23,6 @@ SubtitlesWidget.prototype.getUi = function(root){
   this.uiTable = this.uiRoot.find('.subtitlesTable');
 }
 SubtitlesWidget.prototype.init = function(){
-  this.searchPending = false;
-  this.searchComplete = false;
   this.actions = [
     { type: 'action',
       action: 'search',
@@ -40,6 +38,12 @@ SubtitlesWidget.prototype.init = function(){
     }
   ];
   this.tracksman.on('subtitles',this.refresh.bind(this));
+  this.initState();
+}
+SubtitlesWidget.prototype.initState = function(){
+  this.searchPending = false;
+  this.searchComplete = false;
+  this.lastSubtitlesTrack = undefined;
 }
 SubtitlesWidget.prototype.clear = function(){
   this.uiTable.children().remove();
