@@ -15,9 +15,9 @@ onload = function(){
 
   var selectFile = require('./app_modules/selectfile')($);
 
-  function makeVisible(e,visible){
-    $(e).toggle(visible);
-  }
+  /*
+   * default lang for audio and subtitles
+   */
 
   var lang = 'en';
 
@@ -27,15 +27,8 @@ onload = function(){
 
   var gPlayer = new (require('./app_modules/player'))(dPlayer,Event);
 
-  gPlayer.on('started',onStarted);
-  gPlayer.on('stopped',onStopped);
-
-  function showPlayer(){
-    $(dPlayer).show();
-  }
-  function hidePlayer(){
-    $(dPlayer).hide();
-  }
+  gPlayer.on('started',onPlayStarted);
+  gPlayer.on('stopped',onPlayStopped);
 
   /*
    * tracks manager
@@ -109,27 +102,12 @@ onload = function(){
   });
 
   /*
-   * home screen
-   */
-
-  function showHome(){
-    makeVisible(dHome,true);
-  }
-  function hideHome(){
-    makeVisible(dHome,false);
-  }
-
-  /*
-   * audio management
+   * audio & subtitles
    */
 
   var audioWidget = new (require('./app_modules/audio'))(
     dAudioWidget,gTracksman
   );
-
-  /*
-   * subtitles management
-   */
 
   var subtitlesWidget = new (require('./app_modules/subtitles'))(
     dSubtitlesWidget,gTracksman,selectFile
@@ -233,27 +211,8 @@ onload = function(){
   ]);
 
   /*
-   * application logic
+   * error handling
    */
-
-  function openFile(path) {
-    gTracksman.mediaInfo.filepath = path;
-    gPlayer.play(path);
-  }
-
-  function onStarted(){
-    audioWidget.hide();
-    subtitlesWidget.hide();
-    hideHome();
-    showPlayer();
-  }
-
-  function onStopped(){
-    hidePlayer();
-    audioWidget.hide();
-    subtitlesWidget.hide();
-    showHome();
-  }
 
   process.on('uncaughtException',onError);
   process.on('unhandledRejection',onError);
@@ -265,12 +224,35 @@ onload = function(){
     $(dError).toggle(false);
   })
 
-  $(dError).toggle(false);
-  $(dSubtitlesHint).toggle(false);
-  hidePlayer();
+  /*
+   * application logic
+   */
+
+  function openFile(path) {
+    gTracksman.mediaInfo.filepath = path;
+    gPlayer.play(path);
+  }
+
+  function onPlayStarted(){
+    audioWidget.hide();
+    subtitlesWidget.hide();
+    $(dHome).hide();
+    $(dPlayer).show();
+  }
+
+  function onPlayStopped(){
+    audioWidget.hide();
+    subtitlesWidget.hide();
+    $(dHome).show();
+    $(dPlayer).hide();
+  }
+
   audioWidget.hide();
   subtitlesWidget.hide();
-  showHome();
+  $(dError).hide();
+  $(dPlayer).hide();
+  $(dSubtitlesHint).hide();
+  $(dHome).show();
 
   require('nw.gui').Window.get().show();
 
