@@ -1,14 +1,14 @@
 # arnold
 advanced media center based on VLC and NW.js
 
-# Install & run
+# Install from source & run
 
 ## Mac OSX
 
 1. Download and install [NW.js](http://nwjs.io)
 ```
 wget http://dl.nwjs.io/v0.12.3/nwjs-v0.12.3-osx-x64.zip
-tar -xvf nwjs-v0.12.3-osx-x64.zip
+tar -xf nwjs-v0.12.3-osx-x64.zip
 cd nwjs-v0.12.3-osx-x64
 mv nwjs.app arnold.app
 ```
@@ -21,14 +21,7 @@ npm install
 cd ../../../../
 ```
 
-3. Link VLC (you need to have VLC installed on your system)
-```
-ln -s /Applications/VLC.app/Contents/MacOS/lib arnold.app/Contents/Resources/app.nw/node_modules/webchimera.js/build/Release/lib
-sudo mkdir arnold.app/Contents/Resources/app.nw/node_modules/webchimera.js/build/Release/lib/vlc
-sudo ln -s /Applications/VLC.app/Contents/MacOS/plugins arnold.app/Contents/Resources/app.nw/node_modules/webchimera.js/build/Release/lib/vlc/plugins
-```
-
-4. Run
+3. Run
 ```
 open arnold.app
 ```
