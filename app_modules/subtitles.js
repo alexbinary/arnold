@@ -41,6 +41,9 @@ SubtitlesWidget.prototype.init = function(){
   ];
   this.tracksman.on('subtitles',this.refresh.bind(this));
 }
+SubtitlesWidget.prototype.clear = function(){
+  this.uiTable.children().remove();
+}
 SubtitlesWidget.prototype.initItemList = function(){
   TrackListWidget.prototype.initItemList.call(this);
   for(var i=0, l=this.actions.length ; i<l ; i++){

@@ -10,80 +10,46 @@
 'use strict';
 
 var $ = require('jquery');
+var TrackListWidget = require('../app_modules/tracklistwidget');
 
 function AudioWidget(root,tracksman){
-  this.uiRoot = $(root);
-  this.uiTable = this.uiRoot.find('.audioTable');
-  this.tracksman = tracksman;
-  this.tracksman.on('audio',this.refresh.bind(this));
-  this.refresh();
-  this.visible = true;
+  TrackListWidget.call(this,root,tracksman);
 }
-module.exports = AudioWidget;
+require('util').inherits(AudioWidget, TrackListWidget);
 
-AudioWidget.prototype.show = function(){
-  this.uiRoot.show();
-  this.visible = true;
+AudioWidget.prototype.getUi = function(root){
+  TrackListWidget.prototype.getUi.call(this,root);
+  this.uiTable = this.uiRoot.find('.audioTable');
 }
-AudioWidget.prototype.hide = function(){
-  this.uiRoot.hide();
-  this.visible = false;
-}
-AudioWidget.prototype.toggleVisible = function(){
-  this.visible ? this.hide() : this.show();
+AudioWidget.prototype.init = function(){
+  this.tracksman.on('audio',this.refresh.bind(this));
 }
 AudioWidget.prototype.clear = function(){
   this.uiTable.children().remove();
 }
-AudioWidget.prototype.refresh = function(){
-  this.clear();
-  this.tracks = this.tracksman.audioTracks;
-  this.activeTrack = this.tracksman.activeAudioTrack;
-  for(var i=0 ; i<this.tracks.length ; i++) {
-    var tr = $('<tr></tr>');
-    var td = $('<td></td>');
-    td.text(this.tracks[i].name);
-    tr.append(td);
-    tr.toggleClass('active',this.activeTrack==i);
-    (function(i){
-      tr.click((function(){
-        this.track(i);
-      }).bind(this));
-    }).bind(this)(i);
-    this.uiTable.append(tr);
-  }
+AudioWidget.prototype.getTracksmanTracks = function(){
+  return this.tracksman.audioTracks;
 }
-AudioWidget.prototype.track = function(track){
-  this.tracksman.audio(track);
+AudioWidget.prototype.getTracksmanActiveTrack = function(){
+  return this.tracksman.activeAudioTrack;
 }
-// e is the jQuery keydown event
-AudioWidget.prototype.keydown = function(e){
-  if (e.keyCode == 13 // enter
-   || e.keyCode == 27 // escape
+AudioWidget.prototype.compareItems = function(item1,item2){
+  if(item1.type == 'track'
+  && item2.type == 'track'
+  && item2.track == item1.track
   ){
-    this.hide();
     return true;
   }
-  // meta + arrow is bound to volume control
-  // we dont catch the arrows if used for that
-  if(e.metaKey) return;
+  return false;
+}
+AudioWidget.prototype.selectItem = function(index,userInitiated){
+  var item = this.items[index];
+  if(item){
+    if(item.type == 'track'){
+      this.tracksman.audio(item.index);
+      if(userInitiated) this.hide();
+    }
+  }
+}
 
-  if (e.keyCode == 38  // up arrow
-  ){
-    var count = this.tracks.length;
-    var active = this.activeTrack;
-    if(active == 0) active=count-1;
-    else active--;
-    this.track(active);
-    return true;
-  }
-  if (e.keyCode == 40  // down arrow
-  ){
-    var count = this.tracks.length;
-    var active = this.activeTrack;
-    if(active == count-1) active=0;
-    else active++;
-    this.track(active);
-    return true;
-  }
-}
+module.exports = AudioWidget;

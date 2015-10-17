@@ -36,7 +36,7 @@ TrackListWidget.prototype.toggleVisible = function(){
   this.visible ? this.hide() : this.show();
 }
 TrackListWidget.prototype.clear = function(){
-  this.uiTable.children().remove();
+  // abstract
 }
 TrackListWidget.prototype.refresh = function(){
   var activeTrack = this.getTracksmanActiveTrack();
