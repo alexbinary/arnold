@@ -69,7 +69,13 @@ onload = function(){
                 && e.dataTransfer.files
                 && e.dataTransfer.files[0]
                 && e.dataTransfer.files[0].path;
-    if(filepath) openFile(filepath);
+    if(filepath){
+      if(filepath.endsWith('.srt') && gPlayer.playing){
+        gTracksman.subtitles(gTracksman.addSubtitles(filepath));
+      }else{
+        openFile(filepath);
+      }
+    }
   };
 
   /*
