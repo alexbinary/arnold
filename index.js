@@ -220,7 +220,7 @@ onload = function(){
     $(dError).text(err).toggle(true);
   }
   $(dError).on('click',function(){
-    $(dError).toggle(false);
+    $(dError).fadeOut('fast');
   })
 
   /*
