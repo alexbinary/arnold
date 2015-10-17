@@ -139,7 +139,7 @@ onload = function(){
   });
   subtitlesWidget.on('searchFailure',function(err){
     $(dSubtitlesHint).toggle(false);
-    onError(err);
+    onError(err ? err : 'no subtitles found');
   });
 
   /*
