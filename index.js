@@ -130,7 +130,7 @@ onload = function(){
     $(dSubtitlesHintSearching).toggle(loading);
   });
   subtitlesWidget.on('searchFailure',function(err){
-    $(dSubtitlesHint).toggle(false);
+    $(dSubtitlesHintSearching).toggle(false);
     onError(err ? err : 'no subtitles found');
   });
 
