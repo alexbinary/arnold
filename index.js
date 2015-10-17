@@ -253,9 +253,6 @@ onload = function(){
     audioWidget.hide();
     subtitlesWidget.hide();
     showHome();
-
-    clearAudio();
-    clearSubtitles();
   }
 
   process.on('uncaughtException',onError);
