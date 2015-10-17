@@ -131,7 +131,7 @@ onload = function(){
   mb.initMenuBar();
   mb.createMacBuiltin();
 
-  var miPlay;
+  var miPlay,miStop;
 
   mb.menu('Play',[
 
@@ -139,7 +139,7 @@ onload = function(){
       gPlayer.togglePause();
     },'p','cmd'
     ),
-    mb.item('Stop',function(){
+    miStop = mb.item('Stop',function(){
       gPlayer.stop();
     },'s','cmd'
     ),
@@ -255,12 +255,17 @@ onload = function(){
     subtitlesWidget.hide();
     $(dHome).hide();
     $(dPlayer).show();
+    miPlay.enabled = true;
+    miStop.enabled = true;
   }
   function onPlayStopped(){
+    onPaused();
     audioWidget.hide();
     subtitlesWidget.hide();
     $(dHome).show();
     $(dPlayer).hide();
+    miPlay.enabled = false;
+    miStop.enabled = false;
   }
   function onPlaying(){
     miPlay.label = 'Pause';
@@ -269,12 +274,9 @@ onload = function(){
     miPlay.label = 'Play';
   }
 
-  audioWidget.hide();
-  subtitlesWidget.hide();
   $(dError).hide();
-  $(dPlayer).hide();
   $(dSubtitlesHint).hide();
-  $(dHome).show();
+  onPlayStopped();
 
   setTimeout(function(){
     require('nw.gui').Window.get().show();
