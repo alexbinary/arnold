@@ -9,12 +9,16 @@
 
 'use strict';
 
-module.exports = function($){// $ is the jQuery function
-  return function selectFile(cb) {
-    var input = $('<input type="file">');
-    input.one('change',function(){
-      if(require('is-callable')(cb)) cb(input.val());
+module.exports = function($){ // $ is the jQuery function
+  return function selectFile(){
+    var cb = undefined, fi = [];
+    [arguments[0],arguments[1]].forEach(function(arg){
+      if(typeof arg=='string'&&!fi.length)      fi.push(arg);
+      else if(Array.isArray(arg)&&!fi.length)   fi = arg;
+      else if(require('is-callable')(arg)&&!cb) cb = arg;
     });
-    input.click();
+    $('<input type="file" accept="'+fi.join(',')+'">')
+    .one('change',function(){if(cb)cb(this.value);})
+    .click();
   };
 };

@@ -117,7 +117,7 @@ SubtitlesWidget.prototype.selectItem = function(index,userInitiated){
           else this.emit('searchFailure',err);
         }).bind(this));
       } else if(item.action == 'load'){
-        this.selectFile((function(path){
+        this.selectFile('.srt',(function(path){
           if(userInitiated) this.hide();
           var index = this.tracksman.addSubtitles(path);
           this.tracksman.subtitles(index);
