@@ -30,6 +30,9 @@ onload = function(){
   gPlayer.on('started',onPlayStarted);
   gPlayer.on('stopped',onPlayStopped);
 
+  gPlayer.on('playing',onPlaying);
+  gPlayer.on('paused',onPaused);
+
   /*
    * tracks manager
    */
@@ -128,9 +131,11 @@ onload = function(){
   mb.initMenuBar();
   mb.createMacBuiltin();
 
+  var miPlay;
+
   mb.menu('Play',[
 
-    mb.item('Play/Pause',function(){
+    miPlay = mb.item('Play/Pause',function(){
       gPlayer.togglePause();
     },'p','cmd'
     ),
@@ -179,7 +184,7 @@ onload = function(){
      'cmd'
     ),
   ]);
-  
+
   mb.menu('Video',[
 
     mb.item('Fullscreen',function(){
@@ -251,12 +256,17 @@ onload = function(){
     $(dHome).hide();
     $(dPlayer).show();
   }
-
   function onPlayStopped(){
     audioWidget.hide();
     subtitlesWidget.hide();
     $(dHome).show();
     $(dPlayer).hide();
+  }
+  function onPlaying(){
+    miPlay.label = 'Pause';
+  }
+  function onPaused(){
+    miPlay.label = 'Play';
   }
 
   audioWidget.hide();

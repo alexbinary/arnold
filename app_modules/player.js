@@ -44,6 +44,9 @@ function Player(root, Event) {
     }
     this.emit('playing');
   }).bind(this);
+  this.vlc.onPaused = (function() {
+    this.emit('paused');
+  }).bind(this);
   this.vlc.onStopped = (function() {
     this.playing = false;
     this.emit('stopped');
