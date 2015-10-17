@@ -75,7 +75,7 @@ body {
   right: 50px;
   bottom: 50px;
   color: white;
-  font-size: 2em;
+  font-size: 1.5em;
   text-shadow: 0 0 5px black;
   font-family: "Arial";
   text-align: center;
@@ -95,9 +95,17 @@ body {
   background: rgba(180, 0, 0, 1);
   border-radius: 5px;
   box-shadow: 0 0 75px black;
-  font-size: 0.9em;
+  font-size: 1em;
   font-family: "Arial";
   text-align: center;
+  cursor: pointer;
+}
+#dError p {
+  margin: 0;
+  padding: 0;
+}
+#dErrorHint {
+  font-size: 0.8em;
 }
 
 /*  home screen covers the entire screen

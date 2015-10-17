@@ -217,7 +217,8 @@ onload = function(){
   process.on('unhandledRejection',onError);
 
   function onError(err){
-    $(dError).text(err).toggle(true);
+    $(dErrorText).text(err);
+    $(dError).toggle(true);
   }
   $(dError).on('click',function(){
     $(dError).fadeOut('fast');
