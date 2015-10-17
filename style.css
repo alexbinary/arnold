@@ -126,7 +126,7 @@ body {
   border-radius: 5px;
   font-weight: bold;
 }
-#dHomeDropZone.hover {
+.dragover #dHomeDropZone {
   color: white;
   border-color: white;
 }

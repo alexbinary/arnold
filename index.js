@@ -53,30 +53,23 @@ onload = function(){
     pickAndOpenMediaFile();
   })
 
-  dHomeDropZone.ondragover = function(){
-   $(this).addClass('hover');
+  document.body.ondragover = function(e){
+    e.preventDefault();
+    $(this).addClass('dragover');
   };
-  dHomeDropZone.ondragleave = function(){
-   $(this).removeClass('hover');
-  };
-  dHomeDropZone.ondrop = function(e){
-   $(this).removeClass('hover');
-   var filepath = e
-               && e.dataTransfer
-               && e.dataTransfer.files
-               && e.dataTransfer.files[0]
-               && e.dataTransfer.files[0].path;
-   if(filepath) openFile(filepath);
-  };
-
-  document.body.ondragover = function(){
-   return false;
-  };
-  document.body.ondragleave = function(){
-   return false;
+  document.body.ondragleave = function(e){
+    e.preventDefault();
+    $(this).removeClass('dragover');
   };
   document.body.ondrop = function(e){
-   return false;
+    e.preventDefault();
+    $(this).removeClass('dragover');
+    var filepath = e
+                && e.dataTransfer
+                && e.dataTransfer.files
+                && e.dataTransfer.files[0]
+                && e.dataTransfer.files[0].path;
+    if(filepath) openFile(filepath);
   };
 
   /*
