@@ -133,10 +133,19 @@ onload = function(){
 
   var miPlay,miStop,
       miJumpF1,miJumpF2,miJumpF3,
-      miJumpB1,miJumpB2,miJumpB3;
+      miJumpB1,miJumpB2,miJumpB3,
+      miMute,miVolumeUp,miVolumeDown,
+      miToggleSubtitles,
+      miManageSubtitles,miManageAudio;
 
   mb.menu('Play',[
 
+    miPlay = mb.item('Open file',function(){
+      pickAndOpenMediaFile();
+    },'o','cmd'
+    ),
+    mb.separator(
+    ),
     miPlay = mb.item('Play/Pause',function(){
       gPlayer.togglePause();
     },'p','cmd'
@@ -195,17 +204,17 @@ onload = function(){
     ),
     mb.separator(
     ),
-    mb.item('Mute/Unmute',function(){
+    miMute = mb.item('Mute/Unmute',function(){
       gPlayer.toggleMute();
     },'m','ctrl'
     ),
-    mb.item('Increase volume',function(){
+    miVolumeUp = mb.item('Increase volume',function(){
       gPlayer.volume(gPlayer.volume()+10);
     },
      String.fromCharCode(30), // arrow up
      'cmd'
     ),
-    mb.item('Decrease volume',function(){
+    miVolumeDown = mb.item('Decrease volume',function(){
       gPlayer.volume(gPlayer.volume()-10);
     },
       String.fromCharCode(31), // arrow down
@@ -213,16 +222,16 @@ onload = function(){
     ),
     mb.separator(
     ),
-    mb.item('Toggle subtitles',function(){
+    miToggleSubtitles = mb.item('Toggle subtitles',function(){
       if(gPlayer.playing) subtitlesWidget.toggleSubtitles();
     },'l'),
-    mb.item('Manage subtitles',function(){
+    miManageSubtitles = mb.item('Manage subtitles',function(){
       subtitlesWidget.toggleVisible();
     },'l','ctrl'
     ),
     mb.separator(
     ),
-    mb.item('Manage audio',function(){
+    miManageAudio = mb.item('Manage audio',function(){
       audioWidget.toggleVisible();
     },'b','ctrl'
     ),
@@ -265,6 +274,12 @@ onload = function(){
     miJumpB1.enabled = true;
     miJumpB2.enabled = true;
     miJumpB3.enabled = true;
+    miMute.enabled = true;
+    miVolumeUp.enabled = true;
+    miVolumeDown.enabled = true;
+    miToggleSubtitles.enabled = true;
+    miManageSubtitles.enabled = true;
+    miManageAudio.enabled = true;
   }
   function onPlayStopped(){
     onPaused();
@@ -280,6 +295,12 @@ onload = function(){
     miJumpB1.enabled = false;
     miJumpB2.enabled = false;
     miJumpB3.enabled = false;
+    miMute.enabled = false;
+    miVolumeUp.enabled = false;
+    miVolumeDown.enabled = false;
+    miToggleSubtitles.enabled = false;
+    miManageSubtitles.enabled = false;
+    miManageAudio.enabled = false;
   }
   function onPlaying(){
     miPlay.label = 'Pause';
