@@ -21,6 +21,6 @@
     "subplay": "^1.1.0",
     "time-format-utils": "^1.0.3",
     "underscore": "1.6.x",
-    "webchimera.js": "*"
+    "wcjs-prebuilt": "^2.0.6",
   }
 }
