@@ -254,7 +254,7 @@ onload = function(){
   $(dSubtitlesHint).hide();
   $(dHome).show();
 
-  require('nw.gui').Window.get().show();
+  setTimeout(function(){require('nw.gui').Window.get().show();},100);
 
   // --
 
