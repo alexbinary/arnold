@@ -113,7 +113,7 @@ SubtitlesWidget.prototype.selectItem = function(index,userInitiated){
           this.searchComplete = true;
           this.refresh(); // changing this.searchComplete requires a refresh
           this.emit('loading',false);
-          if(index) this.tracksman.subtitles(index);
+          if(index!==undefined) this.tracksman.subtitles(index);
           else this.emit('searchFailure',err);
         }).bind(this));
       } else if(item.action == 'load'){
