@@ -82,6 +82,24 @@ body {
   font-style: italic;
 }
 
+/*  error box appear on top of everything,
+    on the bottom */
+#dError {
+  position: absolute;
+  z-index: 1000;
+  left: 50px;
+  right: 50px;
+  bottom: 50px;
+  padding: 15px;
+  color: white;
+  background: rgba(180, 0, 0, 1);
+  border-radius: 5px;
+  box-shadow: 0 0 75px black;
+  font-size: 0.9em;
+  font-family: "Arial";
+  text-align: center;
+}
+
 /*  home screen covers the entire screen
     and appears on top of the player  */
 #dHome {

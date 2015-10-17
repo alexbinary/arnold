@@ -254,6 +254,17 @@ onload = function(){
     clearSubtitles();
   }
 
+  process.on('uncaughtException',onError);
+  process.on('unhandledRejection',onError);
+
+  function onError(err){
+    $(dError).text(err).toggle(true);
+  }
+  $(dError).on('click',function(){
+    $(dError).toggle(false);
+  })
+
+  $(dError).toggle(false);
   $(dSubtitlesHint).toggle(false);
   hidePlayer();
   audioWidget.hide();
