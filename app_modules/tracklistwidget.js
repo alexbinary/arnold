@@ -10,13 +10,17 @@
 'use strict';
 
 var $ = require('jquery');
+var EventEmitter = require('events');
 
 function TrackListWidget(root,tracksman){
+  EventEmitter.call(this);
   this.tracksman = tracksman;
   this.getUi(root);
   this.init();
   this.refresh();
 }
+require('util').inherits(TrackListWidget, EventEmitter);
+
 TrackListWidget.prototype.getUi = function(root){
   this.uiRoot = $(root);
 }

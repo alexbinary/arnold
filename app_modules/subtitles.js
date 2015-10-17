@@ -107,10 +107,12 @@ SubtitlesWidget.prototype.selectItem = function(index,userInitiated){
         if(userInitiated) this.hide();
         this.searchPending = true;
         this.update();
+        this.emit('loading',true);
         this.tracksman.searchSubtitles('en',1,(function(found,index){
           this.searchPending = false;
           this.searchComplete = true;
           this.refresh(); // changing this.searchComplete requires a refresh
+          this.emit('loading',false);
           if(found) this.tracksman.subtitles(index);
         }).bind(this));
       } else if(item.action == 'load'){

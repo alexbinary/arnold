@@ -134,6 +134,9 @@ onload = function(){
   var subtitlesWidget = new (require('./app_modules/subtitles'))(
     dSubtitlesWidget,gTracksman,selectFile
   );
+  subtitlesWidget.on('loading',function(loading){
+    $(dSubtitlesHint).toggle(loading);
+  });
 
   /*
    * application menu
@@ -251,6 +254,7 @@ onload = function(){
     clearSubtitles();
   }
 
+  $(dSubtitlesHint).toggle(false);
   hidePlayer();
   audioWidget.hide();
   subtitlesWidget.hide();

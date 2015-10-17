@@ -66,6 +66,22 @@ body {
   text-align: center;
 }
 
+/*  subtitles hint appear on top of the video,
+    on the bottom */
+#dSubtitlesHint {
+  position: absolute;
+  z-index: 110;
+  left: 50px;
+  right: 50px;
+  bottom: 50px;
+  color: white;
+  font-size: 2em;
+  text-shadow: 0 0 5px black;
+  font-family: "Arial";
+  text-align: center;
+  font-style: italic;
+}
+
 /*  home screen covers the entire screen
     and appears on top of the player  */
 #dHome {
@@ -185,7 +201,6 @@ body {
 .subtitlesSearch.loading .contentLoading {
   display: inline;
 }
-
 
 
 
