@@ -37,6 +37,9 @@ function Player(root, Event) {
 
   // map WebChimera callbacks to EventEmitter events for convenience
   this.playing = false;
+  this.vlc.onMediaChanged = (function(){
+    this.vlc.onStopped();
+  }).bind(this);
   this.vlc.onPlaying = (function() {
     if(!this.playing){
       this.playing = true;
