@@ -256,6 +256,7 @@ onload = function(){
 
   setTimeout(function(){
     require('nw.gui').Window.get().show();
+    require('nw.gui').Window.get().focus();
 
     var argv = require('nw.gui').App.argv;
     if(argv && argv.length > 0) {
