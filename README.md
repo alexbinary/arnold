@@ -44,6 +44,3 @@ npm install
 # Licence
 
 Everything public domain.
-
-Background image [rc/background.jpg](rc/background.jpg) provided by NASA  
-http://www.nasa.gov/centers/goddard/news/topstory/2008/spitzer_infrared.html
