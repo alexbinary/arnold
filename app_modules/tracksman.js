@@ -75,7 +75,8 @@ TracksMan.prototype.audio = function (track) {
     return this.activeAudioTrack;
   }
   for(var i=0 ; i<this.audioTracks.length ; i++) {
-    if(this.audioTracks[i].lang == track) {
+    if(this.audioTracks[i].lang
+    && this.audioTracks[i].lang == track) {
       return this.audio(i);
     }
   }
@@ -134,7 +135,8 @@ TracksMan.prototype.subtitles = function (track) {
   }
   if(this.activeSubtitlesTrack === undefined){
     for(var i=0 ; i<this.subtitlesTracks.length ; i++) {
-      if(this.subtitlesTracks[i].lang == track) {
+      if(this.subtitlesTracks[i].lang
+      && this.subtitlesTracks[i].lang == track){
         return this.subtitles(i);
       }
     }
