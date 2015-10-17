@@ -39,7 +39,11 @@ onload = function(){
       ' / '+
       require('time-format-utils').millisecondsToHhmmss(gPlayer.length())
     );
-  })
+  });
+
+  gPlayer.on('downloading',function(downloading){
+    $(dSubtitlesHintDownloading).toggle(downloading);
+  });
 
   /*
    * tracks manager
@@ -123,7 +127,7 @@ onload = function(){
     dSubtitlesWidget,gTracksman,selectFile
   );
   subtitlesWidget.on('loading',function(loading){
-    $(dSubtitlesHint).toggle(loading);
+    $(dSubtitlesHintSearching).toggle(loading);
   });
   subtitlesWidget.on('searchFailure',function(err){
     $(dSubtitlesHint).toggle(false);
@@ -331,7 +335,8 @@ onload = function(){
   }
 
   $(dError).hide();
-  $(dSubtitlesHint).hide();
+  $(dSubtitlesHintSearching).hide();
+  $(dSubtitlesHintDownloading).hide();
   onPlayStopped();
 
   setTimeout(function(){

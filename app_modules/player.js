@@ -165,6 +165,7 @@ Player.prototype.subtitles = function (s) {
 // try to detect encoding if omitted
 Player.prototype.setSubtitlesFile = function (uri, encoding) {
   if (uri.startsWith('http://')) {
+    this.emit('downloading',true);
     var dir  = '/tmp/arnold/srt';
     var name = new Date().getTime() + '.srt';
     var path = dir+'/'+name;
@@ -173,6 +174,7 @@ Player.prototype.setSubtitlesFile = function (uri, encoding) {
     .dest(dir)
     .rename(name)
     .run((function() {
+      this.emit('downloading',false);
       this.setSubtitlesFile(path, encoding);
     }).bind(this));
   } else {

@@ -66,9 +66,9 @@ body {
   text-align: center;
 }
 
-/*  subtitles hint appear on top of the video,
+/*  subtitles hints appear on top of the video,
     on the bottom */
-#dSubtitlesHint {
+.dSubtitlesHint {
   position: absolute;
   z-index: 110;
   left: 50px;
