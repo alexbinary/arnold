@@ -87,8 +87,8 @@ body {
 #dError {
   position: absolute;
   z-index: 1000;
-  left: 50px;
-  right: 50px;
+  left: -5px;
+  right: -5px;
   bottom: 50px;
   padding: 15px;
   color: white;
