@@ -9,7 +9,7 @@
 
 'use strict';
 
-var util         = require('util');
+var $ = require('jquery');
 var EventEmitter = require('events');
 
 /**
@@ -24,16 +24,16 @@ function Player(root, Event) {
   this.Event = Event;
 
   // UI elements
-  this.uiRoot         = root;
-  this.uiCanvas       = root.querySelector('.playerCanvas');
-  this.uiSubtitlesBox = root.querySelector('.playerSubtitlesBox');
+  this.uiRoot         = $(root);
+  this.uiCanvas       = this.uiRoot.find('.playerCanvas');
+  this.uiSubtitlesBox = this.uiRoot.find('.playerSubtitlesBox');
 
   // subtitles player
   this.updateSubtitles = function(){};
 
   // WebChimera player & renderer
   this.wcjs = require("../node_modules_hacked/wcjs-renderer");
-  this.vlc = this.wcjs.init(this.uiCanvas);
+  this.vlc = this.wcjs.init(this.uiCanvas[0]);
 
   // map WebChimera callbacks to EventEmitter events for convenience
   this.playing = false;
@@ -62,14 +62,12 @@ function Player(root, Event) {
     this.resize();
   }).bind(this));
 }
-util.inherits(Player, EventEmitter);
-
-module.exports = Player;
+require('util').inherits(Player, EventEmitter);
 
 // resize video canvas to fit available space
 // see node_modules_hacked/wcjs-renderer/index.js:191
 Player.prototype.resize = function () {
-  this.uiCanvas.dispatchEvent(new this.Event('webglcontextrestored'));
+  this.uiCanvas[0].dispatchEvent(new this.Event('webglcontextrestored'));
 }
 
 // play mrl, resumes playing if no mrl given
@@ -187,7 +185,7 @@ Player.prototype.setSubtitlesFile = function (uri, encoding) {
   }
 }
 Player.prototype.writeSubtitle = function (text) {
-  this.uiSubtitlesBox.innerHTML = text;
+  this.uiSubtitlesBox.text(text);
 }
 Player.prototype.stopExternalSubtitle = function () {
   this.updateSubtitles(-1);
@@ -225,3 +223,5 @@ Player.prototype.getSubtitlesTrack = function () {
 Player.prototype.getPlaylistItem = function () {
   return this.vlc.playlist.items[this.vlc.playlist.currentItem];
 }
+
+module.exports = Player;
