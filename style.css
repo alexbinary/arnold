@@ -82,6 +82,22 @@ body {
   font-style: italic;
 }
 
+/*  player paused hint appears on top of the video
+    in the top right corner */
+#dPlayerHintPaused {
+  position: absolute;
+  z-index: 200;
+  top: 50px;
+  right: 50px;
+  color: white;
+  font-size: 2em;
+  text-shadow: 0 0 2px black;
+  display: none;
+}
+.paused #dPlayerHintPaused {
+  display: block;
+}
+
 /*  error box appear on top of everything,
     on the bottom */
 #dError {

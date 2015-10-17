@@ -43,13 +43,19 @@ function Player(root, Event) {
       this.emit('started');
     }
     this.emit('playing');
+    this.uiRoot.removeClass('paused');
+    this.uiRoot.addClass('playing');
   }).bind(this);
   this.vlc.onPaused = (function() {
     this.emit('paused');
+    this.uiRoot.addClass('paused');
+    this.uiRoot.removeClass('playing');
   }).bind(this);
   this.vlc.onStopped = (function() {
     this.playing = false;
     this.emit('stopped');
+    this.uiRoot.removeClass('paused');
+    this.uiRoot.removeClass('playing');
   }).bind(this);
   this.vlc.onTimeChanged = (function(time) {
     this.updateSubtitles(time/1000);
