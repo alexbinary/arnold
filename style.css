@@ -173,6 +173,7 @@ body {
   font-size: 1em;
   text-align: center;
   color: lightgrey;
+  min-width: 200px;
 }
 #dAudioWidget th,
 #dAudioWidget td,
