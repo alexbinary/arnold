@@ -92,10 +92,25 @@ body {
   color: white;
   font-size: 2em;
   text-shadow: 0 0 2px black;
+  text-align: right;
   display: none;
 }
 .paused #dPlayerHintPaused {
   display: block;
+}
+
+/*  player time hint appears on top of the video
+    in the top right corner, below the paused hint */
+#dPlayerHintTime {
+  position: absolute;
+  z-index: 200;
+  top: 250px;
+  right: 50px;
+  color: white;
+  font-size: 2em;
+  text-shadow: 0 0 2px black;
+  text-align: right;
+  display: none;
 }
 
 /*  error box appear on top of everything,

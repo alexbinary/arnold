@@ -33,6 +33,14 @@ onload = function(){
   gPlayer.on('playing',onPlaying);
   gPlayer.on('paused',onPaused);
 
+  gPlayer.on('timeChanged',function(time){
+    $(dPlayerHintTime).text(
+      require('time-format-utils').millisecondsToHhmmss(time)+
+      ' / '+
+      require('time-format-utils').millisecondsToHhmmss(gPlayer.length())
+    );
+  })
+
   /*
    * tracks manager
    */
@@ -135,7 +143,7 @@ onload = function(){
       miJumpF1,miJumpF2,miJumpF3,
       miJumpB1,miJumpB2,miJumpB3,
       miMute,miVolumeUp,miVolumeDown,
-      miToggleSubtitles,
+      miToggleTime,miToggleSubtitles,
       miManageSubtitles,miManageAudio;
 
   mb.menu('Play',[
@@ -204,6 +212,12 @@ onload = function(){
     ),
     mb.separator(
     ),
+    miToggleTime = mb.item('Toggle time',function(){
+     $(dPlayerHintTime).toggle();
+    },'t'
+    ),
+    mb.separator(
+    ),
     miMute = mb.item('Mute/Unmute',function(){
       gPlayer.toggleMute();
     },'m','ctrl'
@@ -266,6 +280,7 @@ onload = function(){
     subtitlesWidget.hide();
     $(dHome).hide();
     $(dPlayer).show();
+    $(dPlayerHintTime).hide();
     miPlay.enabled = true;
     miStop.enabled = true;
     miJumpF1.enabled = true;
@@ -277,6 +292,7 @@ onload = function(){
     miMute.enabled = true;
     miVolumeUp.enabled = true;
     miVolumeDown.enabled = true;
+    miToggleTime.enabled = true;
     miToggleSubtitles.enabled = true;
     miManageSubtitles.enabled = true;
     miManageAudio.enabled = true;
@@ -288,6 +304,7 @@ onload = function(){
     subtitlesWidget.initState();
     $(dHome).show();
     $(dPlayer).hide();
+    $(dPlayerHintTime).hide();
     miPlay.enabled = false;
     miStop.enabled = false;
     miJumpF1.enabled = false;
@@ -299,6 +316,7 @@ onload = function(){
     miMute.enabled = false;
     miVolumeUp.enabled = false;
     miVolumeDown.enabled = false;
+    miToggleTime.enabled = false;
     miToggleSubtitles.enabled = false;
     miManageSubtitles.enabled = false;
     miManageAudio.enabled = false;
