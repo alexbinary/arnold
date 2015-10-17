@@ -128,12 +128,8 @@ onload = function(){
   mb.initMenuBar();
   mb.createMacBuiltin();
 
-  mb.menu('Play', [
+  mb.menu('Play',[
 
-    mb.item('Fullscreen',function(){
-     require('nw.gui').Window.get().toggleFullscreen();
-    },'f','cmd'
-    ),
     mb.item('Play/Pause',function(){
       gPlayer.togglePause();
     },'p','cmd'
@@ -141,33 +137,6 @@ onload = function(){
     mb.item('Stop',function(){
       gPlayer.stop();
     },'s','cmd'
-    ),
-    mb.item('Mute/Unmute',function(){
-      gPlayer.toggleMute();
-    },'m','ctrl'
-    ),
-    mb.item('Increase volume',function(){
-      gPlayer.volume(gPlayer.volume()+10);
-    },
-     String.fromCharCode(30), // arrow up
-     'cmd'
-    ),
-    mb.item('Decrease volume',function(){
-      gPlayer.volume(gPlayer.volume()-10);
-    },
-      String.fromCharCode(31), // arrow down
-      'cmd'
-    ),
-    mb.item('Toggle subtitles',function(){
-      if(gPlayer.playing) subtitlesWidget.toggleSubtitles();
-    },'l'),
-    mb.item('Manage subtitles',function(){
-      subtitlesWidget.toggleVisible();
-    },'l','ctrl'
-    ),
-    mb.item('Manage audio',function(){
-      audioWidget.toggleVisible();
-    },'b','ctrl'
     ),
     mb.separator(
     ),
@@ -189,6 +158,8 @@ onload = function(){
      String.fromCharCode(29), // arrow right
      'cmd'
     ),
+    mb.separator(
+    ),
     mb.item('Jump -1s',function(){
      gPlayer.jump(-1000*1);
     },
@@ -206,6 +177,47 @@ onload = function(){
     },
      String.fromCharCode(28), // arrow left
      'cmd'
+    ),
+  ]);
+  
+  mb.menu('Video',[
+
+    mb.item('Fullscreen',function(){
+     require('nw.gui').Window.get().toggleFullscreen();
+    },'f','cmd'
+    ),
+    mb.separator(
+    ),
+    mb.item('Mute/Unmute',function(){
+      gPlayer.toggleMute();
+    },'m','ctrl'
+    ),
+    mb.item('Increase volume',function(){
+      gPlayer.volume(gPlayer.volume()+10);
+    },
+     String.fromCharCode(30), // arrow up
+     'cmd'
+    ),
+    mb.item('Decrease volume',function(){
+      gPlayer.volume(gPlayer.volume()-10);
+    },
+      String.fromCharCode(31), // arrow down
+      'cmd'
+    ),
+    mb.separator(
+    ),
+    mb.item('Toggle subtitles',function(){
+      if(gPlayer.playing) subtitlesWidget.toggleSubtitles();
+    },'l'),
+    mb.item('Manage subtitles',function(){
+      subtitlesWidget.toggleVisible();
+    },'l','ctrl'
+    ),
+    mb.separator(
+    ),
+    mb.item('Manage audio',function(){
+      audioWidget.toggleVisible();
+    },'b','ctrl'
     ),
   ]);
 
