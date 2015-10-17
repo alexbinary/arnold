@@ -131,7 +131,9 @@ onload = function(){
   mb.initMenuBar();
   mb.createMacBuiltin();
 
-  var miPlay,miStop;
+  var miPlay,miStop,
+      miJumpF1,miJumpF2,miJumpF3,
+      miJumpB1,miJumpB2,miJumpB3;
 
   mb.menu('Play',[
 
@@ -145,19 +147,19 @@ onload = function(){
     ),
     mb.separator(
     ),
-    mb.item('Jump +1s',function(){
+    miJumpF1 = mb.item('Jump +1s',function(){
      gPlayer.jump(+1000*1);
     },
      String.fromCharCode(29), // arrow right
      'shift'
     ),
-    mb.item('Jump +10s',function(){
+    miJumpF2 = mb.item('Jump +10s',function(){
      gPlayer.jump(+1000*10);
     },
      String.fromCharCode(29), // arrow right
      'alt'
     ),
-    mb.item('Jump +1min',function(){
+    miJumpF3 = mb.item('Jump +1min',function(){
      gPlayer.jump(+1000*60);
     },
      String.fromCharCode(29), // arrow right
@@ -165,19 +167,19 @@ onload = function(){
     ),
     mb.separator(
     ),
-    mb.item('Jump -1s',function(){
+    miJumpB1 = mb.item('Jump -1s',function(){
      gPlayer.jump(-1000*1);
     },
      String.fromCharCode(28), // arrow left
      'shift'
     ),
-    mb.item('Jump -10s',function(){
+    miJumpB2 = mb.item('Jump -10s',function(){
      gPlayer.jump(-1000*10);
     },
      String.fromCharCode(28), // arrow left
      'alt'
     ),
-    mb.item('Jump -1min',function(){
+    miJumpB3 = mb.item('Jump -1min',function(){
      gPlayer.jump(-1000*60);
     },
      String.fromCharCode(28), // arrow left
@@ -257,6 +259,12 @@ onload = function(){
     $(dPlayer).show();
     miPlay.enabled = true;
     miStop.enabled = true;
+    miJumpF1.enabled = true;
+    miJumpF2.enabled = true;
+    miJumpF3.enabled = true;
+    miJumpB1.enabled = true;
+    miJumpB2.enabled = true;
+    miJumpB3.enabled = true;
   }
   function onPlayStopped(){
     onPaused();
@@ -266,6 +274,12 @@ onload = function(){
     $(dPlayer).hide();
     miPlay.enabled = false;
     miStop.enabled = false;
+    miJumpF1.enabled = false;
+    miJumpF2.enabled = false;
+    miJumpF3.enabled = false;
+    miJumpB1.enabled = false;
+    miJumpB2.enabled = false;
+    miJumpB3.enabled = false;
   }
   function onPlaying(){
     miPlay.label = 'Pause';
