@@ -9,6 +9,8 @@
 
 'use strict';
 
+var $ = require('jquery');
+
 onload = function(){
 
   var selectFile = require('./app_modules/selectfile')($);
