@@ -254,7 +254,14 @@ onload = function(){
   $(dSubtitlesHint).hide();
   $(dHome).show();
 
-  setTimeout(function(){require('nw.gui').Window.get().show();},100);
+  setTimeout(function(){
+    require('nw.gui').Window.get().show();
+
+    var argv = require('nw.gui').App.argv;
+    if(argv && argv.length > 0) {
+      openFile(argv[0]);
+    }
+  },100);
 
   // --
 
