@@ -5,6 +5,8 @@ advanced media center based on VLC and NW.js
 
 Arnold runs fine on OSX. Windows and Linux are not supported for now.
 
+To install from source you need [git](http://git-scm.com/download/mac) and [npm](https://nodejs.org/dist/v5.0.0/node-v5.0.0.pkg).
+
 ## Mac OSX
 
 1. Download and install [NW.js](http://nwjs.io)
