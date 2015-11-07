@@ -3,6 +3,8 @@ advanced media center based on VLC and NW.js
 
 # Install from source & run
 
+Arnold runs fine on OSX. Windows and Linux are not supported for now.
+
 ## Mac OSX
 
 1. Download and install [NW.js](http://nwjs.io)
