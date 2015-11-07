@@ -21,7 +21,7 @@ mv nwjs.app arnold.app
 ```
 git clone https://github.com/alexbinary/arnold.git arnold.app/Contents/Resources/app.nw
 cd arnold.app/Contents/Resources/app.nw
-npm install
+sudo npm install
 cd ../../../../
 ```
 
@@ -35,7 +35,7 @@ Then to update with latest code run :
 ```
 cd arnold.app/Contents/Resources/app.nw
 git pull
-npm install
+sudo npm install
 ```
 
 # Licence
