@@ -1,9 +1,13 @@
 # arnold
 advanced media center based on VLC and NW.js
 
-# Install from source & run
+# Download
 
-Arnold runs fine on OSX. Windows and Linux are not supported for now.
+You can download a ready-to-use package for MacOSX at http://bintz.io/arnold/arnold-v0.1.0d.app.zip
+
+Windows and Linux are not supported for now.
+
+# Install from source & run
 
 To install from source you need [git](http://git-scm.com/download/mac) and [npm](https://nodejs.org/dist/v5.0.0/node-v5.0.0.pkg).
 
